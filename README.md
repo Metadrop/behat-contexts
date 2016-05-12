@@ -43,7 +43,7 @@ This report includes:
 
 - Then save a capture full page with width of :width to :path with name :filename
 
-  Saves a screenshot of current page with the given width to a file in the given path to a given filename.
+   Saves a screenshot of current page with the given width to a file in the given path to a given filename.
 
  - Then save last response
 
