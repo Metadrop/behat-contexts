@@ -45,11 +45,11 @@ This report includes:
 
    Saves a screenshot of current page with the given width to a file in the given path to a given filename.
 
- - Then save last response
+- Then save last response
 
    Saves page content to a file.
 
- - Then save last response to :path
+- Then save last response to :path
 
    Saves page content to a file in the given path.
 
