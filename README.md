@@ -33,9 +33,17 @@ This report includes:
 
    Saves a screenshot of current page with the given width to a file.
 
+ - Then capture full page with a width of :width with name :filename in configured directory (screenshots_path).
+
+   Saves a screenshot of current page with the given width to a given filename in configured directory (screenshots_path).
+
  - Then save a capture full page with width of :width to :path
 
    Saves a screenshot of current page with the given width to a file in the given path.
+
+- Then save a capture full page with width of :width to :path with name :filename
+
+  Saves a screenshot of current page with the given width to a file in the given path to a given filename.
 
  - Then save last response
 
