@@ -24,20 +24,20 @@ class DrupalUtilsContext extends RawDrupalContext implements SnippetAcceptingCon
   }
 
   /**
-   * Check the user with a specific mail ($email) have a specific role ($role)
+   * Check the user with a specific mail have a specific role.
    *
    * @param string $mail
-   *  Value Mail
+   *  Value mail
    * @param string $role
    *   Rol name
    *
-   * @Then /^I user with mail "([^"]*)" should have the role "([^"]*)"$/
+   * @Then /^user with mail "([^"]*)" should have the role "([^"]*)"$/
    */
-  public function iUserWithMailShouldHaveTheRole($mail, $role) {
-    $last_uid = db_query("SELECT uid FROM {users} WHERE mail= :mail", array(':mail' => $mail))->fetchField();
-    $account = user_load($last_uid);
+  public function userWithMailShouldHaveTheRole($mail, $role) {
+    $uid = db_query("SELECT uid FROM {users} WHERE mail= :mail", array(':mail' => $mail))->fetchField();
+    $account = user_load($uid);
     if (!in_array($role, $account->roles)) {
-      throw new Exception("Current user has not the role $role");
+      throw new Exception("Given user has not the role $role");
     }
   }
 }
