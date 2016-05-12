@@ -53,6 +53,10 @@ This report includes:
 
    Saves page content to a file in the given path.
 
+ - Then save last response to :path
+
+   Halts test for a given amount of seconds. Useful when debugging tests with timing issues. Don't use this step in real tests.
+
 #### Configuration
   Add DebugContext to your suite
 

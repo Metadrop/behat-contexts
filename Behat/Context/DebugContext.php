@@ -276,4 +276,13 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
     $error_page_filepath = $path . '/' . $filename . '.html';
     file_put_contents($error_page_filepath, $this->getSession()->getPage()->getContent());
   }
+
+  /**
+   * @Given /^I wait for "([^"]*)" seconds$/
+   *
+   * Wait seconds before the next step.
+   */
+  public function iWaitForSeconds($seconds) {
+    sleep($seconds);
+  }
 }
