@@ -232,13 +232,27 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
   }
 
   /**
+   * @Then capture full page with a width of :width with name :filename
+   */
+  public function captureFullPageWithAWidthOfWithFilename($width, $filename) {
+    $this->saveACaptureFullPageWithWidthOfToWithName($width, $this->getScreenshotsPath(), $filename);
+  }
+
+  /**
    * @Then save a capture full page with width of :width to :path
    */
   public function saveACaptureFullPageWithWidthOfTo($width, $path) {
-    // Use default height as screenshot is going to capture the complete page.
-    $this->getSession()->resizeWindow($width, $this::DEFAULT_HEIGHT, 'current');
     $milliseconds = gettimeofday();
     $filename = 'Screenshot-' . date("Ymd--H-i-s") . '.' . $milliseconds['usec'] . '.png';
+    $this->saveACaptureFullPageWithWidthOfToWithName($width, $path, $filename);
+  }
+
+  /**
+   * @Then save a capture full page with width of :width to :path with name :filename
+   */
+  public function saveACaptureFullPageWithWidthOfToWithName($width, $path, $filename) {
+    // Use default height as screenshot is going to capture the complete page.
+    $this->getSession()->resizeWindow($width, $this::DEFAULT_HEIGHT, 'current');
     $this->savescreenShot($filename, $path);
   }
 
