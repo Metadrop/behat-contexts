@@ -15,13 +15,12 @@ use Drupal\DrupalExtension\Context\RawDrupalContext;
 class DrupalUtilsContext extends RawDrupalContext implements SnippetAcceptingContext {
 
   /**
-   * @Given /^I run elysia-cron$/
+   * @Given I run elysia cron
    *
-   * Run elysia-cron
+   * Run elysia-cron.
    */
   public function iRunElysiaCron() {
     elysia_cron_run(TRUE);
-
   }
 
   /**
