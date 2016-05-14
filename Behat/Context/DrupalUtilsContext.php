@@ -40,4 +40,21 @@ class DrupalUtilsContext extends RawDrupalContext implements SnippetAcceptingCon
       throw new Exception("Given user has not the role $role");
     }
   }
+
+  /**
+   * Checks if a form element is required.
+   *
+   * It relys on the requeried class added to he element by Drupal. This
+   * approach doesn't work with file type input elements.
+   *
+   * @Then form :type element :label should be required
+   */
+  public function formElementShouldBeRequired($type, $label) {
+    $page = $this->getSession()->getPage();
+    $xpath = "//label[contains(text(), '{$label}')]/..//{$type}[contains(@class, 'required')]";
+    $element = $page->find('xpath', $xpath);
+    if (NULL === $element) {
+      throw new \InvalidArgumentException("Could not find the form element \"$label\" of type \"$type\"");
+    }
+  }
 }
