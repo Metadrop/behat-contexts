@@ -15,35 +15,32 @@ use Drupal\DrupalExtension\Context\RawDrupalContext;
 class BrowserUtilsContext extends RawDrupalContext implements SnippetAcceptingContext {
 
   /**
-   * @Then I check element :name has the :elect selected
-   * @TODO la variable $label no pinta el texto al fallar el step
+   * @Then select :name should have the option :option selected
+   *
    */
-  public function elementHasTheSelected($name ,$elect) {
-    $session = $this->getSession();
-    $label = $session->getPage()->find('xpath', '//*/div[contains(@class,"form-type-select")]/label[contains(text(), "' . $name . '")]');
-    $opt = $session->getPage()->find('xpath', '//*/select/option[contains(@selected, "selected")][contains(text(), "' . $elect . '")]');
-    if (NULL === $label) {
-      throw new \InvalidArgumentException('name: ' . $name . ' != a label: ' . $label . "" );
-    }
-    elseif (NULL === $opt) {
-      throw new \InvalidArgumentException('elect ' . $elect . ' != a opt: ' . $opt . "");
-    }
-  }
-
-  /**
-   * @Then form :arg1 element :arg2 is required
-   */
-  public function formElementIsRequired($type, $label) {
+  public function selectShouldHaveTheOptionSelected($name, $option) {
+    // Get the select element.
     $page = $this->getSession()->getPage();
-    $xpath = "//label[contains(*, '{$label}')]/../{$type}[contains(@class, 'required')]";
-    $element = $page->find('xpath', $xpath);
-    if (null === $element) {
-      throw new \InvalidArgumentException(sprintf('Could not evaluate XPath: "%s"', $xpath));
+    $element = $page->findField($name);
+
+    if (NULL === $element) {
+      throw new \InvalidArgumentException("Select with id|name|label \"$name\" not found.");
+    }
+
+    // Look for the given option.
+    $option_elem = $element->find('named', array('option', $option));
+    if (NULL === $option_elem) {
+      throw new \InvalidArgumentException("Select \"$name\" doesn't have any option with key or value like \"$option\".");
+    }
+
+    if (!$option_elem->isSelected()) {
+      throw new \InvalidArgumentException("Select \"$name\" doesn't have the option \"$option\" selected.");
     }
   }
 
   /**
-   * @Then I check element :arg1 is disabled
+   * @Then element :name should be disabled
+   *
    */
   public function elementIsDisabled($name) {
     $session = $this->getSession();
@@ -53,45 +50,55 @@ class BrowserUtilsContext extends RawDrupalContext implements SnippetAcceptingCo
       throw new Exception('Element "' . $name . '" is not disabled.');
     }
     elseif ($element === NULL) {
-      throw new Exception('Element not exists.');
+      throw new \InvalidArgumentException('Element not exists.');
     }
   }
 
   /**
    * Click on the element with the provided xpath query
    *
-   * @When /^I click on the element with xpath "([^"]*)"$/
+   * @When I click on the element with xpath :xpath
+   *
    */
   public function iClickOnTheElementWithXPath($xpath) {
-    $session = $this->getSession(); // get the mink session
-    $element = $session->getPage()->find('xpath', $session->getSelectorsHandler()->selectorToXpath('xpath', $xpath)); // runs the actual query and returns the element
-    // errors must not pass silently
-    if (null === $element) {
-      throw new \InvalidArgumentException(sprintf('Could not evaluate XPath: "%s"', $xpath));
+    $session = $this->getSession();
+    $element = $session->getPage()->find('xpath', $session->getSelectorsHandler()->selectorToXpath('xpath', $xpath));
+    if (NULL === $element) {
+      throw new \InvalidArgumentException("XPath expression '$xpath' didn't match any element");
     }
 
-    // ok, let's click on it
+    // Ok, let's click on it.
     $element->click();
   }
 
   /**
-   * @Given /^I select the radio button with name "([^"]*)"$/
+   * @Given I select the radio button with name :name
+   *
+   * This step is useful when a fancy radio buttons are used, for example
+   * hiding the radio button so only the label is visible.
+   *
    */
   public function iSelectTheRadioButtonWithName($name) {
     $session = $this->getSession();
     $element = $session->getPage()->find('xpath', "//label[contains(*, '{$name}')]/../input");
-    // errors must not pass silently
+
+    $element = $this->findElementWithName($name);
+
     if (NULL === $element) {
-      throw new \InvalidArgumentException(sprintf('No se ha encontrado el name ' . $name));
+      throw new \InvalidArgumentException("Could not find the input '$name'");
     }
-    // ok, let's click on it
+    // Ok, let's click on it
     $element->click();
   }
 
   /**
    * Checks, that form element with specified label is visible on page.
    *
-   * @Then I should see a :label textfield form element
+   * @NOTE: This is dependant of how the textfield is renderedd, it may not work
+   * for certain themes of configurations (Fences module?).
+   *
+   * @Then /^(?:|I )should see a "(?P<text>(?:[^"]|\\")*)" textfield form element$/
+   *
    */
   public function iShouldSeeATextfieldFormElement($label) {
     $page = $this->getSession()->getPage();
@@ -102,26 +109,30 @@ class BrowserUtilsContext extends RawDrupalContext implements SnippetAcceptingCo
         return;
       }
       else {
-        throw new \InvalidArgumentException("Form item with label \"$label\" not visible.");
+        throw new \InvalidArgumentException("Textfield item with label \"$label\" is not visible.");
       }
     }
     else {
-      throw new \InvalidArgumentException("Form item with label \"$label\" not found.");
+      throw new \InvalidArgumentException("Textfield item with label \"$label\" not found.");
     }
   }
 
   /**
    * Checks, that form element with specified label is visible on page.
    *
+   * @see iShouldSeeATextfieldFormElement().
+   *
    * @Then I should not see a :label textfield form element
    */
   public function iShouldNotSeeATextfieldFormElement($label) {
-    $page = $this->getSession()->getPage();
-    $xpath = "//label[contains(*, '{$label}') or contains(text(), '{$label}')]/../input";
-    $element = $page->find('xpath', $xpath);
-    if ($element !== NULL && $element->isVisible()) {
-      throw new \InvalidArgumentException("Form item with label \"$label\" is visible.");
+    try {
+      $this->iShouldSeeATextfieldFormElement($label);
+    } catch (\InvalidArgumentException $ex) {
+      // Textfield is not visible or present, step is ok.
+      return;
     }
+    // Textfield was found inside the try-catch, throw error.
+    throw new \InvalidArgumentException("Textfield with label \"$label\" is present and visible.");
   }
 
   /**
