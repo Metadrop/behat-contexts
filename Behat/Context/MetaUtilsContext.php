@@ -44,7 +44,7 @@ class MetaUtilsContext extends RawDrupalContext implements SnippetAcceptingConte
     $this->metadataCheck("name='twitter:description'", $description);
     var_dump($this->metadataCheck());
     if (is_null($this->metadataCheck())){
-      throw new Exception('Error twitter');
+      throw new \Exception('Error twitter');
     }
   }
   /**
@@ -56,7 +56,7 @@ class MetaUtilsContext extends RawDrupalContext implements SnippetAcceptingConte
     $this->metadataCheck("property='og:description'", $description);
     var_dump($this->metadataCheck());
     if (is_null($this->metadataCheck())) {
-      throw new Exception('Error twitter');
+      throw new \Exception('Error twitter');
     }
 
   }
