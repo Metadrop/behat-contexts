@@ -70,16 +70,16 @@ class BrowserSizeContext extends RawDrupalContext implements SnippetAcceptingCon
    *
    * @See $defaults
    *
-   * @Given Browser window size is :arg1
+   * @Given Browser window size is :size
    */
-  public function browserWindowSizeIs($name) {
-      if (array_key_exists($name, $this->customParameters)) {
-        $size = $this->customParameters[$name];
+  public function browserWindowSizeIs($size) {
+      if (array_key_exists($size, $this->customParameters['sizes'])) {
+        $size = $this->customParameters['sizes'][$size];
         $this->getSession()->resizeWindow($size['width'], $size['height'], 'current');
         print_r("Browser Window Size: " . $size['width'] . "x" . $size['height'] . " px");
       }
       else {
-        throw new Exception('Need select one of: ' . "\n" . implode("\n" , array_keys($this->customParameters)));
+        throw new \Exception('Unknown size $size. It shoul dbe one of: "' . implode("\",\"" , array_keys($this->customParameters['sizes'])) . '"');
     }
   }
 }
