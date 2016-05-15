@@ -70,7 +70,7 @@ class BrowserSizeContext extends RawDrupalContext implements SnippetAcceptingCon
    *
    * @See $defaults
    *
-   * @Given Browser window size is :size
+   * @Given (that ) browser window size is :size size
    */
   public function browserWindowSizeIs($size) {
       if (array_key_exists($size, $this->customParameters['sizes'])) {
@@ -79,7 +79,13 @@ class BrowserSizeContext extends RawDrupalContext implements SnippetAcceptingCon
         print_r("Browser Window Size: " . $size['width'] . "x" . $size['height'] . " px");
       }
       else {
-        throw new \Exception('Unknown size $size. It shoul dbe one of: "' . implode("\",\"" , array_keys($this->customParameters['sizes'])) . '"');
+        $sizes = array();
+        foreach ($this->customParameters['sizes'] as $size_name => $size_dimensions) {
+          $sizes[] = "\"$size_name\" (" . $size_dimensions['width'] . "x" . $size_dimensions['height'] . ')';
+        }
+
+
+        throw new \Exception("Unknown size $size. It should be one of: " . implode(", " , $sizes));
     }
   }
 }
