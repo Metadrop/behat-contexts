@@ -154,6 +154,24 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
   }
 
   /**
+   * Get absolute path for a screenshot path.
+   *
+   * If given path is abislutem return it as is. If relative, add screenshots
+   * configured path.
+   *
+   * @param string $path
+   *   Path to turn into an absloute path.
+   * @return string
+   *   Screenshot absolute path.
+   */
+  public function getScreenshotAbsolutePath($path) {
+    if ($path[0] !== '/') {
+      $path = $this->getScreenshotsPath() . '/' . $path;
+    }
+    return $path;
+  }
+
+  /**
    * Returns the template for the files of the repor.
    *
    * All files form a report share the same name but extension is different.
@@ -239,21 +257,21 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
   }
 
   /**
-   * @Then save a capture full page with width of :width to :path
+   * @Then capture full page with width of :width to :path
    */
-  public function saveACaptureFullPageWithWidthOfTo($width, $path) {
+  public function captureFullPageWithWidthOfTo($width, $path) {
     $milliseconds = gettimeofday();
     $filename = 'Screenshot-' . date("Ymd--H-i-s") . '.' . $milliseconds['usec'] . '.png';
-    $this->saveACaptureFullPageWithWidthOfToWithName($width, $path, $filename);
+    $this->saveACaptureFullPageWithWidthOfToWithName($width, $this->getScreenshotAbsolutePath($path), $filename);
   }
 
   /**
-   * @Then save a capture full page with width of :width to :path with name :filename
+   * @Then capture full page with width of :width to :path with name :filename
    */
-  public function saveACaptureFullPageWithWidthOfToWithName($width, $path, $filename) {
+  public function captureFullPageWithWidthOfToWithName($width, $path, $filename) {
     // Use default height as screenshot is going to capture the complete page.
     $this->getSession()->resizeWindow($width, $this::DEFAULT_HEIGHT, 'current');
-    $this->savescreenShot($filename, $path);
+    $this->savescreenShot($filename, $this->getScreenshotAbsolutePath($path));
   }
 
   /**
