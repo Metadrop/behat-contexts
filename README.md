@@ -39,11 +39,11 @@ This report includes:
 
  - Then capture full page with width of :width to :path
 
-   Saves a screenshot of current page with the given width to a file in the given path.
+   Saves a screenshot of current page with the given width to a file in the given path. If path is relative screenshots_path config value is used as root.
 
 - Then capture full page with width of :width to :path with name :filename
 
-   Saves a screenshot of current page with the given width to a file in the given path to a given filename.
+   Saves a screenshot of current page with the given width to a file in the given path to a given filename. If path is relative screenshots_path config value is used as root.
 
 - Then save last response
 
