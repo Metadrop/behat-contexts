@@ -154,6 +154,24 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
   }
 
   /**
+   * Get absolute path for a screenshot path.
+   *
+   * If given path is absolute return it as is. If relative, add screenshots
+   * configured path.
+   *
+   * @param string $path
+   *   Path to turn into an absloute path.
+   * @return string
+   *   Screenshot absolute path.
+   */
+  public function getScreenshotAbsolutePath($path) {
+    if ($path[0] !== '/') {
+      $path = $this->getScreenshotsPath() . '/' . $path;
+    }
+    return $path;
+  }
+
+  /**
    * Returns the template for the files of the repor.
    *
    * All files form a report share the same name but extension is different.
@@ -239,25 +257,25 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
   }
 
   /**
-   * @Then save a capture full page with width of :width to :path
+   * @Then capture full page with width of :width to :path
    */
-  public function saveACaptureFullPageWithWidthOfTo($width, $path) {
+  public function captureFullPageWithWidthOfTo($width, $path) {
     $milliseconds = gettimeofday();
     $filename = 'Screenshot-' . date("Ymd--H-i-s") . '.' . $milliseconds['usec'] . '.png';
-    $this->saveACaptureFullPageWithWidthOfToWithName($width, $path, $filename);
+    $this->saveACaptureFullPageWithWidthOfToWithName($width, $this->getScreenshotAbsolutePath($path), $filename);
   }
 
   /**
-   * @Then save a capture full page with width of :width to :path with name :filename
+   * @Then capture full page with width of :width to :path with name :filename
    */
-  public function saveACaptureFullPageWithWidthOfToWithName($width, $path, $filename) {
+  public function captureFullPageWithWidthOfToWithName($width, $path, $filename) {
     // Use default height as screenshot is going to capture the complete page.
     $this->getSession()->resizeWindow($width, $this::DEFAULT_HEIGHT, 'current');
-    $this->savescreenShot($filename, $path);
+    $this->savescreenShot($filename, $this->getScreenshotAbsolutePath($path));
   }
 
   /**
-   * @Given /^save last response$/
+   * @Given save last response
    *
    * Step to save page content to a file.
    */
@@ -275,5 +293,20 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
     $filename = 'PageContent-' . date("Ymd--H-i-s") . '.' . $milliseconds['usec'];
     $error_page_filepath = $path . '/' . $filename . '.html';
     file_put_contents($error_page_filepath, $this->getSession()->getPage()->getContent());
+  }
+
+  /**
+   * @Then I wait for :seconds second(s)
+   *
+   * Wait seconds before the next step.
+   *
+   * @param int|string $seconds
+   *   Number of seconds to wait. Must be an integer value.
+   */
+  public function iWaitForSeconds($seconds) {
+    if (!filter_var($seconds, FILTER_VALIDATE_INT) !== false) {
+      throw new \InvalidArgumentException("Expected a valid integer number of seconds but given value \"$seconds\" is invalid.");
+    }
+    sleep($seconds);
   }
 }
