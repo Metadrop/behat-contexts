@@ -156,7 +156,7 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
   /**
    * Get absolute path for a screenshot path.
    *
-   * If given path is abislutem return it as is. If relative, add screenshots
+   * If given path is absolute return it as is. If relative, add screenshots
    * configured path.
    *
    * @param string $path
