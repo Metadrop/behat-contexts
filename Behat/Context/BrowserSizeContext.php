@@ -40,7 +40,6 @@ class BrowserSizeContext extends RawDrupalContext implements SnippetAcceptingCon
    * @param array $parameters
    */
   public function __construct($parameters) {
-
     // Default values.
     $this->customParameters = array(
       'sizes' => array(
@@ -73,19 +72,17 @@ class BrowserSizeContext extends RawDrupalContext implements SnippetAcceptingCon
    * @Given (that ) browser window size is :size size
    */
   public function browserWindowSizeIs($size) {
-      if (array_key_exists($size, $this->customParameters['sizes'])) {
-        $size = $this->customParameters['sizes'][$size];
-        $this->getSession()->resizeWindow($size['width'], $size['height'], 'current');
-        print_r("Browser Window Size: " . $size['width'] . "x" . $size['height'] . " px");
+    if (array_key_exists($size, $this->customParameters['sizes'])) {
+      $size = $this->customParameters['sizes'][$size];
+      $this->getSession()->resizeWindow($size['width'], $size['height'], 'current');
+      print_r("Browser Window Size: " . $size['width'] . "x" . $size['height'] . " px");
+    }
+    else {
+      $sizes = array();
+      foreach ($this->customParameters['sizes'] as $size_name => $size_dimensions) {
+        $sizes[] = "\"$size_name\" (" . $size_dimensions['width'] . "x" . $size_dimensions['height'] . ')';
       }
-      else {
-        $sizes = array();
-        foreach ($this->customParameters['sizes'] as $size_name => $size_dimensions) {
-          $sizes[] = "\"$size_name\" (" . $size_dimensions['width'] . "x" . $size_dimensions['height'] . ')';
-        }
-
-
-        throw new \InvalidArgumentException("Unknown size $size. It should be one of: " . implode(", " , $sizes));
+      throw new \InvalidArgumentException("Unknown size $size. It should be one of: " . implode(", " , $sizes));
     }
   }
 }
