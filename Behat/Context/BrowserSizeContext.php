@@ -85,7 +85,7 @@ class BrowserSizeContext extends RawDrupalContext implements SnippetAcceptingCon
         }
 
 
-        throw new \Exception("Unknown size $size. It should be one of: " . implode(", " , $sizes));
+        throw new \InvalidArgumentException("Unknown size $size. It should be one of: " . implode(", " , $sizes));
     }
   }
 }
