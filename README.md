@@ -92,6 +92,12 @@ default:
   be used with a real browser driver like Selenium. Its main purpose is to ease
   tests that depends on window size.
 
+  Keep in mind  that browser window size may not change between scenarios or
+  features, even differnet test execution. For example, if you use PhantomJS
+  the same browser is used for all tests execution (given that PhantomJS is not
+  terminated and executed again). So if a test changes the window size next
+  tests with the @javadcript tag will be performed with that window size.
+
 
 #### Steps
 
