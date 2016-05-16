@@ -275,7 +275,7 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
   }
 
   /**
-   * @Given /^save last response$/
+   * @Given save last response
    *
    * Step to save page content to a file.
    */
