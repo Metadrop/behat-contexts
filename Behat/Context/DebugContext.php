@@ -181,7 +181,10 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
    */
   public function getFilenameReportTemplate() {
     if (empty($this->filenameTemplate)) {
-      $this->filenameTemplate = 'Error-' . date("Ymd--H-i-s") . '_' . basename($this->feature->getFile(), '.feature') . '_line_' . $this->step->getLine();
+      list($usec, $sec) = explode(' ', microtime());
+      $usec = str_replace("0.", ".", $usec);
+      $date = date("Ymd--H-i-s-", $sec) . $usec;
+      $this->filenameTemplate = 'Error-' . $date  . '_' . basename($this->feature->getFile(), '.feature') . '_line_' . $this->step->getLine();
     }
     return $this->filenameTemplate;
   }
@@ -232,6 +235,7 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
    */
   public function generateReportIfStepFailed(AfterStepScope $scope) {
     if ($this->isReportingEnabled()) {
+      $this->filenameTemplate = NULL;
       $this->result = $scope->getTestResult();
       $test_failed = $this->result->getResultCode() === TestResult::FAILED;
       if ($test_failed) {
@@ -246,14 +250,14 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
    * @Then capture full page with a width of :width
    */
   public function captureFullPageWithAWidthOf($width) {
-    $this->saveACaptureFullPageWithWidthOfTo($width, $this->getScreenshotsPath());
+    $this->captureFullPageWithWidthOfToWithName($width, $this->getScreenshotsPath(),$filename = NULL);
   }
 
   /**
    * @Then capture full page with a width of :width with name :filename
    */
   public function captureFullPageWithAWidthOfWithFilename($width, $filename) {
-    $this->saveACaptureFullPageWithWidthOfToWithName($width, $this->getScreenshotsPath(), $filename);
+    $this->captureFullPageWithWidthOfToWithName($width, $this->getScreenshotsPath(), $filename);
   }
 
   /**
@@ -262,7 +266,7 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
   public function captureFullPageWithWidthOfTo($width, $path) {
     $milliseconds = gettimeofday();
     $filename = 'Screenshot-' . date("Ymd--H-i-s") . '.' . $milliseconds['usec'] . '.png';
-    $this->saveACaptureFullPageWithWidthOfToWithName($width, $this->getScreenshotAbsolutePath($path), $filename);
+    $this->captureFullPageWithWidthOfToWithName($width, $this->getScreenshotAbsolutePath($path), $filename);
   }
 
   /**
@@ -271,7 +275,7 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
   public function captureFullPageWithWidthOfToWithName($width, $path, $filename) {
     // Use default height as screenshot is going to capture the complete page.
     $this->getSession()->resizeWindow($width, $this::DEFAULT_HEIGHT, 'current');
-    $this->savescreenShot($filename, $this->getScreenshotAbsolutePath($path));
+    $this->savescreenShot($filename, $this->getScreenshotAbsolutePath($path, NULL));
   }
 
   /**
