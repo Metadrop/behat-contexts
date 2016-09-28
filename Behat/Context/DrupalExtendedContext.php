@@ -3,7 +3,7 @@
 /**
  * @file
  *
- * DrupalUtilsContext Context for Behat.
+ * DrupalExtendedContext Context for Behat.
  *
  */
 
