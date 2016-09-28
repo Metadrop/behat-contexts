@@ -181,7 +181,10 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
    */
   public function getFilenameReportTemplate() {
     if (empty($this->filenameTemplate)) {
-      $this->filenameTemplate = 'Error-' . date("Ymd--H-i-s") . '_' . basename($this->feature->getFile(), '.feature') . '_line_' . $this->step->getLine();
+      list($usec, $sec) = explode(' ', microtime());
+      $usec = str_replace("0.", ".", $usec);
+      $date = date("Ymd--H-i-s-", $sec) . $usec;
+      $this->filenameTemplate = 'Error-' . $date  . '_' . basename($this->feature->getFile(), '.feature') . '_line_' . $this->step->getLine();
     }
     return $this->filenameTemplate;
   }
@@ -232,6 +235,7 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
    */
   public function generateReportIfStepFailed(AfterStepScope $scope) {
     if ($this->isReportingEnabled()) {
+      $this->filenameTemplate = NULL;
       $this->result = $scope->getTestResult();
       $test_failed = $this->result->getResultCode() === TestResult::FAILED;
       if ($test_failed) {
