@@ -126,7 +126,7 @@ The context has some default values. If a size is defined with same name as one 
 
 ### DrupalExtendedContext
 
-  This context extend DrupalRawContext with steps related to Drupal and its modules.
+  This context extends DrupalRawContext with steps related to Drupal and its modules.
 
 
 #### Steps
@@ -142,6 +142,27 @@ The context has some default values. If a size is defined with same name as one 
 - Given I run elysia cron
 
   Runs Elysia cron.
+
+
+#### Configuration
+
+No configuration needed.
+
+
+
+### IUContext
+
+  This context provides steps for certain UI elements.
+
+
+#### Steps
+
+- Given I select :option from :select chosen.js select box
+
+  Selects and option from a Chosen select widget. Only for sinlge selection, it
+  doesn't work with multiple selection enabled or tag style.
+
+  See https://harvesthq.github.io/chosen/
 
 
 #### Configuration
