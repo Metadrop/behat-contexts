@@ -250,7 +250,7 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
    * @Then capture full page with a width of :width
    */
   public function captureFullPageWithAWidthOf($width) {
-    $this->captureFullPageWithWidthOfToWithName($width, $this->getScreenshotsPath(),$filename = NULL);
+    $this->captureFullPageWithWidthOfToWithName($width, $this->getScreenshotsPath(), $filename = NULL);
   }
 
   /**
