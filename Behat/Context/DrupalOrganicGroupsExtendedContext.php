@@ -1,10 +1,8 @@
 <?php
-
 /**
  * @file
  *
- * DrupalUtilsContext Context for Behat.
- *
+ * Context for Behat which contains utilities for Organic groups.
  */
 
 namespace Metadrop\Behat\Context;
@@ -12,6 +10,9 @@ namespace Metadrop\Behat\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Drupal\DrupalExtension\Context\RawDrupalContext;
 
+/**
+ * Utilities for testing organic groups.
+ */
 class DrupalOrganicGroupsExtendedContext extends RawDrupalContext implements SnippetAcceptingContext {
 
   /**
