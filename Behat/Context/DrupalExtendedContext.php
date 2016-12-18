@@ -105,7 +105,8 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
    *   Entity type
    * @param string $bundle
    *   Entity bundle
-   * @param integer
+   *
+   * @return integer
    *   Entity Id
    */
   public function getLastEntityId($entity_type, $bundle = NULL) {
@@ -149,7 +150,7 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
   public function goToTheLastEntityCreated($entity_type, $bundle = NULL, $path = NULL) {
     $last_entity = $this->getLastEntityId($entity_type, $bundle);
     if (empty($last_entity)) {
-      throw new \Exception("Not have any nid");
+      throw new \Exception("Imposible to go to path: the entity does not exists");
     }
 
     $entity = entity_load_single($entity_type, $last_entity);
