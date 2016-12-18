@@ -50,8 +50,9 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
   /**
    * Flush page cache.
    *
-   * @param string $page_name = NULL
+   * @param string $path
    *  Page name without first "/"
+   *  Use "*" as wildcard. Example: http://example.com/articles/* (full path)
    *
    * @Given cache :path page is flushed
    */
