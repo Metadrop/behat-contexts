@@ -96,4 +96,68 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
       throw new \InvalidArgumentException("Form element \"$label\" of type \"$type\" is required");
     }
   }
+
+
+  /**
+   * Get last entity id created
+   *
+   * @param string $entity_type
+   *   Entity type
+   * @param string $bundle
+   *   Entity bundle
+   * @param integer
+   *   Entity Id
+   */
+  public function getLastEntityId($entity_type, $bundle = NULL) {
+
+    $info = entity_get_info($entity_type);
+    $id_key = $info['entity keys']['id'];
+
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', $entity_type);
+    $query->entityCondition('bundle', $bundle);
+    $query->propertyOrderBy($id_key, 'DESC');
+    $query->range(0, 1);
+    $query->addMetaData('account', user_load(1));
+
+    $result = $query->execute();
+    $keys = array_keys($result[$entity_type]);
+    $id = reset($keys);
+
+    if (empty($id)){
+      throw new \Exception("Can't take last one");
+    }
+
+    return $id;
+  }
+
+  /**
+   * Go to last entity created.
+   *
+   * @Given I go to the last entity :entity is created
+   * @Given I go to the last entity :entity is created :path path
+   * @Given I go to the last entity :entity with :bundle bundle is created
+   * @Given I go to the last entity :entity with :bundle bundle is created :path path
+   *
+   * @param string $entity_type
+   *   Entity type.
+   * @param string $bundle
+   *   Entity bundle.
+   * @param string $path
+   *   Entity bundle.
+   */
+  public function goToTheLastEntityCreated($entity_type, $bundle = NULL, $path = NULL) {
+    $last_entity = $this->getLastEntityId($entity_type, $bundle);
+    if (empty($last_entity)) {
+      throw new \Exception("Not have any nid");
+    }
+
+    $entity = entity_load_single($entity_type, $last_entity);
+    if (!empty($entity)) {
+      $uri = entity_uri($entity_type, $entity);
+      $path = !empty($path) ? $uri['path'] . '/' . $path : $path;
+      $this->getSession()->visit($this->locatePath($path));
+    }
+  }
+
 }
