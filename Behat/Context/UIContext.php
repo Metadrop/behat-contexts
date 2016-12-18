@@ -50,4 +50,31 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
                    jQuery('#$id').trigger('change');";
     $this->getSession()->executeScript($javascript);
   }
+
+  /**
+   * Step to remove the multiple property of a file field.
+   *
+   * PhantomJS is not compatible with file field multiple and crashes.
+   * This workarround removes the property, that way the test can upload at least
+   * one file to the widget.
+   *
+   * @Given the file field :field is not multiple
+   */
+  public function fileFieldIsNotMultiple($locator) {
+    $el = $this->getSession()->getPage()->findField($locator);
+
+    if (empty($el)) {
+      throw new ExpectationException('Could not find element with locator: ' . $locator, $this->getSession());
+    }
+
+    $fieldId = $el->getAttribute('id');
+
+    if (empty($fieldId)) {
+      throw new Exception('Could not find an id for field with locator: ' . $locator);
+    }
+
+    $this->getSession()
+      ->executeScript("jQuery('#$fieldId').removeAttr('multiple');");
+  }
+
 }
