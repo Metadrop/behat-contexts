@@ -156,7 +156,7 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
     $entity = entity_load_single($entity_type, $last_entity);
     if (!empty($entity)) {
       $uri = entity_uri($entity_type, $entity);
-      $path = !empty($path) ? $uri['path'] . '/' . $path : $path;
+      $path = empty($path) ? $uri['path'] : $uri['path'] . '/' . $path;
       $this->getSession()->visit($this->locatePath($path));
     }
   }
