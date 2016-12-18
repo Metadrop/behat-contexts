@@ -48,6 +48,36 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
   }
 
   /**
+   * Flush page cache.
+   *
+   * @param string $page_name = NULL
+   *  Page name without first "/"
+   *
+   * @Given cache :path page is flushed
+   */
+  public function cachePageIsFlushed($path = NULL) {
+    global $base_url;
+
+    if (!empty($path) && $path !== '*') {
+      $path = $base_url . '/' . $path;
+    }
+
+    cache_clear_all($path, 'cache_page', TRUE);
+  }
+
+  /**
+   * Flush views cache data.
+   *
+   * @param string $views_name
+   *  Views name
+   *
+   * @Given cache :view views data is flushed
+   */
+  public function cacheViewsDataIsFlushed($views_name) {
+    cache_clear_all($views_name . ':', 'cache_views_data', TRUE);
+  }
+
+  /**
    * @Given I run elysia cron
    *
    * Run elysia-cron.
