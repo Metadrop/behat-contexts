@@ -135,10 +135,10 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
   /**
    * Go to last entity created.
    *
-   * @Given I go to the last entity :entity is created
-   * @Given I go to the last entity :entity is created :path path
-   * @Given I go to the last entity :entity with :bundle bundle is created
-   * @Given I go to the last entity :entity with :bundle bundle is created :path path
+   * @Given I go to the last entity :entity created
+   * @Given I go to the last entity :entity with :bundle bundle created
+   * @Given I go to :subpath of the last entity :entity created
+   * @Given I go to :subpath of the last entity :entity with :bundle bundle created
    *
    * @param string $entity_type
    *   Entity type.
@@ -147,7 +147,7 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
    * @param string $path
    *   Entity bundle.
    */
-  public function goToTheLastEntityCreated($entity_type, $bundle = NULL, $path = NULL) {
+  public function goToTheLastEntityCreated($entity_type, $bundle = NULL, $subpath = NULL) {
     $last_entity = $this->getLastEntityId($entity_type, $bundle);
     if (empty($last_entity)) {
       throw new \Exception("Imposible to go to path: the entity does not exists");
@@ -156,7 +156,7 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
     $entity = entity_load_single($entity_type, $last_entity);
     if (!empty($entity)) {
       $uri = entity_uri($entity_type, $entity);
-      $path = empty($path) ? $uri['path'] : $uri['path'] . '/' . $path;
+      $path = empty($subpath) ? $uri['path'] : $uri['path'] . '/' . $subpath;
       $this->getSession()->visit($this->locatePath($path));
     }
   }
