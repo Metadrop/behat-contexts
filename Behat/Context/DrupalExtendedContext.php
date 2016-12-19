@@ -142,9 +142,6 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
    *   User identifier: username | mail | uid or NULL to current user.
    * @param bool $not
    *   True if the user should NOT have the specific roles.
-   *
-   * @Then I should not have the :role roles(s)
-   * @Then the user :user should not have the :role role(s)
    */
   public function userRoleCheck($role, $user = NULL, $not = FALSE) {
     if (empty($user)) {
