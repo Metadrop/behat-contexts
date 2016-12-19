@@ -103,20 +103,19 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
   }
 
   /**
-   * Check the user with a specific mail have a specific role.
+   * Check the user has or not a specific role.
    *
    * @param string $role
    *   Role name(s) separated by comma.
    * @param string $user
    *   User identifier: username | mail | uid or NULL to current user.
    * @param bool $not
-   *   Checks if should have or not.
+   *   True if the user should NOT have the specific roles.
    *
-   * @Then I should have the :role role(s)
-   * @Then the user :user should have the :role role(s)
+   * @Then I should not have the :role roles(s)
+   * @Then the user :user should not have the :role role(s)
    */
-  public function userShouldHaveTheRole($role, $user = NULL, $not = FALSE) {
-
+  public function userRoleCheck($role, $user = NULL, $not = FALSE) {
     if (empty($user)) {
       $account = $this->user;
     }
@@ -143,18 +142,27 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
   }
 
   /**
-   * Check the user with a specific mail have a specific role.
+   * Check the user has a specific role.
    *
-   * @param string $role
-   *   Role name(s) separated by comma.
-   * @param string $user
-   *   User identifier: username | mail | uid or NULL to current user.
+   * @see userRoleCheck()
+   *
+   * @Then I should have the :role role(s)
+   * @Then the user :user should have the :role role(s)
+   */
+  public function userShouldHaveTheRole($role, $user = NULL) {
+    return $this->userRoleCheck($role, $user);
+  }
+
+  /**
+   * Check the user does not have a specific role.
+   *
+   * @see userRoleCheck()
    *
    * @Then I should not have the :role roles(s)
    * @Then the user :user should not have the :role role(s)
    */
   public function userShouldNotHaveTheRole($role, $user = NULL) {
-    return $this->userShouldHaveTheRole($role, $user, TRUE);
+    return $this->userRoleCheck($role, $user, TRUE);
   }
 
   /**
