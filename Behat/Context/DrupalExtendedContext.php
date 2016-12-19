@@ -144,7 +144,7 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
    *   Entity type.
    * @param string $bundle
    *   Entity bundle.
-   * @param string $path
+   * @param string $subpath
    *   Entity bundle.
    */
   public function goToTheLastEntityCreated($entity_type, $bundle = NULL, $subpath = NULL) {
