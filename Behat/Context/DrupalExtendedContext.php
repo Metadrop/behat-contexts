@@ -230,10 +230,10 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
    */
   public function getLastEntityId($entity_type, $bundle = NULL) {
 
-    $info = entity_get_info($entity_type);
+    $info = entity_get_info($entity_type);    
     $id_key = $info['entity keys']['id'];
-
-    $query = new EntityFieldQuery();
+    
+    $query = new \EntityFieldQuery();
     $query->entityCondition('entity_type', $entity_type);
     $query->entityCondition('bundle', $bundle);
     $query->propertyOrderBy($id_key, 'DESC');
