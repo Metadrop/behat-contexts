@@ -30,7 +30,6 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
 
     // Get field.
     $page = $this->getSession()->getPage();
-    print_r($select);
     $field = $page->findField($select, true);
     if (NULL === $field) {
       throw new ElementNotFoundException($this->getSession(), 'form field', 'id|name|label|value', $select);
