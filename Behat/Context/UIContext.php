@@ -18,17 +18,16 @@ use Drupal\DrupalExtension\Context\RawDrupalContext;
 class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
 
   /**
-   * @Then I fill in ckeditor on field :locator with :value
+   * @Then I fill in CKEditor on field :locator with :value
    */
-  public function iFillInCkeditorOnFieldWith($locator, $value) {
+  public function iFillInCKEditorOnFieldWith($locator, $value) {
     $el = $this->getSession()->getPage()->findField($locator);
 
     if (empty($el)) {
-      throw new ExpectationException('Could not find WYSIWYG with locator: ' . $locator, $this->getSession());
+      throw new ExpectationException('Could not find CKEditor with locator: ' . $locator, $this->getSession());
     }
 
     $fieldId = $el->getAttribute('id');
-
     if (empty($fieldId)) {
       throw new Exception('Could not find an id for field with locator: ' . $locator);
     }
