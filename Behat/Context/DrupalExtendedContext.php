@@ -88,21 +88,104 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
   }
 
   /**
+   * Gets user property by name.
+   *
+   * This function tries to figure out which kind to identificator is refering to
+   * in an "smart" way.
+   *
+   * @param string $name
+   *   The identifier
+   *   Examples: "admin", "12", "example@example.com"
+   *
+   * @return string
+   *   The property
+   */
+  public function getUserPropertyByName($name) {
+    if (valid_email_address($name)) {
+      $property = 'mail';
+    }
+    elseif (is_numeric($name)) {
+      $property = 'uid';
+    }
+    else {
+      $property = 'name';
+    }
+    return $property;
+  }
+
+  /**
+   * Gets the user that matches the condition.
+   *
+   * @param $condition
+   *   Query condition: mail, name, uid.
+   * @param $value
+   *   Value to compare (equal)
+   */
+  public function getUserByCondition($condition, $value, $reset = TRUE) {
+    $query = db_select('users');
+    $query->fields('users', array('uid'));
+    $query->condition($condition, $value);
+
+    $result = $query->execute();
+    $uid    = $result->fetchField();
+
+    $account = user_load($uid, $reset);
+    return $account;
+  }
+
+  /**
    * Check the user with a specific mail have a specific role.
    *
-   * @param string $mail
-   *  Value mail
    * @param string $role
-   *   Rol name
+   *   Role name(s) separated by comma.
+   * @param string $user
+   *   User identifier: username | mail | uid or NULL to current user.
+   * @param bool $not
+   *   Checks if should have or not.
    *
-   * @Then /^user with mail "([^"]*)" should have the role "([^"]*)"$/
+   * @Then I should have the :role role(s)
+   * @Then the user :user should have the :role role(s)
    */
-  public function userWithMailShouldHaveTheRole($mail, $role) {
-    $uid = db_query("SELECT uid FROM {users} WHERE mail= :mail", array(':mail' => $mail))->fetchField();
-    $account = user_load($uid);
-    if (!in_array($role, $account->roles)) {
-      throw new Exception("Given user has not the role $role");
+  public function userShouldHaveTheRole($role, $user = NULL, $not = FALSE) {
+
+    if (empty($user)) {
+      $account = $this->user;
     }
+    else {
+      $condition = $this->getUserPropertyByName($user);
+      $account = $this->getUserByCondition($condition, $user);
+    }
+
+    if ($account) {
+      $roles = explode(',', $role);
+      $roles = array_map('trim', $roles);
+      foreach ($roles as $role) {
+        if (!$not && !in_array($role, $account->roles)) {
+          throw new \Exception("Given user does not have the role $role");
+        }
+        else if ($not && in_array($role, $account->roles)) {
+          throw new \Exception("Given user have the role $role");
+        }
+      }
+    }
+    else {
+      throw new \Exception("Given user does not exists!");
+    }
+  }
+
+  /**
+   * Check the user with a specific mail have a specific role.
+   *
+   * @param string $role
+   *   Role name(s) separated by comma.
+   * @param string $user
+   *   User identifier: username | mail | uid or NULL to current user.
+   *
+   * @Then I should not have the :role roles(s)
+   * @Then the user :user should not have the :role role(s)
+   */
+  public function userShouldNotHaveTheRole($role, $user = NULL) {
+    return $this->userShouldHaveTheRole($role, $user, TRUE);
   }
 
   /**
