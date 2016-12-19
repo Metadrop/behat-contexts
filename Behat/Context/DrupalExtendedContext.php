@@ -52,11 +52,11 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
    *
    * @param string $path
    *  Page name without first "/"
-   *  Use "*" as wildcard. Example: http://example.com/articles/* (full path)
+   *  Use "*" as wildcard. Example: articles/*
    *
-   * @Given cache :path page is flushed
+   * @Given :path page cache is flushed
    */
-  public function cachePageIsFlushed($path = NULL) {
+  public function pageCacheIsFlushed($path = NULL) {
     global $base_url;
 
     if (!empty($path) && $path !== '*') {
@@ -67,14 +67,14 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
   }
 
   /**
-   * Flush views cache data.
+   * Flush views data cache.
    *
    * @param string $views_name
    *  Views name
    *
-   * @Given cache :view views data is flushed
+   * @Given :view view data cache is flushed
    */
-  public function cacheViewsDataIsFlushed($views_name) {
+  public function viewDataCacheIsFlushed($views_name) {
     cache_clear_all($views_name . ':', 'cache_views_data', TRUE);
   }
 
