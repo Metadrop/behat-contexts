@@ -155,11 +155,14 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
     if ($account) {
       $roles = explode(',', $role);
       $roles = array_map('trim', $roles);
+      // Case insensitive:
+      $roles = array_map('strtolower', $roles);
+      $aroles = array_map('strtolower', $account->roles);
       foreach ($roles as $role) {
-        if (!$not && !in_array($role, $account->roles)) {
+        if (!$not && !in_array($role, $aroles)) {
           throw new \Exception("Given user does not have the role $role");
         }
-        else if ($not && in_array($role, $account->roles)) {
+        else if ($not && in_array($role, $aroles)) {
           throw new \Exception("Given user have the role $role");
         }
       }
