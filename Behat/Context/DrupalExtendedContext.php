@@ -88,6 +88,16 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
   }
 
   /**
+   * @Given I run the elysia cron :job job
+   *
+   * Run elysia-cron-job.
+   */
+  public function iRunElysiaCronJob($job) {
+    // @NOTE We force it
+    elysia_cron_run_job($job, TRUE, TRUE, TRUE);
+  }
+
+  /**
    * Gets user property by name.
    *
    * This function tries to figure out which kind to identificator is refering to
