@@ -229,6 +229,40 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
     }
   }
 
+  /**
+   * Creates content of a given type provided in the form, and sets a date field
+   * to some offset value.
+   * | title    | author     | status |
+   * | My title | Joe Editor | 1      |
+   * | ...      | ...        | ...    |
+   *
+   * Format example
+   * "Y-m-d\TH:i:s\Z"
+   *
+   * @NOTE Use with care, always review the value that this function is returning
+   * since we don't take time zones in account.
+   *
+   * @Given :type content with :field_name date value set :offset days from today formatted like :format:
+   */
+  public function createNodesDateOffset($type, $field_name, $offset, $format, TableNode $nodesTable) {
+
+    $today = date('d-m-Y');
+
+    foreach ($nodesTable->getHash() as $nodeHash) {
+      $node = (object) $nodeHash;
+      $node->type = $type;
+      if (!empty($format)) {
+        $timestamp = strtotime($today) + ($offset * static::DAY_IN_SECONDS);
+        $node->{$field_name} = gmdate($format, $timestamp);
+      }
+      else {
+        // 86400 = day in seconds.
+        $node->{$field_name} = strtotime($this->today) + ($offset * 86400);
+      }
+
+      $this->nodeCreate($node);
+    }
+  }
 
   /**
    * Get last entity id created
@@ -267,6 +301,9 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
 
     return $id;
   }
+
+
+
 
   /**
    * Go to last entity created.
