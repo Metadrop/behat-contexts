@@ -298,7 +298,7 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
   }
 
   /**
-   * Creates content of a given type provided in the form authored by current user:
+   * Creates content of a given type authored by current user provided in the form:
    * | title    | status | created           |
    * | My title | 1      | 2014-10-17 8:00am |
    * | ...      | ...    | ...               |
