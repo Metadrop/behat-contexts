@@ -109,15 +109,16 @@ To declare sizes and make them available use the context params:
 
 - Metadrop\Behat\Context\BrowserSizeContext:
     parameters:
-      Default:
-        width: 1200
-        height: 800
-      Full:
-        width: 1200
-        height: 800
-      My custom size:
-        width: 1440
-        height: 960
+      sizes:
+        Default:
+          width: 1200
+          height: 800
+        Full:
+          width: 1200
+          height: 800
+        My custom size:
+          width: 1440
+          height: 960
 
 
 The context has some default values. If a size is defined with same name as one of the default sizes the dimensions are overwritten. If a completely new size is defined is simply added to the available size.
