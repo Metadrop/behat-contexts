@@ -98,6 +98,7 @@ Keep in mind  that browser window size may not change between scenarios or featu
 #### Steps
 
 - Given (that )browser window size is :size size
+
   Changes window broeser size to the given size. The size must be one of the default ones or one of the sizes declared in the configuration.
 
 
