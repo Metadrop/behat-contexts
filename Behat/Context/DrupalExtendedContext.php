@@ -200,7 +200,7 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
    *
    * @see userRoleCheck()
    *
-   * @Then I should not have the :role roles(s)
+   * @Then I should not have the :role role(s)
    * @Then the user :user should not have the :role role(s)
    */
   public function userShouldNotHaveTheRole($role, $user = NULL) {
