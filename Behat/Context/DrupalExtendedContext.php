@@ -298,6 +298,26 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
   }
 
   /**
+   * Refresh node_access for the last node created.
+   *
+   * @param string $bundle
+   *   Entity bundle.
+   *
+   * @Given the access of last node created is refreshed
+   * @Given the access of last node created with :bundle bundle is refreshed
+   */
+  public function refreshLastNodeAccess($bundle = NULL) {
+    $last_nodeId = $this->getLastEntityId('node', $bundle);
+    if (empty($last_nodeId)) {
+      throw new \Exception("Can't get last node");
+    }
+
+    $node = node_load($last_nodeId);
+    node_access_acquire_grants($node);
+
+  }
+
+  /**
    * Creates content of a given type authored by current user provided in the form:
    * | title    | status | created           |
    * | My title | 1      | 2014-10-17 8:00am |
