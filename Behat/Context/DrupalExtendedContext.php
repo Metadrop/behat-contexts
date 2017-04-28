@@ -307,12 +307,12 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
    * @Given the access of last node created with :bundle bundle is refreshed
    */
   public function refreshLastNodeAccess($bundle = NULL) {
-    $last_nodeId = $this->getLastEntityId('node', $bundle);
-    if (empty($last_nodeId)) {
+    $lastNodeId = $this->getLastEntityId('node', $bundle);
+    if (empty($lastNodeId)) {
       throw new \Exception("Can't get last node");
     }
 
-    $node = node_load($last_nodeId);
+    $node = node_load($lastNodeId);
     node_access_acquire_grants($node);
 
   }
