@@ -334,4 +334,23 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
       $this->nodeCreate($node);
     }
   }
+
+  /**
+   * Wait for AJAX to finish.
+   *
+   * @param int $seconds
+   *   Max time to wait for AJAX.
+   *
+   * @Given I wait for AJAX to finish at least :seconds seconds
+   *
+   * @throws \Exception
+   *   Ajax call didn't finish on time.
+   */
+  public function iWaitForAjaxToFinish($seconds) {
+    $finished = $this->getSession()->wait($seconds * 1000, '(typeof(jQuery)=="undefined" || (0 === jQuery.active && 0 === jQuery(\':animated\').length))');
+    if (!$finished) {
+      throw new \Exception("Ajax call didn't finished within $seconds seconds.");
+    }
+  }
+
 }
