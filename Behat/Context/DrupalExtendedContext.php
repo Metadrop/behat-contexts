@@ -368,7 +368,7 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
    *   Exception file not found.
    *
    * @throws Exception
-   *   Exception tfile could not be copied.
+   *   Exception file could not be copied.
    *
    * @Given file with name :filename
    * @Given file with name :filename in the :directory directory
@@ -382,9 +382,9 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
     $destination = $directory . '/' . $filename;
 
     $absolutePath = $this->getMinkParameter('files_path');
-    $path = $absolutePath .'/'. $filename;
+    $path = $absolutePath . '/' . $filename;
 
-    if (!file_exists($path)){
+    if (!file_exists($path)) {
       throw new Exception("Error: file " . $filename ." not found");
     }
     else {
