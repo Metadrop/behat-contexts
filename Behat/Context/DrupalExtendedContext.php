@@ -15,6 +15,15 @@ use Drupal\DrupalExtension\Context\RawDrupalContext;
 
 class DrupalExtendedContext extends RawDrupalContext implements SnippetAcceptingContext {
 
+
+ /**
+   * Array of files to be cleaned up @AfterScenario.
+   *
+   * @var array
+   */
+  protected $files = array();
+
+
   /**
    * Gets info about required state of a form element.
    *
@@ -334,6 +343,62 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
       $this->nodeCreate($node);
     }
   }
+
+
+  /**
+   * Deletes Files after each Scenario.
+   *
+   * @AfterScenario
+   */
+  public function cleanFiles() {
+    foreach ($this->files as $k => $v) {
+      file_delete($v);
+    }
+  }
+
+  /**
+   * Creates file in drupal.
+   *
+   * @param string $filename
+   *   The name of the file to create.
+   * @param string directory
+   *   A string containing the files scheme, usually "public://".
+   *
+   * @throws Exception
+   *   Exception file not found.
+   *
+   * @throws Exception
+   *   Exception file could not be copied.
+   *
+   * @Given file with name :filename
+   * @Given file with name :filename in the :directory directory
+   */
+  public function createFileWithName($filename, $directory = NULL) {
+
+    if (empty($directory)) {
+      $directory = file_default_scheme() . '://';
+    }
+
+    $destination = $directory . '/' . $filename;
+
+    $absolutePath = $this->getMinkParameter('files_path');
+    $path = $absolutePath . '/' . $filename;
+
+    if (!file_exists($path)) {
+      throw new Exception("Error: file " . $filename ." not found");
+    }
+    else {
+      $data = file_get_contents($path);
+      $file = file_save_data($data, $destination, FILE_EXISTS_REPLACE);
+      if ($file) {
+        $this->files[] = $file;
+      }
+      else {
+        throw new Exception("Error: file could not be copied to directory");
+      }
+    }
+  }
+
 
   /**
    * Wait for AJAX to finish.
