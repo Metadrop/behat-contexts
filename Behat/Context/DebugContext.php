@@ -261,7 +261,7 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
   }
 
   /**
-   * @Then capture full page with width of :width to :path
+   * @Then capture full page with a width of :width to :path
    */
   public function captureFullPageWithWidthOfTo($width, $path) {
     $milliseconds = gettimeofday();
@@ -270,7 +270,7 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
   }
 
   /**
-   * @Then capture full page with width of :width to :path with name :filename
+   * @Then capture full page with a width of :width to :path with name :filename
    */
   public function captureFullPageWithWidthOfToWithName($width, $path, $filename) {
     // Use default height as screenshot is going to capture the complete page.
