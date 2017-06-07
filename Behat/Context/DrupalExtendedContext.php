@@ -247,17 +247,17 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
   public function createNodesDateOffset($type, $field_name, $offset, $format, TableNode $nodesTable) {
 
     $today = date('d-m-Y');
+    $day_in_seconds = 86400;
 
     foreach ($nodesTable->getHash() as $nodeHash) {
       $node = (object) $nodeHash;
       $node->type = $type;
       if (!empty($format)) {
-        $timestamp = strtotime($today) + ($offset * static::DAY_IN_SECONDS);
+        $timestamp = strtotime($today) + ($offset * $day_in_seconds);
         $node->{$field_name} = gmdate($format, $timestamp);
       }
       else {
-        // 86400 = day in seconds.
-        $node->{$field_name} = strtotime($this->today) + ($offset * 86400);
+        $node->{$field_name} = strtotime($this->today) + ($offset * $day_in_seconds);
       }
 
       $this->nodeCreate($node);
