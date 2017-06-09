@@ -15,14 +15,12 @@ use Drupal\DrupalExtension\Context\RawDrupalContext;
 
 class DrupalExtendedContext extends RawDrupalContext implements SnippetAcceptingContext {
 
-
  /**
    * Array of files to be cleaned up @AfterScenario.
    *
    * @var array
    */
   protected $files = array();
-
 
   /**
    * Gets info about required state of a form element.
@@ -344,7 +342,6 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
     }
   }
 
-
   /**
    * Deletes Files after each Scenario.
    *
@@ -399,7 +396,6 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
     }
   }
 
-
   /**
    * Wait for AJAX to finish.
    *
@@ -417,5 +413,20 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
       throw new \Exception("Ajax call didn't finished within $seconds seconds.");
     }
   }
+
+  /**
+   * Wait for batch process.
+   *
+   * Wait until the id="updateprogress" element is gone,
+   * or timeout after 5 seconds (5,000 ms).
+   *
+   * @param init $seconds
+   *
+   * @Given I wait for the batch job to finish
+   * @Given I wait for the batch job to finish at least :seconds seconds
+   */
+  public function iWaitForTheBatchJobToFinish($seconds = 5) {
+    $this->getSession()->wait($seconds * 1000, 'jQuery("#updateprogress").length === 0');
+   }
 
 }
