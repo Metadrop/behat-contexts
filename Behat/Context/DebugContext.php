@@ -37,6 +37,7 @@ use Behat\Gherkin\Node\StepNode;
  *   'report_on_error': If yes, the context generates the report on failed
  *      steps.
  *   'error_reporting_path': Path where to store generated reports.
+ *   'error_reporting_url': Url to show generated reports.
  *   'screenshots_path': Path where to store generated screenshots.
  *   'page_contents_path': Path where to store page contents.
  *
@@ -98,6 +99,7 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
     $defaults = array(
       'report_on_error' => FALSE,
       'error_reporting_path' => '/tmp',
+      'error_reporting_url' => NULL,
       'screenshots_path' => '/tmp',
       'page_contents_path' => '/tmp',
     );
@@ -131,6 +133,16 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
    */
   public function getReportPath() {
     return $this->customParameters['error_reporting_path'];
+  }
+
+  /**
+   * Returns the configured url to show error reports.
+   *
+   * @return string
+   *   Url to show error reports.
+   */
+  public function getReportUrl() {
+    return $this->customParameters['error_reporting_url'];
   }
 
   /**
@@ -200,16 +212,14 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
   public function saveReport() {
     $this->session = $this->getSession();
 
-    $this->saveInfoFile();
-
-    // If it's Selenium Driver save a screenshot.
-    if ($this->session ->getDriver() instanceof \Behat\Mink\Driver\Selenium2Driver) {
-      $this->saveScreenshot($this->getFilenameReportTemplate() . '.png', $this->getReportPath());
+    if ($this->getReportUrl()) {
+      echo "Error generated reports:\n";
     }
 
-    // Dump HTML content.
-    $error_page_filepath = $this->getReportPath() . '/' . $this->getFilenameReportTemplate() . '.html';
-    file_put_contents($error_page_filepath, $this->session->getPage()->getContent());
+    $this->saveInfoFile();
+    $this->saveHtmlFile();
+    $this->savePngFile();
+
   }
 
   /**
@@ -218,7 +228,8 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
    * Contains the current URL and the error exception dump.
    */
   protected function saveInfoFile() {
-    $error_filepath = $this->getReportPath() . '/' . $this->getFilenameReportTemplate() . '.txt';
+    $error_file = $this->getFilenameReportTemplate() . '.txt';
+    $error_filepath = $this->getReportPath() . '/' . $error_file;
 
     // Generate content.
     $error_report = $this->session->getCurrentUrl() . "\n\n";
@@ -226,6 +237,45 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
 
     // Save it.
     file_put_contents($error_filepath, $error_report);
+
+    if ($url = $this->getReportUrl()) {
+      echo " - info (exception): " . $url . '/' . $error_file  . "\n";
+    }
+  }
+
+  /**
+   * Generates and saves the report HTML file.
+   *
+   * Contains the HTML output.
+   */
+  public function saveHtmlFile() {
+    // Dump HTML content.
+    $error_file = $this->getFilenameReportTemplate() . '.html';
+    $error_page_filepath = $this->getReportPath() . '/' . $error_file;
+    file_put_contents($error_page_filepath, $this->session->getPage()->getContent());
+
+    if ($url = $this->getReportUrl()) {
+      echo " - html (output): " . $url . '/' . $error_file  . "\n";
+    }
+  }
+
+
+  /**
+   * Generates and saves the report PNG file.
+   *
+   * Contains the page screenshot.
+   */
+  public function savePngFile() {
+    // If it's Selenium Driver save a screenshot.
+    if ($this->session->getDriver() instanceof \Behat\Mink\Driver\Selenium2Driver) {
+
+      $error_file = $this->getFilenameReportTemplate() . '.png';
+      $this->saveScreenshot($error_file, $this->getReportPath());
+
+      if ($url = $this->getReportUrl()) {
+        echo " - png (screenshoot): " . $url . '/' . $error_file . "\n";
+      }
+    }
   }
 
   /**
