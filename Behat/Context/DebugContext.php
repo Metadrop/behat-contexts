@@ -273,7 +273,7 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
       $this->saveScreenshot($error_file, $this->getReportPath());
 
       if ($url = $this->getReportUrl()) {
-        echo " - png (screenshoot): " . $url . '/' . $error_file . "\n";
+        echo " - png (screenshot): " . $url . '/' . $error_file . "\n";
       }
     }
   }
