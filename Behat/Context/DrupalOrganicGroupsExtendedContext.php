@@ -98,6 +98,36 @@ class DrupalOrganicGroupsExtendedContext extends RawDrupalContext implements Sni
   }
 
   /**
+   * Subscribes user to group (node).
+   *
+   * @param string $username
+   *   User name.
+   * @param string $group_name
+   *   Group name.
+   *
+   * @Given user :user is subscribed to the group with name :name
+   */
+  public function userIsSubscribedToNodeGroup($username, $group_name) {
+    $this->userIsSubscribedToGroup($username, 'node', $group_name);
+  }
+
+  /**
+   * Subscribes user to group (node) with specific roles.
+   *
+   * @param string $username
+   *   User name.
+   * @param string $group_name
+   *   Group name.
+   * @param string $roles
+   *   Roles. Use ',' to add multiple.
+   *
+   * @Given user :user is subscribed to the group with name :name as a(n) :role role(s)
+   */
+  public function userIsSubscribedToNodeGroupWithRoles($username, $group_name, $roles) {
+    $this->userIsSubscribedToGroupWithRoles($username, 'node', $group_name, $roles);
+  }
+
+  /**
    * Subscribe user to group.
    *
    * @param string $group_type
