@@ -59,7 +59,7 @@ class DrupalOrganicGroupsExtendedContext extends RawDrupalContext implements Sni
    * @param string $group_name
    *   Group name.
    *
-   * @Given user :user is subscribed to :group_type group with name :name
+   * @Given user :user is subscribed to the group of type :group_type group with name :name
    */
   public function userIsSubscribedToGroup($username, $group_type, $group_name) {
     $gid = $this->getEntityIdBylabel($group_type, $group_name);
@@ -80,7 +80,7 @@ class DrupalOrganicGroupsExtendedContext extends RawDrupalContext implements Sni
    * @param string $group_name
    *   Group name.
    *
-   * @Given user :user is subscribed to :group_type group with name :name as a :role role(s)
+   * @Given user :user is subscribed to the group of type :group_type group with name :name as a(n) :role role(s)
    */
   public function userIsSubscribedToGroupWithRoles($username, $group_type, $group_name, $roles) {
     $gid = $this->getEntityIdBylabel($group_type, $group_name);
