@@ -64,7 +64,7 @@ class DrupalOrganicGroupsExtendedContext extends RawDrupalContext implements Sni
   public function userIsSubscribedToGroup($username, $group_type, $group_name) {
     $gid = $this->getEntityIdBylabel($group_type, $group_name);
     if (empty($gid)) {
-      throw new Exception($group_type . ' group with name ' . $group_name . ' doesn\'t exists!');
+      throw new \Exception($group_type . ' group with name ' . $group_name . ' doesn\'t exists!');
     }
     $user = user_load_by_name($username);
     $this->subscribeUserToGroup($group_type, $gid, $user);
@@ -85,7 +85,7 @@ class DrupalOrganicGroupsExtendedContext extends RawDrupalContext implements Sni
   public function userIsSubscribedToGroupWithRoles($username, $group_type, $group_name, $roles) {
     $gid = $this->getEntityIdBylabel($group_type, $group_name);
     if (empty($gid)) {
-      throw new Exception($group_type . ' group with name ' . $group_name . ' doesn\'t exists!');
+      throw new \Exception($group_type . ' group with name ' . $group_name . ' doesn\'t exists!');
     }
 
     $user = user_load_by_name($username);

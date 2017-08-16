@@ -382,7 +382,7 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
     $path = $absolutePath . '/' . $filename;
 
     if (!file_exists($path)) {
-      throw new Exception("Error: file " . $filename ." not found");
+      throw new \Exception("Error: file " . $filename ." not found");
     }
     else {
       $data = file_get_contents($path);
@@ -391,7 +391,7 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
         $this->files[] = $file;
       }
       else {
-        throw new Exception("Error: file could not be copied to directory");
+        throw new \Exception("Error: file could not be copied to directory");
       }
     }
   }
