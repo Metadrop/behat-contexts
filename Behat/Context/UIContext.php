@@ -18,6 +18,22 @@ use Drupal\DrupalExtension\Context\RawDrupalContext;
 class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
 
   /**
+   * Context parameters.
+   *
+   * @var array
+   */
+  protected $customParams;
+
+  /**
+   * Constructor.
+   *
+   * @param type $parameters
+   */
+  public function __construct($parameters = array()) {
+    $this->customParams = $parameters;
+  }
+
+  /**
    * @Then I fill in CKEditor on field :locator with :value
    */
   public function iFillInCKEditorOnFieldWith($locator, $value) {
@@ -92,6 +108,53 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
 
     $this->getSession()
       ->executeScript("jQuery('#$fieldId').removeAttr('multiple');");
+  }
+
+  /**
+   * Helper to scroll to selector with JS.
+   *
+   * @param string $selector
+   *   jQuery selector
+   * @param int $offset
+   *   Pixels to add or remove to selector position.
+   *   E.G. Take into account fix headers, footers, etc.
+   */
+  public function scrollToSelector($selector, $offset = null) {
+    $offset_default = isset($this->customParams['scroll_offset']) ? $this->customParams['scroll_offset'] : 0;
+    $offset = is_null($offset) ? $offset_default : $offset;
+    $op = $offset >= 0 ? '+' : '-';
+    $script = "jQuery('html,body').unbind().animate({scrollTop: jQuery('$selector').offset().top" . $op . abs($offset) . "},'slow')";
+    print $script;
+    $this->getSession()->executeScript($script);
+  }
+
+  /**
+   * @When I scroll to :selector
+   * @When I scroll to :selector with :offset
+   */
+  public function scrollToElement($selector, $offset = null) {
+    $this->scrollToSelector($selector, $offset);
+  }
+
+  /**
+   * @When I scroll to :field field
+   * @When I scroll to :field field with :offset
+   */
+  public function scrollToField($field, $offset = null) {
+
+    $page = $this->getSession()->getPage();
+    $field = $page->findField($field, true);
+
+    if (NULL === $field) {
+      throw new ElementNotFoundException($this->getSession(), 'form field', 'id|name|label|value', $field);
+    }
+
+    // Get option.
+    $id = $field->getAttribute('id');
+    $selector = '#' . $id;
+
+    $this->scrollToSelector($selector, $offset);
+
   }
 
 }
