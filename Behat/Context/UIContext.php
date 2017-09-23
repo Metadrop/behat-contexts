@@ -157,7 +157,7 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
   }
 
   /**
-   * Click on the element with the provided CSS Selector
+   * Click on the element with the provided CSS Selector.
    *
    * @When /^I click on the element with css selector "([^"]*)"$/
    */
@@ -175,7 +175,7 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
   }
 
   /**
-   * Click on the element with the provided xpath query
+   * Click on the element with the provided xpath query.
    *
    * @When /^I click on the element with xpath "([^"]*)"$/
    */
@@ -196,7 +196,7 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
   }
 
   /**
-   * Click on the label using xpath
+   * Click on the label using xpath.
    *
    * @When I click on the label :label
    */
