@@ -198,7 +198,7 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
   /**
    * Click on the label using xpath.
    *
-   * @When I click on the label :label
+   * @When I click on the :label label
    */
   public function iClickOnTheLabel($label) {
     $label = str_replace("\"", "\\\"", $label);
