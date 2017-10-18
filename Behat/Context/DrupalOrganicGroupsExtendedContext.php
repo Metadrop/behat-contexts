@@ -166,7 +166,7 @@ class DrupalOrganicGroupsExtendedContext extends RawDrupalContext implements Sni
     $this->subscribeUserToGroup($group_type, $gid, $user);
 
     // Load og entity.
-    $this->subscribeUserToGroupWithRole($group_type, $gid, $role, $user);
+    $this->addUserGroupRole($group_type, $gid, $role, $user);
   }
 
   /**
