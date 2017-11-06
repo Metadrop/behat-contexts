@@ -123,7 +123,7 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
     $offset_default = isset($this->customParams['scroll_offset']) ? $this->customParams['scroll_offset'] : 0;
     $offset = is_null($offset) ? $offset_default : $offset;
     $op = $offset >= 0 ? '+' : '-';
-    $script = "jQuery('html,body').unbind().animate({scrollTop: jQuery('$selector').offset().top" . $op . abs($offset) . "},'slow')";
+    $script = "jQuery('html,body').unbind().animate({scrollTop: jQuery('$selector').offset().top" . $op . abs($offset) . "},0)";
     $this->getSession()->executeScript($script);
   }
 
