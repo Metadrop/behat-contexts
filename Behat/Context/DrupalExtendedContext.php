@@ -15,6 +15,13 @@ use Drupal\DrupalExtension\Context\RawDrupalContext;
 
 class DrupalExtendedContext extends RawDrupalContext implements SnippetAcceptingContext {
 
+ /**
+   * Array of files to be cleaned up @AfterScenario.
+   *
+   * @var array
+   */
+  protected $files = array();
+
   /**
    * Gets info about required state of a form element.
    *
@@ -200,7 +207,7 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
    *
    * @see userRoleCheck()
    *
-   * @Then I should not have the :role roles(s)
+   * @Then I should not have the :role role(s)
    * @Then the user :user should not have the :role role(s)
    */
   public function userShouldNotHaveTheRole($role, $user = NULL) {
@@ -298,6 +305,26 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
   }
 
   /**
+   * Refresh node_access for the last node created.
+   *
+   * @param string $bundle
+   *   Entity bundle.
+   *
+   * @Given the access of last node created is refreshed
+   * @Given the access of last node created with :bundle bundle is refreshed
+   */
+  public function refreshLastNodeAccess($bundle = NULL) {
+    $lastNodeId = $this->getLastEntityId('node', $bundle);
+    if (empty($lastNodeId)) {
+      throw new \Exception("Can't get last node");
+    }
+
+    $node = node_load($lastNodeId);
+    node_access_acquire_grants($node);
+
+  }
+
+  /**
    * Creates content of a given type authored by current user provided in the form:
    * | title    | status | created           |
    * | My title | 1      | 2014-10-17 8:00am |
@@ -314,4 +341,92 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
       $this->nodeCreate($node);
     }
   }
+
+  /**
+   * Deletes Files after each Scenario.
+   *
+   * @AfterScenario
+   */
+  public function cleanFiles() {
+    foreach ($this->files as $k => $v) {
+      file_delete($v);
+    }
+  }
+
+  /**
+   * Creates file in drupal.
+   *
+   * @param string $filename
+   *   The name of the file to create.
+   * @param string directory
+   *   A string containing the files scheme, usually "public://".
+   *
+   * @throws Exception
+   *   Exception file not found.
+   *
+   * @throws Exception
+   *   Exception file could not be copied.
+   *
+   * @Given file with name :filename
+   * @Given file with name :filename in the :directory directory
+   */
+  public function createFileWithName($filename, $directory = NULL) {
+
+    if (empty($directory)) {
+      $directory = file_default_scheme() . '://';
+    }
+
+    $destination = $directory . '/' . $filename;
+
+    $absolutePath = $this->getMinkParameter('files_path');
+    $path = $absolutePath . '/' . $filename;
+
+    if (!file_exists($path)) {
+      throw new \Exception("Error: file " . $filename ." not found");
+    }
+    else {
+      $data = file_get_contents($path);
+      $file = file_save_data($data, $destination, FILE_EXISTS_REPLACE);
+      if ($file) {
+        $this->files[] = $file;
+      }
+      else {
+        throw new \Exception("Error: file could not be copied to directory");
+      }
+    }
+  }
+
+  /**
+   * Wait for AJAX to finish.
+   *
+   * @param int $seconds
+   *   Max time to wait for AJAX.
+   *
+   * @Given I wait for AJAX to finish at least :seconds seconds
+   *
+   * @throws \Exception
+   *   Ajax call didn't finish on time.
+   */
+  public function iWaitForAjaxToFinish($seconds) {
+    $finished = $this->getSession()->wait($seconds * 1000, '(typeof(jQuery)=="undefined" || (0 === jQuery.active && 0 === jQuery(\':animated\').length))');
+    if (!$finished) {
+      throw new \Exception("Ajax call didn't finished within $seconds seconds.");
+    }
+  }
+
+  /**
+   * Wait for batch process.
+   *
+   * Wait until the id="updateprogress" element is gone,
+   * or timeout after 5 seconds (5,000 ms).
+   *
+   * @param init $seconds
+   *
+   * @Given I wait for the batch job to finish
+   * @Given I wait for the batch job to finish at least :seconds seconds
+   */
+  public function iWaitForTheBatchJobToFinish($seconds = 5) {
+    $this->getSession()->wait($seconds * 1000, 'jQuery("#updateprogress").length === 0');
+   }
+
 }
