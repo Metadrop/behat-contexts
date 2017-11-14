@@ -206,4 +206,19 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
     $this->iClickOnTheElementWithXPath($xpath);
   }
 
+  /**
+   * @When I switch to the frame :frame
+   */
+  public function iSwitchToTheFrame($frame) {
+    $this->getSession()->switchToIFrame($frame);
+    $this->iframe = $frame;
+  }
+
+  /**
+   * @When I switch out of all frames
+   */
+  public function iSwitchOutOfAllFrames() {
+    $this->getSession()->switchToIFrame();
+    $this->iframe = NULL;
+  }
 }
