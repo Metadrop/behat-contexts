@@ -206,4 +206,50 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
     $this->iClickOnTheElementWithXPath($xpath);
   }
 
+  /**
+   * Get element by xpath.
+   */
+  protected function getElementByXpath($xpath_element) {
+    $page = $this->getSession()->getPage();
+    $findelement = $page->find('xpath', $xpath_element);
+    return $findelement;
+  }
+
+  /**
+   * Check if a type of element has an attribute with an specific value.
+   *
+   * @Then the :element element of :type type should have the :attribute attribute with :value value
+   */
+  public function theElementShouldHaveAttributeWithValue($element, $type, $attribute, $value, $not = NULL) {
+    is_null($not) ? $not = FALSE : $not = TRUE;
+    $xpath = "//{$type}[contains(text(),'{$element}')]";
+    $category_element = $this->getElementByXpath($xpath);
+
+    if (is_null($category_element)) {
+      throw new \Exception("The element {$element} was not found");
+    }
+
+    $not ? $xpath = "//{$type}[not(contains(@{$attribute},'{$value}'))][contains(text(),'{$element}')]" : $xpath = "//{$type}[contains(@{$attribute},'{$value}')][contains(text(),'{$element}')]";
+
+    $category_element = $this->getElementByXpath($xpath);
+
+    if (is_null($category_element) && $not) {
+      print $xpath;
+      throw new \Exception("The element {$element} does not have the attribute {$attribute} with the value {$value}");
+    } elseif (is_null($category_element) && !$not) {
+      print $xpath;
+      throw new \Exception("The element {$element} has the attribute {$attribute} with the value {$value}");
+    }
+  }
+
+  /**
+   * Check if a type of element has an attribute with an specific value.
+   *
+   * @Then the :element element of :type type should not have the :attribute attribute with :value value
+   */
+  public function theElementShouldNotHaveAttributeWithValue($element, $type, $attribute, $value, $not = NULL) {
+    $not = TRUE;
+    $this->theElementShouldHaveAttributeWithValue($element, $type, $attribute, $value, $not);
+  }
+
 }
