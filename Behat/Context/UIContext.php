@@ -220,8 +220,8 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
    *
    * @Then the :element element of :type type should have the :attribute attribute with :value value
    */
-  public function theElementShouldHaveAttributeWithValue($element, $type, $attribute, $value, $not = NULL) {
-    is_null($not) ? $not = FALSE : $not = TRUE;
+  public function theElementShouldHaveAttributeWithValue($element, $type, $attribute, $value, $not = FALSE) {
+    $not = is_null($not) ? FALSE : $not;
     $xpath = "//{$type}[contains(text(),'{$element}')]";
     $category_element = $this->getElementByXpath($xpath);
 
@@ -229,14 +229,15 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
       throw new \Exception("The element {$element} was not found");
     }
 
-    $not ? $xpath = "//{$type}[not(contains(@{$attribute},'{$value}'))][contains(text(),'{$element}')]" : $xpath = "//{$type}[contains(@{$attribute},'{$value}')][contains(text(),'{$element}')]";
+    $xpath = $not ? "//{$type}[not(contains(@{$attribute},'{$value}'))][contains(text(),'{$element}')]" : "//{$type}[contains(@{$attribute},'{$value}')][contains(text(),'{$element}')]";
 
     $category_element = $this->getElementByXpath($xpath);
 
     if (is_null($category_element) && $not) {
       print $xpath;
       throw new \Exception("The element {$element} does not have the attribute {$attribute} with the value {$value}");
-    } elseif (is_null($category_element) && !$not) {
+    }
+    elseif (is_null($category_element) && !$not) {
       print $xpath;
       throw new \Exception("The element {$element} has the attribute {$attribute} with the value {$value}");
     }
@@ -247,8 +248,7 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
    *
    * @Then the :element element of :type type should not have the :attribute attribute with :value value
    */
-  public function theElementShouldNotHaveAttributeWithValue($element, $type, $attribute, $value, $not = NULL) {
-    $not = TRUE;
+  public function theElementShouldNotHaveAttributeWithValue($element, $type, $attribute, $value, $not = TRUE) {
     $this->theElementShouldHaveAttributeWithValue($element, $type, $attribute, $value, $not);
   }
 
