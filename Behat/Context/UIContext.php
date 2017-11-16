@@ -123,7 +123,7 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
     $offset_default = isset($this->customParams['scroll_offset']) ? $this->customParams['scroll_offset'] : 0;
     $offset = is_null($offset) ? $offset_default : $offset;
     $op = $offset >= 0 ? '+' : '-';
-    $script = "jQuery('html,body').unbind().animate({scrollTop: jQuery('$selector').offset().top" . $op . abs($offset) . "},'slow')";
+    $script = "jQuery('html,body').unbind().animate({scrollTop: jQuery('$selector').offset().top" . $op . abs($offset) . "},0)";
     $this->getSession()->executeScript($script);
   }
 
@@ -250,6 +250,22 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
    */
   public function theElementShouldNotHaveAttributeWithValue($element, $type, $attribute, $value, $not = TRUE) {
     $this->theElementShouldHaveAttributeWithValue($element, $type, $attribute, $value, $not);
+  }
+
+  /**
+   * @When I switch to the frame :frame
+   */
+  public function iSwitchToTheFrame($frame) {
+    $this->getSession()->switchToIFrame($frame);
+    $this->iframe = $frame;
+  }
+
+  /**
+   * @When I switch out of all frames
+   */
+  public function iSwitchOutOfAllFrames() {
+    $this->getSession()->switchToIFrame();
+    $this->iframe = NULL;
   }
 
 }
