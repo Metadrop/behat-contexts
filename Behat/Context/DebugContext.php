@@ -87,6 +87,13 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
   protected $feature;
 
   /**
+   * Failed step's file name.
+   *
+   * @var completed file name error.
+   */
+  protected $filenameTemplate;
+  
+  /**
    * Constructor.
    *
    * Save class params, if any.
