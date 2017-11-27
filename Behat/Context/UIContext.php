@@ -14,6 +14,7 @@ namespace Metadrop\Behat\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Drupal\DrupalExtension\Context\RawDrupalContext;
+use Behat\Mink\Exception\ExpectationException;
 
 class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
 
