@@ -56,7 +56,7 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
    *
    * @var array
    */
-  protected $customParams;
+  protected $customParameters;
 
   /**
    * The Mink session.
@@ -86,6 +86,13 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
    */
   protected $feature;
 
+  /**
+   * Failed step's file name.
+   *
+   * @var completed file name error.
+   */
+  protected $filenameTemplate;
+  
   /**
    * Constructor.
    *
