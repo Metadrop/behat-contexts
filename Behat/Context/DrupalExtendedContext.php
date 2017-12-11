@@ -163,7 +163,7 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
    */
   public function userRoleCheck($role, $user = NULL, $not = FALSE) {
     if (empty($user)) {
-      $account = $this->user;
+      $account = $this->getUserManager()->getCurrentUser();
     }
     else {
       $condition = $this->getUserPropertyByName($user);
@@ -337,7 +337,7 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
     foreach ($nodesTable->getHash() as $nodeHash) {
       $node = (object) $nodeHash;
       $node->type = $type;
-      $node->uid  = $this->user->uid;
+      $node->uid  = $this->getUserManager->getCurrentUser()->uid;
       $this->nodeCreate($node);
     }
   }
