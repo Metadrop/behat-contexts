@@ -30,7 +30,7 @@ class BrowserSizeContext extends RawDrupalContext implements SnippetAcceptingCon
    *
    * @var array
    */
-  protected $customParams;
+  protected $customParameters;
 
   /**
    * Constructor.
