@@ -248,8 +248,8 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
    *
    * @Then the :element element of :type type should not have the :attribute attribute with :value value
    */
-  public function theElementShouldNotHaveAttributeWithValue($element, $type, $attribute, $value, $not = TRUE) {
-    $this->theElementShouldHaveAttributeWithValue($element, $type, $attribute, $value, $not);
+  public function theElementShouldNotHaveAttributeWithValue($element, $type, $attribute, $value) {
+    $this->theElementShouldHaveAttributeWithValue($element, $type, $attribute, $value, TRUE);
   }
 
   /**
