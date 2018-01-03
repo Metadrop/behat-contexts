@@ -234,7 +234,7 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
     $found_element_attribute = $this->getElementByXpath($xpath_attribute);
 
     if (is_null($found_element_attribute)) {
-      $condition_error_string = $not ? "has not" : "has";
+      $condition_error_string = $not ? "has" : "has not";
       throw new \Exception("The element {$element} {$condition_error_string} the attribute {$attribute} with the value {$value}");
     }
   }
