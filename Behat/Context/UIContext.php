@@ -221,18 +221,18 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
    * @Then the :element element of :type type should have the :attribute attribute with :value value
    */
   public function theElementShouldHaveAttributeWithValue($element, $type, $attribute, $value, $not = FALSE) {
-    $xpath = "//{$type}[contains(text(),'{$element}')]";
-    $category_element = $this->getElementByXpath($xpath);
+    $xpath_element = "//{$type}[contains(text(),'{$element}')]";
+    $found_element = $this->getElementByXpath($xpath_element);
 
-    if (is_null($category_element)) {
+    if (is_null($found_element)) {
       throw new \Exception("The element {$element} was not found");
     }
 
-    $xpath = $not ? "//{$type}[not(contains(@{$attribute},'{$value}'))][contains(text(),'{$element}')]" : "//{$type}[contains(@{$attribute},'{$value}')][contains(text(),'{$element}')]";
+    $xpath_attribute = $not ? "//{$type}[not(contains(@{$attribute},'{$value}'))][contains(text(),'{$element}')]" : "//{$type}[contains(@{$attribute},'{$value}')][contains(text(),'{$element}')]";
 
-    $category_element = $this->getElementByXpath($xpath);
+    $found_element_attribute = $this->getElementByXpath($xpath_attribute);
 
-    if (is_null($category_element)) {
+    if (is_null($found_element_attribute)) {
       $condition_error_string = $not ? "has not" : "has";
       throw new \Exception("The element {$element} {$condition_error_string} the attribute {$attribute} with the value {$value}");
     }
