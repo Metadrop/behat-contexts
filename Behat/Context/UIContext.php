@@ -208,6 +208,47 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
   }
 
   /**
+   * Get element by xpath.
+   */
+  protected function getElementByXpath($xpath_element) {
+    $page = $this->getSession()->getPage();
+    $findelement = $page->find('xpath', $xpath_element);
+    return $findelement;
+  }
+
+  /**
+   * Check if a type of element has an attribute with an specific value.
+   *
+   * @Then the :element element of :type type should have the :attribute attribute with :value value
+   */
+  public function theElementShouldHaveAttributeWithValue($element, $type, $attribute, $value, $not = FALSE) {
+    $xpath_element = "//{$type}[contains(text(),'{$element}')]";
+    $found_element = $this->getElementByXpath($xpath_element);
+
+    if (is_null($found_element)) {
+      throw new \Exception("The element {$element} was not found");
+    }
+
+    $xpath_attribute = $not ? "//{$type}[not(contains(@{$attribute},'{$value}'))][contains(text(),'{$element}')]" : "//{$type}[contains(@{$attribute},'{$value}')][contains(text(),'{$element}')]";
+
+    $found_element_attribute = $this->getElementByXpath($xpath_attribute);
+
+    if (is_null($found_element_attribute)) {
+      $condition_error_string = $not ? "has not" : "has";
+      throw new \Exception("The element {$element} {$condition_error_string} the attribute {$attribute} with the value {$value}");
+    }
+  }
+
+  /**
+   * Check if a type of element has an attribute with an specific value.
+   *
+   * @Then the :element element of :type type should not have the :attribute attribute with :value value
+   */
+  public function theElementShouldNotHaveAttributeWithValue($element, $type, $attribute, $value) {
+    $this->theElementShouldHaveAttributeWithValue($element, $type, $attribute, $value, TRUE);
+  }
+
+  /**
    * @When I switch to the frame :frame
    */
   public function iSwitchToTheFrame($frame) {
@@ -222,4 +263,5 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
     $this->getSession()->switchToIFrame();
     $this->iframe = NULL;
   }
+
 }
