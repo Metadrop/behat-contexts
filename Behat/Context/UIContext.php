@@ -221,7 +221,6 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
    * @Then the :element element of :type type should have the :attribute attribute with :value value
    */
   public function theElementShouldHaveAttributeWithValue($element, $type, $attribute, $value, $not = FALSE) {
-    $not = is_null($not) ? FALSE : $not;
     $xpath = "//{$type}[contains(text(),'{$element}')]";
     $category_element = $this->getElementByXpath($xpath);
 
@@ -233,13 +232,9 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
 
     $category_element = $this->getElementByXpath($xpath);
 
-    if (is_null($category_element) && $not) {
-      print $xpath;
-      throw new \Exception("The element {$element} does not have the attribute {$attribute} with the value {$value}");
-    }
-    elseif (is_null($category_element) && !$not) {
-      print $xpath;
-      throw new \Exception("The element {$element} has the attribute {$attribute} with the value {$value}");
+    if (is_null($category_element)) {
+      $condition_error_string = $not ? "has not" : "has";
+      throw new \Exception("The element {$element} {$condition_error_string} the attribute {$attribute} with the value {$value}");
     }
   }
 
