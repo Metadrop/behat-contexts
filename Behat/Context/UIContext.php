@@ -1,14 +1,5 @@
 <?php
 
-/**
- * @file
- *
- * DrupalUtilsContext Context for Behat.
- *
- * Adds steps for UI elements.
- *
- */
-
 namespace Metadrop\Behat\Context;
 
 use Behat\Behat\Context\SnippetAcceptingContext;
@@ -16,6 +7,14 @@ use Behat\Mink\Exception\ElementNotFoundException;
 use Drupal\DrupalExtension\Context\RawDrupalContext;
 use Behat\Mink\Exception\ExpectationException;
 
+/**
+ * @file
+ * DrupalUtilsContext Context for Behat.
+ */
+
+/**
+ * Adds steps for UI elements.
+ */
 class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
 
   /**
@@ -28,16 +27,19 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
   /**
    * Constructor.
    *
-   * @param type $parameters
+   * @param array|null $parameters
+   *   Custom Parameters.
    */
   public function __construct($parameters = array()) {
     $this->customParams = $parameters;
   }
 
   /**
+   * Step fill CKEditor.
+   *
    * @Then I fill in CKEditor on field :locator with :value
    */
-  public function iFillInCKEditorOnFieldWith($locator, $value) {
+  public function iFillInCkEditorOnFieldWith($locator, $value) {
     $el = $this->getSession()->getPage()->findField($locator);
 
     if (empty($el)) {
@@ -66,7 +68,7 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
 
     // Get field.
     $page = $this->getSession()->getPage();
-    $field = $page->findField($select, true);
+    $field = $page->findField($select, TRUE);
     if (NULL === $field) {
       throw new ElementNotFoundException($this->getSession(), 'form field', 'id|name|label|value', $select);
     }
@@ -115,12 +117,12 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
    * Helper to scroll to selector with JS.
    *
    * @param string $selector
-   *   jQuery selector
+   *   jQuery selector.
    * @param int $offset
    *   Pixels to add or remove to selector position.
    *   E.G. Take into account fix headers, footers, etc.
    */
-  public function scrollToSelector($selector, $offset = null) {
+  public function scrollToSelector($selector, $offset = NULL) {
     $offset_default = isset($this->customParams['scroll_offset']) ? $this->customParams['scroll_offset'] : 0;
     $offset = is_null($offset) ? $offset_default : $offset;
     $op = $offset >= 0 ? '+' : '-';
@@ -129,21 +131,25 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
   }
 
   /**
+   * Step scroll to selector.
+   *
    * @When I scroll to :selector
    * @When I scroll to :selector with :offset
    */
-  public function scrollToElement($selector, $offset = null) {
+  public function scrollToElement($selector, $offset = NULL) {
     $this->scrollToSelector($selector, $offset);
   }
 
   /**
+   * Step scroll to field.
+   *
    * @When I scroll to :field field
    * @When I scroll to :field field with :offset
    */
-  public function scrollToField($field, $offset = null) {
+  public function scrollToField($field, $offset = NULL) {
 
     $page = $this->getSession()->getPage();
-    $field = $page->findField($field, true);
+    $field = $page->findField($field, TRUE);
 
     if (NULL === $field) {
       throw new ElementNotFoundException($this->getSession(), 'form field', 'id|name|label|value', $field);
@@ -162,13 +168,14 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
    *
    * @When /^I click on the element with css selector "([^"]*)"$/
    */
-  public function iClickOnTheElementWithCSSSelector($cssSelector) {
+  public function iClickOnTheElementWithCssSelector($cssSelector) {
     $session = $this->getSession();
     $element = $session->getPage()->find(
       'xpath',
-      $session->getSelectorsHandler()->selectorToXpath('css', $cssSelector) // just changed xpath to css
+      // Just changed xpath to css.
+      $session->getSelectorsHandler()->selectorToXpath('css', $cssSelector)
     );
-    if (null === $element) {
+    if (NULL === $element) {
       throw new \InvalidArgumentException(sprintf('Could not evaluate CSS Selector: "%s"', $cssSelector));
     }
 
@@ -180,19 +187,20 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
    *
    * @When /^I click on the element with xpath "([^"]*)"$/
    */
-  public function iClickOnTheElementWithXPath($xpath) {
-    $session = $this->getSession(); // get the mink session
+  public function iClickOnTheElementWithXpath($xpath) {
+    // Get the mink session.
+    $session = $this->getSession();
     $element = $session->getPage()->find(
       'xpath',
       $session->getSelectorsHandler()->selectorToXpath('xpath', $xpath)
     );
 
-    // errors must not pass silently
-    if (null === $element) {
+    // Errors must not pass silently.
+    if (NULL === $element) {
       throw new \InvalidArgumentException(sprintf('Could not evaluate XPath: "%s"', $xpath));
     }
 
-    // ok, let's click on it
+    // ok, let's click on it.
     $element->click();
   }
 
@@ -249,6 +257,8 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
   }
 
   /**
+   * Step switch to the frame.
+   *
    * @When I switch to the frame :frame
    */
   public function iSwitchToTheFrame($frame) {
@@ -257,6 +267,8 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
   }
 
   /**
+   * Step switch out of all frames.
+   *
    * @When I switch out of all frames
    */
   public function iSwitchOutOfAllFrames() {
