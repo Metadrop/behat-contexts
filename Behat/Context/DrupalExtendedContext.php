@@ -253,12 +253,11 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
 
     $info = entity_get_info($entity_type);
     $id_key = $info['entity keys']['id'];
-    $bundle_key = $info['entity keys']['bundle'];
 
     $query = new \EntityFieldQuery();
     $query->entityCondition('entity_type', $entity_type);
     if ($bundle) {
-      $query->entityCondition($bundle_key, $bundle);
+      $query->entityCondition('bundle', $bundle);
     }
 
     $query->propertyOrderBy($id_key, 'DESC');
