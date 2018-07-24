@@ -429,4 +429,28 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
     $this->getSession()->wait($seconds * 1000, 'jQuery("#updateprogress").length === 0');
    }
 
+   /**
+    * Check that user with mail exists.
+    *
+    * @Then user with mail :mail exists
+    */
+   public function userWithMailExists($mail, $exists = TRUE) {
+     $user = user_load_by_mail($mail);
+     if (!$user && $exists) {
+       throw new \Exception("The user with mail '" . $mail . "' was not found.");
+     }
+     elseif (!empty($user) && !$exists) {
+       throw new \Exception("The user with mail '" . $mail . "' exists.");
+     }
+   }
+
+   /**
+    * Check that user with mail not exists.
+    *
+    * @Then user with mail :mail not exists
+    */
+   public function userWithMailNotExists($mail) {
+     $this->userWithMailExists($mail, FALSE);
+   }
+
 }
