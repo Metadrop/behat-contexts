@@ -497,4 +497,39 @@ public function iRunTheCronOfSearchApiSolr() {
      $this->userWithMailExists($mail, FALSE);
    }
 
+  /**
+   * Create paragraphs and reference it to the last node of type given.
+   *
+   * @param string $paragraph_type
+   *   Paragraph type.
+   * @param string $field_paragraph
+   *   Field to reference the paragrapshs.
+   * @param \Behat\Gherkin\Node\TableNode $paragraph_fields_table
+   *   Paragraph fields.
+   *
+   * @Given paragraph of :paragraph_type type referenced on the :field_paragraph field of the last content:
+   */
+  public function createParagraph($paragraph_type, $field_paragraph, TableNode $paragraph_fields_table) {
+    $entity_type = 'node';
+    $last_id = $this->getLastEntityIdD8($entity_type);
+    if (empty($last_id)) {
+      throw new \Exception("Imposible to get the last content.");
+    }
+
+    $controller = \Drupal::entityManager()->getStorage($entity_type);
+    $entity = $controller->load($last_id);
+
+    // Create multiple paragraphs.
+    foreach ($paragraph_fields_table->getHash() as $paragraph_data) {
+      $paragraph_object = (object) $paragraph_data;
+      $paragraph_object->type = $paragraph_type;
+      $this->parseEntityFields('paragraph', $paragraph_object);
+      $this->expandEntityFields('paragraph', $paragraph_object);
+      $paragraph = Paragraph::create((array) $paragraph_object);
+      $paragraph->save();
+      $entity->get($field_paragraph)->appendItem($paragraph);
+    }
+    $entity->save();
+  }
+
 }
