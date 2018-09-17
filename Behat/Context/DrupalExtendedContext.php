@@ -105,6 +105,24 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
     elysia_cron_run_job($job, TRUE, TRUE, TRUE);
   }
 
+/**
+ * @Given I run the cron of Search API
+ *
+ * Run search-api-cron
+ */
+public function iRunTheCronOfSearchApi() {
+  search_api_cron();
+}
+
+/**
+ * @Given I run the cron of Search API Solr
+ *
+ * Run search-api-solr-cron
+ */
+public function iRunTheCronOfSearchApiSolr() {
+  search_api_solr_cron();
+}
+
   /**
    * Gets user property by name.
    *
