@@ -507,17 +507,23 @@ public function iRunTheCronOfSearchApiSolr() {
    *   First text.
    * @param string $second_text
    *   Second text.
-   * @param string $tag
-   *   Tag.
+   * @param string $region
+   *   Region.
    *
-   * @Then I should see :text1 text before :text2 from :tag_element element
+   * @Then I should see :text1 text before :text2
+   * @Then I should see :text1 text before :text2 in the :region region
    */
-  public function iShouldSeeTextBefore($first_text, $second_text, $tag) {
+  public function iShouldSeeTextBefore($first_text, $second_text, $region = NULL) {
     // Take sesion & page.
     $session = $this->getSession();
-    $page = $session->getPage();
+    if (isset($region)) {
+      $page = $session->getPage()->find('region', $region);
+    }
+    else {
+      $page = $session->getPage();
+    }
 
-    $xpath = "//" . $tag . "[contains(*, '$second_text')]/preceding::" . $tag . "[contains(*, '$first_text')]";
+    $xpath = "//*[contains(*, '$second_text')]/preceding::*[contains(*, '$first_text')]";
     $element = $page->find('xpath', $xpath);
     // Check.
     if ($element === NULL) {
