@@ -501,7 +501,7 @@ public function iRunTheCronOfSearchApiSolr() {
    * Checks that text appears before another text.
    *
    * Example:
-   * I should see "Element 1" text before "Element 2" from "li" element.
+   * I should see "Element 1" text before "Element 2" in the "content" region.
    *
    * @param string $first_text
    *   First text.
