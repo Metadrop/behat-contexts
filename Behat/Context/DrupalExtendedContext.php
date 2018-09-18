@@ -498,7 +498,21 @@ public function iRunTheCronOfSearchApiSolr() {
    }
 
   /**
-   * Create paragraphs and reference it to the last node of type given.
+   * Create a paragraph and reference it in the given field of the last node created.
+   *
+   * You can only create several paragraphs of the same type at once.
+   * To add other types you must do so in different steps.
+   *
+   * Example:
+   * Given paragraph of "paragraph_type" type referenced on the "field_paragraph" field of the last content:
+   *  | title                  | field_body        |
+   *  | Behat paragraph        | behat body        |
+   *  | Behat paragraph Second | behat second body |
+   *
+   * Given paragraph of "paragraph_type_second" type referenced on the "field_paragraph" field of the last content:
+   *  | title                  | field_body        |
+   *  | Behat paragraph        | behat body        |
+   *  | Behat paragraph Second | behat second body |
    *
    * @param string $paragraph_type
    *   Paragraph type.
@@ -513,7 +527,7 @@ public function iRunTheCronOfSearchApiSolr() {
     $entity_type = 'node';
     $last_id = $this->getLastEntityIdD8($entity_type);
     if (empty($last_id)) {
-      throw new \Exception("Imposible to get the last content.");
+      throw new \Exception("Impossible to get the last content id.");
     }
 
     $controller = \Drupal::entityManager()->getStorage($entity_type);
