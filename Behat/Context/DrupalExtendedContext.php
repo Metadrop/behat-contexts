@@ -497,4 +497,38 @@ public function iRunTheCronOfSearchApiSolr() {
      $this->userWithMailExists($mail, FALSE);
    }
 
+  /**
+   * Checks that text appears before another text.
+   *
+   * Example:
+   * I should see "Element 1" text before "Element 2" in the "content" region.
+   *
+   * @param string $first_text
+   *   First text.
+   * @param string $second_text
+   *   Second text.
+   * @param string $region
+   *   Region.
+   *
+   * @Then I should see :text1 text before :text2
+   * @Then I should see :text1 text before :text2 in the :region region
+   */
+  public function iShouldSeeTextBefore($first_text, $second_text, $region = NULL) {
+    // Take sesion & page.
+    $session = $this->getSession();
+    if (isset($region)) {
+      $page = $session->getPage()->find('region', $region);
+    }
+    else {
+      $page = $session->getPage();
+    }
+
+    $xpath = "//*[contains(*, '$second_text')]/preceding::*[contains(*, '$first_text')]";
+    $element = $page->find('xpath', $xpath);
+    // Check.
+    if ($element === NULL) {
+      throw new \Exception("The text $first_text is not being seen before $second_text");
+    }
+  }
+
 }
