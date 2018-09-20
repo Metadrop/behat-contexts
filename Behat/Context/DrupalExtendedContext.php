@@ -12,6 +12,7 @@ namespace Metadrop\Behat\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Gherkin\Node\TableNode;
 use Drupal\DrupalExtension\Context\RawDrupalContext;
+use Drupal\paragraphs\Entity\Paragraph;
 
 class DrupalExtendedContext extends RawDrupalContext implements SnippetAcceptingContext {
 
@@ -294,6 +295,30 @@ public function iRunTheCronOfSearchApiSolr() {
   }
 
   /**
+   * Discovers last entity id created of type.
+   */
+  public function getLastEntityIdD8($entity_type, $bundle = NULL) {
+
+    $info = \Drupal::entityTypeManager()->getDefinition($entity_type);
+    $id_key = $info->getKey('id');
+    $bundle_key = $info->getKey('bundle');
+
+    $query = \Drupal::entityQuery($entity_type);
+    if ($bundle) {
+      $query->condition($bundle_key, $bundle);
+    }
+    $query->sort($id_key, 'DESC');
+    $query->range(0, 1);
+    $query->addMetaData('account', user_load(1));
+    $results = $query->execute();
+
+    if (!empty($results)) {
+      $id = reset($results);
+      return $id;
+    }
+  }
+
+  /**
    * Go to last entity created.
    *
    * @Given I go to the last entity :entity created
@@ -496,6 +521,19 @@ public function iRunTheCronOfSearchApiSolr() {
    public function userWithMailNotExists($mail) {
      $this->userWithMailExists($mail, FALSE);
    }
+
+  /**
+   * Get core handler.
+   *
+   * This allow use functions to create commerce entities like 'Given content'
+   * steps makes.
+   *
+   * @return \Drupal\Driver\Cores\CoreInterface
+   *   Core handler for current core.
+   */
+  public function getCore() {
+    return $this->getDriver()->getCore();
+  }
 
   /**
    * Overrides \Drupal\Driver\Cores\AbstractCore::expandEntityFields method.
