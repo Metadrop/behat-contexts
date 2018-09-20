@@ -510,9 +510,9 @@ public function iRunTheCronOfSearchApiSolr() {
    *  | Behat paragraph Second | behat second body |
    *
    * Given paragraph of "paragraph_type_second" type referenced on the "field_paragraph" field of the last content:
-   *  | title                  | field_body        |
-   *  | Behat paragraph        | behat body        |
-   *  | Behat paragraph Second | behat second body |
+   *  | title                  | field_text        |
+   *  | Behat paragraph        | behat text        |
+   *  | Behat paragraph Second | behat second text |
    *
    * @param string $paragraph_type
    *   Paragraph type.
