@@ -498,6 +498,21 @@ public function iRunTheCronOfSearchApiSolr() {
    }
 
   /**
+   * Overrides \Drupal\Driver\Cores\AbstractCore::expandEntityFields method.
+   *
+   * That method is protected and we can't use it from this context.
+   */
+  protected function expandEntityFields($entity_type, \stdClass $entity) {
+    $field_types = $this->getCore()->getEntityFieldTypes($entity_type);
+    foreach ($field_types as $field_name => $type) {
+      if (isset($entity->$field_name)) {
+        $entity->$field_name = $this->getCore()->getFieldHandler($entity, $entity_type, $field_name)
+          ->expand($entity->$field_name);
+      }
+    }
+  }
+
+  /**
    * Create a paragraph and reference it in the given field of the last node created.
    *
    * You can only create several paragraphs of the same type at once.
