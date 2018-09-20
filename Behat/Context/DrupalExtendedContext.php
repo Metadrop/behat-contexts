@@ -553,6 +553,7 @@ public function iRunTheCronOfSearchApiSolr() {
   /**
    * Create a paragraph and reference it in the given field of the last node created.
    *
+   * Only works in drupal 8.
    * You can only create several paragraphs of the same type at once.
    * To add other types you must do so in different steps.
    *
