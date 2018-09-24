@@ -523,7 +523,6 @@ public function iRunTheCronOfSearchApiSolr() {
    }
 
   /**
-<<<<<<< HEAD
    * Get core handler.
    *
    * This allow use functions to create commerce entities like 'Given content'
