@@ -593,15 +593,14 @@ public function iRunTheCronOfSearchApiSolr() {
    * To add other types you must do so in different steps.
    *
    * Example:
-   * Given paragraph of "paragraph_type" type referenced on the "field_paragraph" field of the last content:
-   *  | title                  | field_body        |
-   *  | Behat paragraph        | behat body        |
-   *  | Behat paragraph Second | behat second body |
+   * Given paragraph of "layout" type referenced on the "field_paragraph" field of the last content:
+   *  | title                  | field_body        | depth | layout               |
+   *  | Behat paragraph        | behat body        | 0     | layout_kit_accordion |
    *
    * Given paragraph of "paragraph_type_second" type referenced on the "field_paragraph" field of the last content:
-   *  | title                  | field_text        |
-   *  | Behat paragraph        | behat text        |
-   *  | Behat paragraph Second | behat second text |
+   *  | title                  | field_text        | depth |
+   *  | Behat paragraph        | behat text        | 1     |
+   *  | Behat paragraph Second | behat second text | 1     |
    *
    * @param string $paragraph_type
    *   Paragraph type.
@@ -624,13 +623,26 @@ public function iRunTheCronOfSearchApiSolr() {
 
     // Create multiple paragraphs.
     foreach ($paragraph_fields_table->getHash() as $paragraph_data) {
+      $field_value = [];
+
+      if (isset($paragraph_data['depth'])) {
+        $field_value['depth'] = $paragraph_data['depth'];
+        unset($paragraph_data['depth']);
+      }
+      if (isset($paragraph_data['layout'])) {
+        $field_value['options']['layout'] = $paragraph_data['layout'];
+        unset($paragraph_data['layout']);
+      }
+
       $paragraph_object = (object) $paragraph_data;
       $paragraph_object->type = $paragraph_type;
       $this->parseEntityFields('paragraph', $paragraph_object);
       $this->expandEntityFields('paragraph', $paragraph_object);
       $paragraph = Paragraph::create((array) $paragraph_object);
       $paragraph->save();
-      $entity->get($field_paragraph)->appendItem($paragraph);
+
+      $field_value['target_id'] = $paragraph->id();
+      $entity->get($field_paragraph)->appendItem($field_value);
     }
     $entity->save();
   }
