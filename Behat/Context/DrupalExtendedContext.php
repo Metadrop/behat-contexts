@@ -12,6 +12,7 @@ namespace Metadrop\Behat\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Gherkin\Node\TableNode;
 use Drupal\DrupalExtension\Context\RawDrupalContext;
+use Drupal\paragraphs\Entity\Paragraph;
 
 class DrupalExtendedContext extends RawDrupalContext implements SnippetAcceptingContext {
 
@@ -294,6 +295,30 @@ public function iRunTheCronOfSearchApiSolr() {
   }
 
   /**
+   * Discovers last entity id created of type.
+   */
+  public function getLastEntityIdD8($entity_type, $bundle = NULL) {
+
+    $info = \Drupal::entityTypeManager()->getDefinition($entity_type);
+    $id_key = $info->getKey('id');
+    $bundle_key = $info->getKey('bundle');
+
+    $query = \Drupal::entityQuery($entity_type);
+    if ($bundle) {
+      $query->condition($bundle_key, $bundle);
+    }
+    $query->sort($id_key, 'DESC');
+    $query->range(0, 1);
+    $query->addMetaData('account', user_load(1));
+    $results = $query->execute();
+
+    if (!empty($results)) {
+      $id = reset($results);
+      return $id;
+    }
+  }
+
+  /**
    * Go to last entity created.
    *
    * @Given I go to the last entity :entity created
@@ -498,6 +523,34 @@ public function iRunTheCronOfSearchApiSolr() {
    }
 
   /**
+   * Get core handler.
+   *
+   * This allow use functions to create commerce entities like 'Given content'
+   * steps makes.
+   *
+   * @return \Drupal\Driver\Cores\CoreInterface
+   *   Core handler for current core.
+   */
+  public function getCore() {
+    return $this->getDriver()->getCore();
+  }
+
+  /**
+   * Overrides \Drupal\Driver\Cores\AbstractCore::expandEntityFields method.
+   *
+   * That method is protected and we can't use it from this context.
+   */
+  protected function expandEntityFields($entity_type, \stdClass $entity) {
+    $field_types = $this->getCore()->getEntityFieldTypes($entity_type);
+    foreach ($field_types as $field_name => $type) {
+      if (isset($entity->$field_name)) {
+        $entity->$field_name = $this->getCore()->getFieldHandler($entity, $entity_type, $field_name)
+          ->expand($entity->$field_name);
+      }
+    }
+  }
+
+  /**
    * Checks that text appears before another text.
    *
    * Example:
@@ -529,6 +582,56 @@ public function iRunTheCronOfSearchApiSolr() {
     if ($element === NULL) {
       throw new \Exception("The text $first_text is not being seen before $second_text");
     }
+  }
+
+  /**
+   * Create a paragraph and reference it in the given field of the last node created.
+   *
+   * Only works in drupal 8.
+   * You can only create several paragraphs of the same type at once.
+   * To add other types you must do so in different steps.
+   *
+   * Example:
+   * Given paragraph of "paragraph_type" type referenced on the "field_paragraph" field of the last content:
+   *  | title                  | field_body        |
+   *  | Behat paragraph        | behat body        |
+   *  | Behat paragraph Second | behat second body |
+   *
+   * Given paragraph of "paragraph_type_second" type referenced on the "field_paragraph" field of the last content:
+   *  | title                  | field_text        |
+   *  | Behat paragraph        | behat text        |
+   *  | Behat paragraph Second | behat second text |
+   *
+   * @param string $paragraph_type
+   *   Paragraph type.
+   * @param string $field_paragraph
+   *   Field to reference the paragrapshs.
+   * @param \Behat\Gherkin\Node\TableNode $paragraph_fields_table
+   *   Paragraph fields.
+   *
+   * @Given paragraph of :paragraph_type type referenced on the :field_paragraph field of the last content:
+   */
+  public function createParagraph($paragraph_type, $field_paragraph, TableNode $paragraph_fields_table) {
+    $entity_type = 'node';
+    $last_id = $this->getLastEntityIdD8($entity_type);
+    if (empty($last_id)) {
+      throw new \Exception("Impossible to get the last content id.");
+    }
+
+    $controller = \Drupal::entityManager()->getStorage($entity_type);
+    $entity = $controller->load($last_id);
+
+    // Create multiple paragraphs.
+    foreach ($paragraph_fields_table->getHash() as $paragraph_data) {
+      $paragraph_object = (object) $paragraph_data;
+      $paragraph_object->type = $paragraph_type;
+      $this->parseEntityFields('paragraph', $paragraph_object);
+      $this->expandEntityFields('paragraph', $paragraph_object);
+      $paragraph = Paragraph::create((array) $paragraph_object);
+      $paragraph->save();
+      $entity->get($field_paragraph)->appendItem($paragraph);
+    }
+    $entity->save();
   }
 
 }
