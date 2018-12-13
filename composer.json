@@ -11,5 +11,10 @@
             "email": "hi@metadrop.net"
         }
     ],
+    "autoload": {
+      "psr-4": {
+        "Metadrop\\": "./"
+      }
+    },
     "minimum-stability": "dev"
 }
