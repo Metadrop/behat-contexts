@@ -1,0 +1,15 @@
+{
+    "name": "metadrop/behat-contexts",
+    "description": "Contexts that we use with Behat 3.x tests on Drupal sites.",
+    "type": "library",
+    "require": {
+        "drupal/drupal-extension": "^3.4"
+    },
+    "authors": [
+        {
+            "name": "Metadrop",
+            "email": "hi@metadrop.net"
+        }
+    ],
+    "minimum-stability": "dev"
+}
