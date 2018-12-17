@@ -37,6 +37,9 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
   /**
    * Step to fill a Chosen select form element.
    *
+   * @TODO: compare method with nuvole drupal-extension, drop from here if
+   * nuvole method works!
+   *
    * It doesn't work when multiple selection is enabled.
    *
    * See https://harvesthq.github.io/chosen/
