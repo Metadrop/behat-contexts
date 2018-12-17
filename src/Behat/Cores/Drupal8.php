@@ -52,7 +52,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     $query = \Drupal::entityQuery('user');
     $query->condition($property, $value);
     $entity_ids = $query->execute();
-    return User::load(reset($entity_ids));
+    return !empty($entity_ids) ? User::load(reset($entity_ids)) : NULL;
   }
 
   /**
