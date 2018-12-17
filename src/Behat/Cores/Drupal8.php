@@ -6,6 +6,7 @@ use NuvoleWeb\Drupal\Driver\Cores\Drupal8 as OriginalDrupal8;
 use Metadrop\Behat\Cores\Traits\UsersTrait;
 use Metadrop\Behat\Cores\Traits\CronTrait;
 use Webmozart\Assert\Assert;
+use Behat\Behat\Tester\Exception\PendingException;
 
 class Drupal8 extends OriginalDrupal8 implements CoreInterface {
 
