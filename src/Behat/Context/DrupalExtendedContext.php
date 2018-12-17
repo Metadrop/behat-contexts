@@ -399,7 +399,7 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
     * @Then user with mail :mail exists
     */
    public function userWithMailExists($mail, $exists = TRUE) {
-     $user = user_load_by_mail($mail);
+     $user = $this->getCore()->loadUserByProperty('mail', $mail);
      if (!$user && $exists) {
        throw new \Exception("The user with mail '" . $mail . "' was not found.");
      }
