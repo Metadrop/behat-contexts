@@ -51,7 +51,6 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     $query = \Drupal::entityQuery('user');
     $query->condition($property, $value);
     $entity_ids = $query->execute();
-    Assert::count($entity_ids, 1, 'User with property "' . $property . '" and value "' . $value . '" exists.');
     return User::load(reset($entity_ids));
   }
 
