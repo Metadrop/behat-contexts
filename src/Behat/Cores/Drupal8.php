@@ -14,4 +14,11 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     \Drupal::cache($bin)->delete($cid);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function viewsCacheClear($view_name) {
+    throw new PendingException('Views cache clearing not implemented yet in Drupal 8!');
+  }
+
 }

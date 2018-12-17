@@ -77,13 +77,13 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
   /**
    * Flush views data cache.
    *
-   * @param string $views_name
+   * @param string $view_name
    *  Views name
    *
    * @Given :view view data cache is flushed
    */
-  public function viewDataCacheIsFlushed($views_name) {
-    cache_clear_all($views_name . ':', 'cache_views_data', TRUE);
+  public function viewDataCacheIsFlushed($view_name) {
+    $this->getCore()->viewsCacheClear($view_name);
   }
 
   /**

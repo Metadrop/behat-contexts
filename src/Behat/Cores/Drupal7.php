@@ -13,4 +13,12 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
   public function cacheClear($cid, $bin = 'cache') {
     cache_clear_all($cid, $bin, TRUE);
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function viewsCacheClear($view_name) {
+    $this->cacheClear($view_name . ':', 'cache_views-data');
+  }
+
 }
