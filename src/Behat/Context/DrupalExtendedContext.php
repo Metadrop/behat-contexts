@@ -71,7 +71,7 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
       $path = $base_url . '/' . $path;
     }
 
-    cache_clear_all($path, 'cache_page', TRUE);
+    $this->getCore()->cacheClear($path, 'page');
   }
 
   /**
