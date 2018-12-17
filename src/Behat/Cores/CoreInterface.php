@@ -90,7 +90,7 @@ interface CoreInterface {
    * @param string $entity_type
    *   Entity type.
    */
-  public function attachParagraphToEntity($paragraph_type, $paragraph_field, array $paragraph_values, $entity, $entity_type = NULL);
+  public function attachParagraphToEntity($paragraph_type, $paragraph_field, array $paragraph_values, $entity, $entity_type);
 
   /**
    * Entity save.
@@ -101,5 +101,23 @@ interface CoreInterface {
    *   Entity.
    */
   public function entitySave($entity_type, $entity);
+
+  /**
+   * Get entity uri.
+   *
+   * @param string $entity_type
+   *   Entity type.
+   * @param mixed $entity
+   *   Entity.
+   */
+  public function entityUri($entity_type, $entity);
+
+  /**
+   * Grant node access acquirements.
+   *
+   * @param object $node
+   *   Node.
+   */
+  public function nodeAccessAcquireGrants($node);
 
 }
