@@ -107,24 +107,19 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
 
   /**
    * @Given I run the cron of Search API
-   * @USECORE
    *
    * Run search-api-cron
    */
   public function iRunTheCronOfSearchApi() {
-    search_api_cron();
+    $this->getCore()->runModuleCron('search_api');
   }
 
   /**
    * @Given I run the cron of Search API Solr
    *
-   * @USECORE
-   *
    * Run search-api-solr-cron
    */
   public function iRunTheCronOfSearchApiSolr() {
-    search_api_solr_cron();
-  }
 
   /**
    * Gets user property by name.
@@ -172,6 +167,7 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
 
     $account = user_load($uid, $reset);
     return $account;
+    $this->getCore()->runModuleCron('search_api_solr');
   }
 
   /**

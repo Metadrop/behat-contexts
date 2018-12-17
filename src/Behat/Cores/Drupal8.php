@@ -3,10 +3,12 @@
 namespace Metadrop\Behat\Cores;
 
 use NuvoleWeb\Drupal\Driver\Cores\Drupal8 as OriginalDrupal8;
+use Metadrop\Behat\Cores\Traits\CronTrait;
 use Webmozart\Assert\Assert;
 
 class Drupal8 extends OriginalDrupal8 implements CoreInterface {
 
+  use CronTrait;
   /**
    * {@inheritdoc}
    */

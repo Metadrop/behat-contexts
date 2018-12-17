@@ -4,9 +4,11 @@ namespace Metadrop\Behat\Cores;
 
 use NuvoleWeb\Drupal\Driver\Cores\Drupal7 as OriginalDrupal7;
 use Webmozart\Assert\Assert;
+use Metadrop\Behat\Cores\Traits\CronTrait;
 
 class Drupal7 extends OriginalDrupal7 implements CoreInterface {
 
+  use CronTrait;
   /**
    * {@inheritdoc}
    */
