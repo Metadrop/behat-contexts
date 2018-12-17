@@ -89,24 +89,20 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
   /**
    * @Given I run elysia cron
    *
-   * @USECORE
-   *
    * Run elysia-cron.
    */
   public function iRunElysiaCron() {
-    elysia_cron_run(TRUE);
+    $this->getCore()->runElysiaCron();
   }
 
   /**
    * @Given I run the elysia cron :job job
    *
-   * @USECORE
-   *
    * Run elysia-cron-job.
    */
   public function iRunElysiaCronJob($job) {
     // @NOTE We force it
-    elysia_cron_run_job($job, TRUE, TRUE, TRUE);
+    $this->getCore()->runElysiaCronJob($job);
   }
 
   /**

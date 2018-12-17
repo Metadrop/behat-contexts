@@ -21,4 +21,18 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     throw new PendingException('Views cache clearing not implemented yet in Drupal 8!');
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function runElysiaCron() {
+    throw new PendingException('Elysia cron run not implemented yet!');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function runElysiaCronJob($job) {
+    throw new PendingException('Elysia job cron run not implemented yet!');
+  }
+
 }
