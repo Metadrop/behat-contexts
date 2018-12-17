@@ -211,67 +211,6 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
   }
 
   /**
-   * Get last entity id created
-   *
-   * @param string $entity_type
-   *   Entity type
-   * @param string $bundle
-   *   Entity bundle
-   *
-   * @return integer
-   *   Entity Id
-   */
-  public function getLastEntityId($entity_type, $bundle = NULL) {
-
-    $info = entity_get_info($entity_type);
-    $id_key = $info['entity keys']['id'];
-
-    $query = new \EntityFieldQuery();
-    $query->entityCondition('entity_type', $entity_type);
-    if ($bundle) {
-      $query->entityCondition('bundle', $bundle);
-    }
-
-    $query->propertyOrderBy($id_key, 'DESC');
-    $query->range(0, 1);
-    $query->addMetaData('account', user_load(1));
-
-    $result = $query->execute();
-    $keys = array_keys($result[$entity_type]);
-    $id = reset($keys);
-
-    if (empty($id)){
-      throw new \Exception("Can't take last one");
-    }
-
-    return $id;
-  }
-
-  /**
-   * Discovers last entity id created of type.
-   */
-  public function getLastEntityIdD8($entity_type, $bundle = NULL) {
-
-    $info = \Drupal::entityTypeManager()->getDefinition($entity_type);
-    $id_key = $info->getKey('id');
-    $bundle_key = $info->getKey('bundle');
-
-    $query = \Drupal::entityQuery($entity_type);
-    if ($bundle) {
-      $query->condition($bundle_key, $bundle);
-    }
-    $query->sort($id_key, 'DESC');
-    $query->range(0, 1);
-    $query->addMetaData('account', user_load(1));
-    $results = $query->execute();
-
-    if (!empty($results)) {
-      $id = reset($results);
-      return $id;
-    }
-  }
-
-  /**
    * Go to last entity created.
    *
    * @Given I go to the last entity :entity created
@@ -289,15 +228,15 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
    *   Entity bundle.
    */
   public function goToTheLastEntityCreated($entity_type, $bundle = NULL, $subpath = NULL) {
-    $last_entity = $this->getLastEntityId($entity_type, $bundle);
+    $last_entity = $this->getCore()->getLastEntityId($entity_type, $bundle);
     if (empty($last_entity)) {
       throw new \Exception("Imposible to go to path: the entity does not exists");
     }
 
-    $entity = entity_load_single($entity_type, $last_entity);
+    $entity = $this->getCore()->entityLoadSingle($entity_type, $last_entity);
     if (!empty($entity)) {
-      $uri = entity_uri($entity_type, $entity);
-      $path = empty($subpath) ? $uri['path'] : $uri['path'] . '/' . $subpath;
+      $uri = $this->getCore()->entityUri($entity_type, $entity);
+      $path = empty($subpath) ? $uri : $uri . '/' . $subpath;
       $this->getSession()->visit($this->locatePath($path));
     }
   }
@@ -312,14 +251,13 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
    * @Given the access of last node created with :bundle bundle is refreshed
    */
   public function refreshLastNodeAccess($bundle = NULL) {
-    $lastNodeId = $this->getLastEntityId('node', $bundle);
+    $lastNodeId = $this->getCore()->getLastEntityId('node', $bundle);
     if (empty($lastNodeId)) {
       throw new \Exception("Can't get last node");
     }
 
-    $node = node_load($lastNodeId);
-    node_access_acquire_grants($node);
-
+    $node = $this->getCore()->entityLoadSingle('node', $lastNodeId);
+    $this->getCore()->nodeAccessAcquireGrants($node);
   }
 
   /**

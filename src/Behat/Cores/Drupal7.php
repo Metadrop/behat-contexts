@@ -11,6 +11,7 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
 
   use UsersTrait;
   use CronTrait;
+
   /**
    * {@inheritdoc}
    */
@@ -59,6 +60,60 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
    */
   public function getUserRoles($user) {
     return $user->roles;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getLastEntityId($entity_type, $bundle = NULL) {
+
+    $info = entity_get_info($entity_type);
+    $id_key = $info['entity keys']['id'];
+
+    $query = new \EntityFieldQuery();
+    $query->entityCondition('entity_type', $entity_type);
+    if ($bundle) {
+      $query->entityCondition('bundle', $bundle);
+    }
+
+    $query->propertyOrderBy($id_key, 'DESC');
+    $query->range(0, 1);
+    $query->addMetaData('account', user_load(1));
+
+    $result = $query->execute();
+    $keys = array_keys($result[$entity_type]);
+    $id = reset($keys);
+
+    if (empty($id)){
+      throw new \Exception("Can't take last one");
+    }
+
+    return $id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function entityLoadSingle($entity_type, $id) {
+    $entity = entity_load_single($entity_type, $id);
+    Assert::notEq($entity, FALSE, 'Entity with id "' . $id . '" exists.');
+    return $entity;
+  }
+
+
+  /**
+   * {@inheritdoc}
+   */
+  public function entityUri($entity_type, $entity) {
+    $uri = entity_uri($entity_type, $entity);
+    return !empty($uri['path']) ? $uri['path'] : NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function nodeAccessAcquireGrants($node) {
+    node_access_acquire_grants($node);
   }
 
 }

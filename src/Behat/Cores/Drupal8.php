@@ -59,4 +59,52 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     return $user->getRoles();
   }
 
+  /**
+   * Discovers last entity id created of type.
+   */
+  public function getLastEntityId($entity_type, $bundle = NULL) {
+
+    $info = \Drupal::entityTypeManager()->getDefinition($entity_type);
+    $id_key = $info->getKey('id');
+    $bundle_key = $info->getKey('bundle');
+
+    $query = \Drupal::entityQuery($entity_type);
+    if ($bundle) {
+      $query->condition($bundle_key, $bundle);
+    }
+    $query->sort($id_key, 'DESC');
+    $query->range(0, 1);
+    $query->addMetaData('account', user_load(1));
+    $results = $query->execute();
+
+    if (!empty($results)) {
+      $id = reset($results);
+      return $id;
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function entityUri($entity_type, $entity) {
+    return $entity->toUrl()->toString();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function entityLoadSingle($entity_type, $id) {
+    $controller = \Drupal::entityManager()->getStorage($entity_type);
+    $entity = $controller->load($id);
+    Assert::notEq($entity, FALSE, 'Entity of type "' . $entity_type . '" with id "' . $id . '" does not exists.');
+    return $entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function nodeAccessAcquireGrants($node) {
+    throw new PendingException('Node access grants not implemented yet!');
+  }
+
 }
