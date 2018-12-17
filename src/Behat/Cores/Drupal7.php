@@ -111,6 +111,26 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
     return $entity;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function attachParagraphToEntity($paragraph_type, $paragraph_field, array $paragraph_values, $entity, $entity_type) {
+    $paragraph_object = new ParagraphsItemEntity($paragraph_values += [
+      'field_name' => $paragraph_field,
+      'bundle' => $paragraph_type,
+    ]);
+
+    $paragraph_object->is_new = TRUE;
+    $paragraph_object->setHostEntity($entity_type, $entity);
+    $paragraph_object->save();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function entitySave($entity_type, $entity) {
+    entity_save($entity_type, $entity);
+  }
 
   /**
    * {@inheritdoc}

@@ -9,6 +9,7 @@ use Metadrop\Behat\Cores\Traits\FileTrait;
 use Webmozart\Assert\Assert;
 use Behat\Behat\Tester\Exception\PendingException;
 use Drupal\user\Entity\User;
+use Drupal\paragraphs\Entity\Paragraph;
 
 class Drupal8 extends OriginalDrupal8 implements CoreInterface {
 
@@ -117,6 +118,13 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    */
   public function entityId($entity_type, $entity) {
     return $entity->id();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function entitySave($entity_type, $entity) {
+    $entity->save();
   }
 
   /**
