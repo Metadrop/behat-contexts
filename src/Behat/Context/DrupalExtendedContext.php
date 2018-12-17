@@ -90,6 +90,8 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
   /**
    * @Given I run elysia cron
    *
+   * @USECORE
+   *
    * Run elysia-cron.
    */
   public function iRunElysiaCron() {
@@ -99,6 +101,8 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
   /**
    * @Given I run the elysia cron :job job
    *
+   * @USECORE
+   *
    * Run elysia-cron-job.
    */
   public function iRunElysiaCronJob($job) {
@@ -106,23 +110,26 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
     elysia_cron_run_job($job, TRUE, TRUE, TRUE);
   }
 
-/**
- * @Given I run the cron of Search API
- *
- * Run search-api-cron
- */
-public function iRunTheCronOfSearchApi() {
-  search_api_cron();
-}
+  /**
+   * @Given I run the cron of Search API
+   * @USECORE
+   *
+   * Run search-api-cron
+   */
+  public function iRunTheCronOfSearchApi() {
+    search_api_cron();
+  }
 
-/**
- * @Given I run the cron of Search API Solr
- *
- * Run search-api-solr-cron
- */
-public function iRunTheCronOfSearchApiSolr() {
-  search_api_solr_cron();
-}
+  /**
+   * @Given I run the cron of Search API Solr
+   *
+   * @USECORE
+   *
+   * Run search-api-solr-cron
+   */
+  public function iRunTheCronOfSearchApiSolr() {
+    search_api_solr_cron();
+  }
 
   /**
    * Gets user property by name.
@@ -153,6 +160,8 @@ public function iRunTheCronOfSearchApiSolr() {
   /**
    * Gets the user that matches the condition.
    *
+   * @USECORE
+   *
    * @param $condition
    *   Query condition: mail, name, uid.
    * @param $value
@@ -172,6 +181,8 @@ public function iRunTheCronOfSearchApiSolr() {
 
   /**
    * Check the user has or not a specific role.
+   *
+   * @USECORE
    *
    * @param string $role
    *   Role name(s) separated by comma.
@@ -326,6 +337,8 @@ public function iRunTheCronOfSearchApiSolr() {
    * @Given I go to :subpath of the last entity :entity created
    * @Given I go to :subpath of the last entity :entity with :bundle bundle created
    *
+   * @USECORE
+   *
    * @param string $entity_type
    *   Entity type.
    * @param string $bundle
@@ -409,6 +422,8 @@ public function iRunTheCronOfSearchApiSolr() {
    *
    * @throws Exception
    *   Exception file could not be copied.
+   *
+   * @USECORE
    *
    * @Given file with name :filename
    * @Given file with name :filename in the :directory directory
@@ -586,6 +601,8 @@ public function iRunTheCronOfSearchApiSolr() {
 
   /**
    * Create a paragraph and reference it in the given field of the last node created.
+   *
+   * @USECORE
    *
    * Only works in drupal 8.
    * You can only create several paragraphs of the same type at once.
