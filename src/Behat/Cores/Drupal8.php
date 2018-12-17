@@ -7,6 +7,7 @@ use Metadrop\Behat\Cores\Traits\UsersTrait;
 use Metadrop\Behat\Cores\Traits\CronTrait;
 use Webmozart\Assert\Assert;
 use Behat\Behat\Tester\Exception\PendingException;
+use Drupal\user\Entity\User;
 
 class Drupal8 extends OriginalDrupal8 implements CoreInterface {
 
