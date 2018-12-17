@@ -3,6 +3,7 @@
 namespace Metadrop\Behat\Cores;
 
 use NuvoleWeb\Drupal\Driver\Cores\Drupal8 as OriginalDrupal8;
+use Metadrop\Behat\Cores\Traits\UsersTrait;
 use Metadrop\Behat\Cores\Traits\CronTrait;
 use Webmozart\Assert\Assert;
 
