@@ -6,11 +6,14 @@ use NuvoleWeb\Drupal\Driver\Cores\Drupal7 as OriginalDrupal7;
 use Metadrop\Behat\Cores\Traits\UsersTrait;
 use Webmozart\Assert\Assert;
 use Metadrop\Behat\Cores\Traits\CronTrait;
+use Metadrop\Behat\Cores\Traits\FileTrait;
+
 
 class Drupal7 extends OriginalDrupal7 implements CoreInterface {
 
   use UsersTrait;
   use CronTrait;
+  use FileTrait;
 
   /**
    * {@inheritdoc}
@@ -53,6 +56,14 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
 
     $account = user_load($uid, $reset);
     return $account;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function entityId($entity_type, $entity) {
+    list($entity_id) = entity_extract_ids($entity_type, $entity);
+    return $entity_id;
   }
 
   /**

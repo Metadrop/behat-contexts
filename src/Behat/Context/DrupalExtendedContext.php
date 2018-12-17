@@ -309,29 +309,10 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
    * @Given file with name :filename in the :directory directory
    */
   public function createFileWithName($filename, $directory = NULL) {
-
-    if (empty($directory)) {
-      $directory = file_default_scheme() . '://';
-    }
-
-    $destination = $directory . '/' . $filename;
-
     $absolutePath = $this->getMinkParameter('files_path');
     $path = $absolutePath . '/' . $filename;
 
-    if (!file_exists($path)) {
-      throw new \Exception("Error: file " . $filename ." not found");
-    }
-    else {
-      $data = file_get_contents($path);
-      $file = file_save_data($data, $destination, FILE_EXISTS_REPLACE);
-      if ($file) {
-        $this->files[] = $file;
-      }
-      else {
-        throw new \Exception("Error: file could not be copied to directory");
-      }
-    }
+    $this->files[] = $this->getCore()->createFileWithName($path, $directory);
   }
 
   /**

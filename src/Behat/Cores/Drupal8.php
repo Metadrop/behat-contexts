@@ -5,6 +5,7 @@ namespace Metadrop\Behat\Cores;
 use NuvoleWeb\Drupal\Driver\Cores\Drupal8 as OriginalDrupal8;
 use Metadrop\Behat\Cores\Traits\UsersTrait;
 use Metadrop\Behat\Cores\Traits\CronTrait;
+use Metadrop\Behat\Cores\Traits\FileTrait;
 use Webmozart\Assert\Assert;
 use Behat\Behat\Tester\Exception\PendingException;
 use Drupal\user\Entity\User;
@@ -13,6 +14,8 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
 
   use UsersTrait;
   use CronTrait;
+  use FileTrait;
+
   /**
    * {@inheritdoc}
    */
@@ -98,6 +101,23 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     $entity = $controller->load($id);
     Assert::notEq($entity, FALSE, 'Entity of type "' . $entity_type . '" with id "' . $id . '" does not exists.');
     return $entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function attachParagraphToEntity($paragraph_type, $paragraph_field, array $paragraph_values, $entity, $entity_type) {
+    $paragraph_values['type'] = $paragraph_type;
+    $paragraph = Paragraph::create($paragraph_values);
+    $paragraph->save();
+    $entity->get($paragraph_field)->appendItem($paragraph);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function entityId($entity_type, $entity) {
+    return $entity->id();
   }
 
   /**
