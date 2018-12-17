@@ -11,8 +11,7 @@ namespace Metadrop\Behat\Context;
 
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Gherkin\Node\TableNode;
-use Drupal\DrupalExtension\Context\RawDrupalContext;
-use Drupal\paragraphs\Entity\Paragraph;
+use NuvoleWeb\Drupal\DrupalExtension\Context\RawDrupalContext;
 
 class DrupalExtendedContext extends RawDrupalContext implements SnippetAcceptingContext {
 
@@ -536,19 +535,6 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
    public function userWithMailNotExists($mail) {
      $this->userWithMailExists($mail, FALSE);
    }
-
-  /**
-   * Get core handler.
-   *
-   * This allow use functions to create commerce entities like 'Given content'
-   * steps makes.
-   *
-   * @return \Drupal\Driver\Cores\CoreInterface
-   *   Core handler for current core.
-   */
-  public function getCore() {
-    return $this->getDriver()->getCore();
-  }
 
   /**
    * Overrides \Drupal\Driver\Cores\AbstractCore::expandEntityFields method.
