@@ -51,6 +51,14 @@ interface CoreInterface {
   public function loadUserByProperty($property, $value, $reset = TRUE);
 
   /**
+   * Obtain user roles.
+   *
+   * @param mixed $user
+   *   User.
+   */
+  public function getUserRoles($user);
+
+  /**
    * Get last entity id.
    *
    * @param string $entity_type

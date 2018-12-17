@@ -120,60 +120,11 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
    * Run search-api-solr-cron
    */
   public function iRunTheCronOfSearchApiSolr() {
-
-  /**
-   * Gets user property by name.
-   *
-   * This function tries to figure out which kind to identificator is refering to
-   * in an "smart" way.
-   *
-   * @param string $name
-   *   The identifier
-   *   Examples: "admin", "12", "example@example.com"
-   *
-   * @return string
-   *   The property
-   */
-  public function getUserPropertyByName($name) {
-    if (valid_email_address($name)) {
-      $property = 'mail';
-    }
-    elseif (is_numeric($name)) {
-      $property = 'uid';
-    }
-    else {
-      $property = 'name';
-    }
-    return $property;
-  }
-
-  /**
-   * Gets the user that matches the condition.
-   *
-   * @USECORE
-   *
-   * @param $condition
-   *   Query condition: mail, name, uid.
-   * @param $value
-   *   Value to compare (equal)
-   */
-  public function getUserByCondition($condition, $value, $reset = TRUE) {
-    $query = db_select('users');
-    $query->fields('users', array('uid'));
-    $query->condition($condition, $value);
-
-    $result = $query->execute();
-    $uid    = $result->fetchField();
-
-    $account = user_load($uid, $reset);
-    return $account;
     $this->getCore()->runModuleCron('search_api_solr');
   }
 
   /**
    * Check the user has or not a specific role.
-   *
-   * @USECORE
    *
    * @param string $role
    *   Role name(s) separated by comma.
@@ -185,11 +136,11 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
   public function userRoleCheck($role, $user = NULL, $not = FALSE) {
     if (empty($user)) {
       $current_user = $this->getUserManager()->getCurrentUser();
-      $account = user_load($current_user->uid);
+      $account = $this->getCore()->loadUserByProperty('uid', $current_user->uid);
     }
     else {
-      $condition = $this->getUserPropertyByName($user);
-      $account = $this->getUserByCondition($condition, $user);
+      $property = $this->getCore()->getUserPropertyByName($user);
+      $account = $this->getCore()->loadUserByProperty($property, $user);
     }
 
     if ($account) {
@@ -197,7 +148,7 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
       $roles = array_map('trim', $roles);
       // Case insensitive:
       $roles = array_map('strtolower', $roles);
-      $aroles = array_map('strtolower', $account->roles);
+      $aroles = array_map('strtolower', $this->getCore()->getUserRoles($account));
       foreach ($roles as $role) {
         if (!$not && !in_array($role, $aroles)) {
           throw new \Exception("Given user does not have the role $role");

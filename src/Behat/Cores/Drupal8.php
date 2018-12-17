@@ -8,6 +8,7 @@ use Webmozart\Assert\Assert;
 
 class Drupal8 extends OriginalDrupal8 implements CoreInterface {
 
+  use UsersTrait;
   use CronTrait;
   /**
    * {@inheritdoc}
@@ -35,6 +36,24 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    */
   public function runElysiaCronJob($job) {
     throw new PendingException('Elysia job cron run not implemented yet!');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function loadUserByProperty($property, $value, $reset = TRUE) {
+    $query = \Drupal::entityQuery('user');
+    $query->condition($property, $value);
+    $entity_ids = $query->execute();
+    Assert::count($entity_ids, 1, 'User with property "' . $property . '" and value "' . $value . '" exists.');
+    return User::load(reset($entity_ids));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getUserRoles($user) {
+    return $user->getRoles();
   }
 
 }
