@@ -13,9 +13,49 @@ Install with [Composer](http://getcomposer.org) with the following command:
 
 ## Configure
 
-Each context may have its own configuration, see each context section.
+Each context may have its own configuration. [Here is an example](https://github.com/Metadrop/behat-contexts/blob/dev/behat.yml.dist) with all the contexts added.
 
 ## Contexts
+
+### Cache context
+
+Steps to clear caches.
+
+#### Steps
+
+- Given :path page cache is flushed
+  Clear specific page caches.
+
+- Given :view view data cache is flushed
+  Clear caches for a specific view. Only available for Drupal 7, pending to implement in D8. 
+
+### Content authored context
+
+Allow created content owned by logged in user.
+
+#### Steps
+
+ - Given own :type content:
+   Create content with the author as the current user.
+
+### Cron context
+
+Helpers to execute cron.
+
+#### Steps
+
+ - Given I run elysia cron
+   Run elysia cron
+
+ - Given I run the elysia cron :job job
+   Run elysia-cron-job.
+
+ - Given I run the cron of Search API
+   Run search api cron.
+
+ - Given I run the cron of Search API Solr
+   Run search api solr cron.
+
 
 ### DebugContext
 
