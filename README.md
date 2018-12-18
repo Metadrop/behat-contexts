@@ -5,11 +5,9 @@ Contexts that we use with Behat 3.x tests on Drupal sites.
 
 ## Install
 
-This contexts use the Drupal Extension [Drupal Extension](https://www.drupal.org/project/drupalextension), so it should be installed in your system.
+Install with [Composer](http://getcomposer.org) with the following command:
 
-Put this repository in the bootstrap directory of your project. A Drupal 7 project using Drupal Extension this directory may be located in sites/all/tests/behat/bootstrap. So, directory Metadrop of this repository should be in that bootstrap directory. Contexts will be autoladed.
-
-@TODO: Improve installation method, use some standard way.
+`composer require metadrop/behat-contexts`
 
 ## Configure
 
@@ -66,26 +64,26 @@ This report includes:
 ```
 default:
   autoload:
-    '': "%paths.base%/../all/tests/behat/bootstrap"
+    ...
   suites:
     default:
-      paths:
-        - "%paths.base%/../all/tests/behat/features"
+      ...
       contexts:
         - Metadrop\Behat\Context\DebugContext:
             parameters:
               'report_on_error': true
-              'error_reporting_path': '/var/error_reports/tests/reports'
-              'screenshots_path': '/var/error_reports/tests/screenshots'
-              'page_contents_path': '/var/error_reports/tests/pages'
+              'error_reporting_url': 'https://example.com/sites/default/files/behat/errors'
+              'error_reporting_path': '/var/www/html/docroot/sites/default/files/behat/errors'
+              'screenshots_path': '/var/www/html/docroot/sites/default/files/behat/screenshots'
+              'page_contents_path': '/var/www/html/docroot/sites/default/files/behat/pages'
 ```
 
 **Parameters**
   - report_on_error: If _true_ error reports are generated on failed steps.
-  - error_reporting_path: Path where reports are saved.
+  - error_reporting_path: Path where reports are saved. 
+  - error_reporting_url: Url where the error screenshots will be shown. As we can see in example, the url must point to the directory where we save the reports, and the directory must be accesible through website.
   - screenshots_path: Path where screenshots are saved. Report screenshots are saved in the report path, here only screenshots from _capture full page_ steps are saved.
   - page_contents_path: Path where page contents are saved. Report page contents are saved in the report path, here only page contents from _save page content_ steps are saved.
-
 
 
 ### BrowserSizeContext
