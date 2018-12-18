@@ -180,6 +180,15 @@ Steps related with node access system. Only for D7.
    - @Given the access of last node created with :bundle bundle is refreshed
      Refresh node grants from the last node of a specific content type.
 
+### Paragraphs context
+
+Steps to attach paragraphs to content.
+
+#### Steps
+
+   - Given paragraph of :paragraph_type type referenced on the :field_paragraph field of the last content:
+     Create a paragraph with fields and attach it to the last node created.
+
 
 ### IUContext
 
