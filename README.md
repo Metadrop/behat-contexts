@@ -189,11 +189,22 @@ Steps to attach paragraphs to content.
    - Given paragraph of :paragraph_type type referenced on the :field_paragraph field of the last content:
      Create a paragraph with fields and attach it to the last node created.
 
+### Url Context
+
+Steps to check url values
+
+#### Steps
+
+   - Then current url should have the ":param" param with ":value" value
+     Check an url has a specific value in a query parameter.
+
+   - Then current url should not have the ":param" param with ":value" value
+     Check an url hasn't a specific value in a query parameter.
+
 
 ### IUContext
 
   This context provides steps for certain UI elements.
-
 
 #### Steps
 
