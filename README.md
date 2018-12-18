@@ -168,6 +168,18 @@ Steps for form elements.
    - Then form :type element :label should not be required
      Check a form element of a specific type (s.e.: input, select) with label isn't required.
 
+### Node Access context
+
+Steps related with node access system. Only for D7.
+
+#### Steps
+
+   - Given the access of last node created is refreshed
+     Refresh node grants from the last node.
+
+   - @Given the access of last node created with :bundle bundle is refreshed
+     Refresh node grants from the last node of a specific content type.
+
 
 ### IUContext
 
