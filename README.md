@@ -127,6 +127,23 @@ default:
   - screenshots_path: Path where screenshots are saved. Report screenshots are saved in the report path, here only screenshots from _capture full page_ steps are saved.
   - page_contents_path: Path where page contents are saved. Report page contents are saved in the report path, here only page contents from _save page content_ steps are saved.
 
+### Entity Context
+
+Agnostic steps related with entities.
+
+#### Steps
+ - Given I go to the last entity :entity created
+   Go to last entity created.
+
+ - Given I go to the last entity :entity with :bundle bundle created
+   Go to the last entity created from a specific bundle.
+
+ - Given I go to :subpath of the last entity :entity created
+   Go to last entity created subpath (s.e.:node/1/edit).
+
+ - Given I go to :subpath of the last entity :entity with :bundle bundle created.
+   Go to last entity created subpath (s.e.:node/1/edit) from a specific bundle.
+
 
 ### IUContext
 
