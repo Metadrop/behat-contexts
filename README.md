@@ -127,25 +127,6 @@ default:
   - screenshots_path: Path where screenshots are saved. Report screenshots are saved in the report path, here only screenshots from _capture full page_ steps are saved.
   - page_contents_path: Path where page contents are saved. Report page contents are saved in the report path, here only page contents from _save page content_ steps are saved.
 
-### DrupalExtendedContext
-
-  This context extends DrupalRawContext with steps related to Drupal and its modules.
-
-
-#### Steps
-
-- Then form :type element :label should be required
-
-  Checks a form element is required. File input type is not supported.
-
-- Then form :type element :label should not be required
-
-  Checks a form element is required. File input type is not supported.
-
-- Given I run elysia cron
-
-  Runs Elysia cron.
-
 
 #### Configuration
 
