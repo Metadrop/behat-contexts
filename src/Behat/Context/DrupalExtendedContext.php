@@ -11,8 +11,6 @@ namespace Metadrop\Behat\Context;
 
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Gherkin\Node\TableNode;
-use Drupal\DrupalExtension\Context\RawDrupalContext;
-use Drupal\paragraphs\Entity\Paragraph;
 
 class DrupalExtendedContext extends RawDrupalContext implements SnippetAcceptingContext {
 
@@ -72,19 +70,19 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
       $path = $base_url . '/' . $path;
     }
 
-    cache_clear_all($path, 'cache_page', TRUE);
+    $this->getCore()->cacheClear($path, 'page');
   }
 
   /**
    * Flush views data cache.
    *
-   * @param string $views_name
+   * @param string $view_name
    *  Views name
    *
    * @Given :view view data cache is flushed
    */
-  public function viewDataCacheIsFlushed($views_name) {
-    cache_clear_all($views_name . ':', 'cache_views_data', TRUE);
+  public function viewDataCacheIsFlushed($view_name) {
+    $this->getCore()->viewsCacheClear($view_name);
   }
 
   /**
@@ -93,7 +91,7 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
    * Run elysia-cron.
    */
   public function iRunElysiaCron() {
-    elysia_cron_run(TRUE);
+    $this->getCore()->runElysiaCron();
   }
 
   /**
@@ -103,71 +101,25 @@ class DrupalExtendedContext extends RawDrupalContext implements SnippetAccepting
    */
   public function iRunElysiaCronJob($job) {
     // @NOTE We force it
-    elysia_cron_run_job($job, TRUE, TRUE, TRUE);
-  }
-
-/**
- * @Given I run the cron of Search API
- *
- * Run search-api-cron
- */
-public function iRunTheCronOfSearchApi() {
-  search_api_cron();
-}
-
-/**
- * @Given I run the cron of Search API Solr
- *
- * Run search-api-solr-cron
- */
-public function iRunTheCronOfSearchApiSolr() {
-  search_api_solr_cron();
-}
-
-  /**
-   * Gets user property by name.
-   *
-   * This function tries to figure out which kind to identificator is refering to
-   * in an "smart" way.
-   *
-   * @param string $name
-   *   The identifier
-   *   Examples: "admin", "12", "example@example.com"
-   *
-   * @return string
-   *   The property
-   */
-  public function getUserPropertyByName($name) {
-    if (valid_email_address($name)) {
-      $property = 'mail';
-    }
-    elseif (is_numeric($name)) {
-      $property = 'uid';
-    }
-    else {
-      $property = 'name';
-    }
-    return $property;
+    $this->getCore()->runElysiaCronJob($job);
   }
 
   /**
-   * Gets the user that matches the condition.
+   * @Given I run the cron of Search API
    *
-   * @param $condition
-   *   Query condition: mail, name, uid.
-   * @param $value
-   *   Value to compare (equal)
+   * Run search-api-cron
    */
-  public function getUserByCondition($condition, $value, $reset = TRUE) {
-    $query = db_select('users');
-    $query->fields('users', array('uid'));
-    $query->condition($condition, $value);
+  public function iRunTheCronOfSearchApi() {
+    $this->getCore()->runModuleCron('search_api');
+  }
 
-    $result = $query->execute();
-    $uid    = $result->fetchField();
-
-    $account = user_load($uid, $reset);
-    return $account;
+  /**
+   * @Given I run the cron of Search API Solr
+   *
+   * Run search-api-solr-cron
+   */
+  public function iRunTheCronOfSearchApiSolr() {
+    $this->getCore()->runModuleCron('search_api_solr');
   }
 
   /**
@@ -183,11 +135,11 @@ public function iRunTheCronOfSearchApiSolr() {
   public function userRoleCheck($role, $user = NULL, $not = FALSE) {
     if (empty($user)) {
       $current_user = $this->getUserManager()->getCurrentUser();
-      $account = user_load($current_user->uid);
+      $account = $this->getCore()->loadUserByProperty('uid', $current_user->uid);
     }
     else {
-      $condition = $this->getUserPropertyByName($user);
-      $account = $this->getUserByCondition($condition, $user);
+      $property = $this->getCore()->getUserPropertyByName($user);
+      $account = $this->getCore()->loadUserByProperty($property, $user);
     }
 
     if ($account) {
@@ -195,7 +147,7 @@ public function iRunTheCronOfSearchApiSolr() {
       $roles = array_map('trim', $roles);
       // Case insensitive:
       $roles = array_map('strtolower', $roles);
-      $aroles = array_map('strtolower', $account->roles);
+      $aroles = array_map('strtolower', $this->getCore()->getUserRoles($account));
       foreach ($roles as $role) {
         if (!$not && !in_array($role, $aroles)) {
           throw new \Exception("Given user does not have the role $role");
@@ -258,73 +210,14 @@ public function iRunTheCronOfSearchApiSolr() {
   }
 
   /**
-   * Get last entity id created
-   *
-   * @param string $entity_type
-   *   Entity type
-   * @param string $bundle
-   *   Entity bundle
-   *
-   * @return integer
-   *   Entity Id
-   */
-  public function getLastEntityId($entity_type, $bundle = NULL) {
-
-    $info = entity_get_info($entity_type);
-    $id_key = $info['entity keys']['id'];
-
-    $query = new \EntityFieldQuery();
-    $query->entityCondition('entity_type', $entity_type);
-    if ($bundle) {
-      $query->entityCondition('bundle', $bundle);
-    }
-
-    $query->propertyOrderBy($id_key, 'DESC');
-    $query->range(0, 1);
-    $query->addMetaData('account', user_load(1));
-
-    $result = $query->execute();
-    $keys = array_keys($result[$entity_type]);
-    $id = reset($keys);
-
-    if (empty($id)){
-      throw new \Exception("Can't take last one");
-    }
-
-    return $id;
-  }
-
-  /**
-   * Discovers last entity id created of type.
-   */
-  public function getLastEntityIdD8($entity_type, $bundle = NULL) {
-
-    $info = \Drupal::entityTypeManager()->getDefinition($entity_type);
-    $id_key = $info->getKey('id');
-    $bundle_key = $info->getKey('bundle');
-
-    $query = \Drupal::entityQuery($entity_type);
-    if ($bundle) {
-      $query->condition($bundle_key, $bundle);
-    }
-    $query->sort($id_key, 'DESC');
-    $query->range(0, 1);
-    $query->addMetaData('account', user_load(1));
-    $results = $query->execute();
-
-    if (!empty($results)) {
-      $id = reset($results);
-      return $id;
-    }
-  }
-
-  /**
    * Go to last entity created.
    *
    * @Given I go to the last entity :entity created
    * @Given I go to the last entity :entity with :bundle bundle created
    * @Given I go to :subpath of the last entity :entity created
    * @Given I go to :subpath of the last entity :entity with :bundle bundle created
+   *
+   * @USECORE
    *
    * @param string $entity_type
    *   Entity type.
@@ -334,15 +227,15 @@ public function iRunTheCronOfSearchApiSolr() {
    *   Entity bundle.
    */
   public function goToTheLastEntityCreated($entity_type, $bundle = NULL, $subpath = NULL) {
-    $last_entity = $this->getLastEntityId($entity_type, $bundle);
+    $last_entity = $this->getCore()->getLastEntityId($entity_type, $bundle);
     if (empty($last_entity)) {
       throw new \Exception("Imposible to go to path: the entity does not exists");
     }
 
-    $entity = entity_load_single($entity_type, $last_entity);
+    $entity = $this->getCore()->entityLoadSingle($entity_type, $last_entity);
     if (!empty($entity)) {
-      $uri = entity_uri($entity_type, $entity);
-      $path = empty($subpath) ? $uri['path'] : $uri['path'] . '/' . $subpath;
+      $uri = $this->getCore()->entityUri($entity_type, $entity);
+      $path = empty($subpath) ? $uri : $uri . '/' . $subpath;
       $this->getSession()->visit($this->locatePath($path));
     }
   }
@@ -357,14 +250,13 @@ public function iRunTheCronOfSearchApiSolr() {
    * @Given the access of last node created with :bundle bundle is refreshed
    */
   public function refreshLastNodeAccess($bundle = NULL) {
-    $lastNodeId = $this->getLastEntityId('node', $bundle);
+    $lastNodeId = $this->getCore()->getLastEntityId('node', $bundle);
     if (empty($lastNodeId)) {
       throw new \Exception("Can't get last node");
     }
 
-    $node = node_load($lastNodeId);
-    node_access_acquire_grants($node);
-
+    $node = $this->getCore()->entityLoadSingle('node', $lastNodeId);
+    $this->getCore()->nodeAccessAcquireGrants($node);
   }
 
   /**
@@ -410,33 +302,16 @@ public function iRunTheCronOfSearchApiSolr() {
    * @throws Exception
    *   Exception file could not be copied.
    *
+   * @USECORE
+   *
    * @Given file with name :filename
    * @Given file with name :filename in the :directory directory
    */
   public function createFileWithName($filename, $directory = NULL) {
-
-    if (empty($directory)) {
-      $directory = file_default_scheme() . '://';
-    }
-
-    $destination = $directory . '/' . $filename;
-
     $absolutePath = $this->getMinkParameter('files_path');
     $path = $absolutePath . '/' . $filename;
 
-    if (!file_exists($path)) {
-      throw new \Exception("Error: file " . $filename ." not found");
-    }
-    else {
-      $data = file_get_contents($path);
-      $file = file_save_data($data, $destination, FILE_EXISTS_REPLACE);
-      if ($file) {
-        $this->files[] = $file;
-      }
-      else {
-        throw new \Exception("Error: file could not be copied to directory");
-      }
-    }
+    $this->files[] = $this->getCore()->createFileWithName($path, $directory);
   }
 
   /**
@@ -504,7 +379,7 @@ public function iRunTheCronOfSearchApiSolr() {
     * @Then user with mail :mail exists
     */
    public function userWithMailExists($mail, $exists = TRUE) {
-     $user = user_load_by_mail($mail);
+     $user = $this->getCore()->loadUserByProperty('mail', $mail);
      if (!$user && $exists) {
        throw new \Exception("The user with mail '" . $mail . "' was not found.");
      }
@@ -521,34 +396,6 @@ public function iRunTheCronOfSearchApiSolr() {
    public function userWithMailNotExists($mail) {
      $this->userWithMailExists($mail, FALSE);
    }
-
-  /**
-   * Get core handler.
-   *
-   * This allow use functions to create commerce entities like 'Given content'
-   * steps makes.
-   *
-   * @return \Drupal\Driver\Cores\CoreInterface
-   *   Core handler for current core.
-   */
-  public function getCore() {
-    return $this->getDriver()->getCore();
-  }
-
-  /**
-   * Overrides \Drupal\Driver\Cores\AbstractCore::expandEntityFields method.
-   *
-   * That method is protected and we can't use it from this context.
-   */
-  protected function expandEntityFields($entity_type, \stdClass $entity) {
-    $field_types = $this->getCore()->getEntityFieldTypes($entity_type);
-    foreach ($field_types as $field_name => $type) {
-      if (isset($entity->$field_name)) {
-        $entity->$field_name = $this->getCore()->getFieldHandler($entity, $entity_type, $field_name)
-          ->expand($entity->$field_name);
-      }
-    }
-  }
 
   /**
    * Checks that text appears before another text.
@@ -587,6 +434,8 @@ public function iRunTheCronOfSearchApiSolr() {
   /**
    * Create a paragraph and reference it in the given field of the last node created.
    *
+   * @USECORE
+   *
    * Only works in drupal 8.
    * You can only create several paragraphs of the same type at once.
    * To add other types you must do so in different steps.
@@ -604,22 +453,21 @@ public function iRunTheCronOfSearchApiSolr() {
    *
    * @param string $paragraph_type
    *   Paragraph type.
-   * @param string $field_paragraph
+   * @param string $paragraph_field
    *   Field to reference the paragrapshs.
    * @param \Behat\Gherkin\Node\TableNode $paragraph_fields_table
    *   Paragraph fields.
    *
    * @Given paragraph of :paragraph_type type referenced on the :field_paragraph field of the last content:
    */
-  public function createParagraph($paragraph_type, $field_paragraph, TableNode $paragraph_fields_table) {
+  public function createParagraph($paragraph_type, $paragraph_field, TableNode $paragraph_fields_table) {
     $entity_type = 'node';
-    $last_id = $this->getLastEntityIdD8($entity_type);
+    $last_id = $this->getCore()->getLastEntityId($entity_type);
     if (empty($last_id)) {
       throw new \Exception("Impossible to get the last content id.");
     }
 
-    $controller = \Drupal::entityManager()->getStorage($entity_type);
-    $entity = $controller->load($last_id);
+    $entity = $this->getCore()->entityLoadSingle($entity_type, $last_id);
 
     // Create multiple paragraphs.
     foreach ($paragraph_fields_table->getHash() as $paragraph_data) {
@@ -627,11 +475,9 @@ public function iRunTheCronOfSearchApiSolr() {
       $paragraph_object->type = $paragraph_type;
       $this->parseEntityFields('paragraph', $paragraph_object);
       $this->expandEntityFields('paragraph', $paragraph_object);
-      $paragraph = Paragraph::create((array) $paragraph_object);
-      $paragraph->save();
-      $entity->get($field_paragraph)->appendItem($paragraph);
+      $this->getCore()->attachParagraphToEntity($paragraph_type, $paragraph_field, (array) $paragraph_object, $entity, $entity_type);
     }
-    $entity->save();
+    $this->getCore()->entitySave($entity_type, $entity);
   }
 
 }

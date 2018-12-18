@@ -3,8 +3,14 @@
     "description": "Contexts that we use with Behat 3.x tests on Drupal sites.",
     "type": "library",
     "require": {
-        "drupal/drupal-extension": "^3.4"
+        "nuvoleweb/drupal-behat": "dev-update-drupal-driver"
     },
+    "repositories": [
+      {
+        "type": "vcs",
+        "url": "https://github.com/mistermoper/drupal-behat"
+      }
+    ],
     "authors": [
         {
             "name": "Metadrop",
