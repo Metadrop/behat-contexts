@@ -3,6 +3,8 @@
 
 Contexts that we use with Behat 3.x tests on Drupal sites.
 
+This repository is based on [Nuvole drupal extension](/nuvoleweb/drupal-behat).
+
 ## Install
 
 Install with [Composer](http://getcomposer.org) with the following command:
