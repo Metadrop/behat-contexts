@@ -1,6 +1,7 @@
 <?php
 
 namespace Metadrop\Behat\Context;
+
 use NuvoleWeb\Drupal\DrupalExtension\Context\RawDrupalContext as NuvoleRawDrupalContext;
 
 /**
