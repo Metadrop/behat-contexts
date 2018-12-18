@@ -156,6 +156,18 @@ Create files in drupal.
    - Given file with name :filename in the :directory directory
      Create file in drupal file system in a specific directory. Directory must start with file system (public:// , private://). Default is public:// .
 
+### Form Context
+
+Steps for form elements.
+
+#### Steps
+
+   - Then form :type element :label should be required
+     Check a form element of a specific type (s.e.: input, select) with label is required.
+
+   - Then form :type element :label should not be required
+     Check a form element of a specific type (s.e.: input, select) with label isn't required.
+
 
 ### IUContext
 
