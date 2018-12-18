@@ -45,16 +45,16 @@ Helpers to execute cron.
 #### Steps
 
  - Given I run elysia cron
-   Run elysia cron
+   Run elysia cron. Only for D7.
 
  - Given I run the elysia cron :job job
-   Run elysia-cron-job.
+   Run elysia-cron-job. Only for D7.
 
  - Given I run the cron of Search API
-   Run search api cron.
+   Run search api cron. Only for D7.
 
  - Given I run the cron of Search API Solr
-   Run search api solr cron.
+   Run search api solr cron. Only for D7.
 
 
 ### DebugContext
