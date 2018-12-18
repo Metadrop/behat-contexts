@@ -128,12 +128,6 @@ default:
   - page_contents_path: Path where page contents are saved. Report page contents are saved in the report path, here only page contents from _save page content_ steps are saved.
 
 
-#### Configuration
-
-No configuration needed.
-
-
-
 ### IUContext
 
   This context provides steps for certain UI elements.
