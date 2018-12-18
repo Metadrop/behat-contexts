@@ -90,7 +90,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    * {@inheritdoc}
    */
   public function entityUri($entity_type, $entity) {
-    return $entity->toUrl()->toString();
+    return $entity->toUrl()->getInternalPath();
   }
 
   /**
