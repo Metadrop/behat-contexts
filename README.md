@@ -144,6 +144,18 @@ Agnostic steps related with entities.
  - Given I go to :subpath of the last entity :entity with :bundle bundle created.
    Go to last entity created subpath (s.e.:node/1/edit) from a specific bundle.
 
+### File context
+
+Create files in drupal.
+
+#### Steps
+
+   - Given file with name :filename
+     Create file in drupal file system. Files are extracted from files_path set in behat.
+
+   - Given file with name :filename in the :directory directory
+     Create file in drupal file system in a specific directory. Directory must start with file system (public:// , private://). Default is public:// .
+
 
 ### IUContext
 
