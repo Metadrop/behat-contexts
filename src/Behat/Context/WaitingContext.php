@@ -39,4 +39,19 @@ class WaitingContext extends RawMinkContext {
     $this->getSession()->wait($seconds * 1000, 'jQuery("#updateprogress").length === 0');
   }
 
+  /**
+   * @Then I wait for :seconds second(s)
+   *
+   * Wait seconds before the next step.
+   *
+   * @param int|string $seconds
+   *   Number of seconds to wait. Must be an integer value.
+   */
+  public function iWaitForSeconds($seconds) {
+    if (!filter_var($seconds, FILTER_VALIDATE_INT) !== false) {
+      throw new \InvalidArgumentException("Expected a valid integer number of seconds but given value \"$seconds\" is invalid.");
+    }
+    sleep($seconds);
+  }
+
 }
