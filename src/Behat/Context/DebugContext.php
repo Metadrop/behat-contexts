@@ -20,6 +20,7 @@ use Behat\Testwork\Tester\Result\TestResult;
 
 use Behat\Gherkin\Node\FeatureNode;
 use Behat\Gherkin\Node\StepNode;
+use NuvoleWeb\Drupal\DrupalExtension\Context\ScreenShotContext as NuvoleScreenshotContext;
 
 /**
  *
@@ -47,7 +48,7 @@ use Behat\Gherkin\Node\StepNode;
  *  the other files of the report.
  *
  */
-class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
+class DebugContext extends NuvoleScreenshotContext implements SnippetAcceptingContext {
 
   const DEFAULT_HEIGHT = 600;
 
@@ -105,10 +106,11 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
     // Default values.
     $defaults = array(
       'report_on_error' => FALSE,
-      'error_reporting_path' => '/tmp',
+      'error_reporting_path' => sys_get_temp_dir(),
       'error_reporting_url' => NULL,
-      'screenshots_path' => '/tmp',
-      'page_contents_path' => '/tmp',
+      'screenshots_url' => NULL,
+      'screenshots_path' => sys_get_temp_dir(),
+      'page_contents_path' => sys_get_temp_dir(),
     );
 
     // Collect received parameters.
@@ -153,6 +155,16 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
   }
 
   /**
+   * Returns the configured url to show error reports.
+   *
+   * @return string
+   *   Url to show error reports.
+   */
+  public function getScreenshotsUrl() {
+    return $this->customParameters['screenshots_url'];
+  }
+
+  /**
    * Returns the configured path where to store screenshots.
    *
    * @return string
@@ -191,42 +203,15 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
   }
 
   /**
-   * Returns the template for the files of the repor.
-   *
-   * All files form a report share the same name but extension is different.
-   *
-   * @return string
-   *   Filename template.
-   */
-  public function getFilenameReportTemplate() {
-    if (empty($this->filenameTemplate)) {
-      list($usec, $sec) = explode(' ', microtime());
-      $usec = str_replace("0.", ".", $usec);
-      $date = date("Ymd--H-i-s-", $sec) . $usec;
-      $this->filenameTemplate = 'Error-' . $date  . '_' . basename($this->feature->getFile(), '.feature') . '_line_' . $this->step->getLine();
-    }
-    return $this->filenameTemplate;
-  }
-
-  /**
    * Generates and saves an error report.
    *
-   * @param \FeatureNode $feature
-   *   Gherkin feature object.
-   * @param \StepNode $step
-   *   Gherkin step object.
    */
-  public function saveReport() {
+  public function saveReport($file, $result) {
     $this->session = $this->getSession();
 
-    if ($this->getReportUrl()) {
-      echo "Error generated reports:\n";
-    }
-
-    $this->saveInfoFile();
-    $this->saveHtmlFile();
-    $this->savePngFile();
-
+    $this->saveInfoFile($file, $result);
+    $this->saveHtmlFile($file);
+    $this->savePngFile($file);
   }
 
   /**
@@ -234,13 +219,13 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
    *
    * Contains the current URL and the error exception dump.
    */
-  protected function saveInfoFile() {
-    $error_file = $this->getFilenameReportTemplate() . '.txt';
+  protected function saveInfoFile($filename = '',  $result) {
+    $error_file =  $filename . '.txt';
     $error_filepath = $this->getReportPath() . '/' . $error_file;
 
     // Generate content.
     $error_report = $this->session->getCurrentUrl() . "\n\n";
-    $error_report .= $this->result->getException();
+    $error_report .= $result->getException();
 
     // Save it.
     file_put_contents($error_filepath, $error_report);
@@ -255,9 +240,8 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
    *
    * Contains the HTML output.
    */
-  public function saveHtmlFile() {
-    // Dump HTML content.
-    $error_file = $this->getFilenameReportTemplate() . '.html';
+  public function saveHtmlFile($filename = '') {
+    $error_file =  $filename . '.html';
     $error_page_filepath = $this->getReportPath() . '/' . $error_file;
     file_put_contents($error_page_filepath, $this->session->getPage()->getContent());
 
@@ -266,39 +250,19 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
     }
   }
 
-
   /**
    * Generates and saves the report PNG file.
    *
    * Contains the page screenshot.
    */
-  public function savePngFile() {
+  public function savePngFile($filename = '') {
     // If it's Selenium Driver save a screenshot.
     if ($this->session->getDriver() instanceof \Behat\Mink\Driver\Selenium2Driver) {
-
-      $error_file = $this->getFilenameReportTemplate() . '.png';
+      $error_file =  $filename . '.png';
       $this->saveScreenshot($error_file, $this->getReportPath());
 
       if ($url = $this->getReportUrl()) {
         echo " - png (screenshot): " . $url . '/' . $error_file . "\n";
-      }
-    }
-  }
-
-  /**
-   * Generate a error report on failed step.
-   *
-   * @AfterStep
-   */
-  public function generateReportIfStepFailed(AfterStepScope $scope) {
-    if ($this->isReportingEnabled()) {
-      $this->filenameTemplate = NULL;
-      $this->result = $scope->getTestResult();
-      $test_failed = $this->result->getResultCode() === TestResult::FAILED;
-      if ($test_failed) {
-        $this->feature = $scope->getFeature();
-        $this->step = $scope->getStep();
-        $this->saveReport();
       }
     }
   }
@@ -329,10 +293,12 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
   /**
    * @Then capture full page with a width of :width to :path with name :filename
    */
-  public function captureFullPageWithWidthOfToWithName($width, $path, $filename) {
+  public function captureFullPageWithWidthOfToWithName($width, $filepath, $filename) {
     // Use default height as screenshot is going to capture the complete page.
     $this->getSession()->resizeWindow((int) $width, $this::DEFAULT_HEIGHT, 'current');
-    $this->savescreenShot($filename, $this->getScreenshotAbsolutePath($path, NULL));
+    $message = "Screenshot created in @file_name";
+    $full_path = $filepath . '/' . $filename;
+    $this->createScreenshot($full_path, $message, FALSE);
   }
 
   /**
@@ -341,33 +307,26 @@ class DebugContext extends RawDrupalContext implements SnippetAcceptingContext {
    * Step to save page content to a file.
    */
   public function saveLastResponse() {
-    $this->saveLastResponseToFile($this->getPageContentPath());
+    $this->createScreenshot($this->getScreenshotsPath() . DIRECTORY_SEPARATOR . 'last_response', 'File saved in @file_name');
   }
 
   /**
-   * @Then save last response to :path
-   *
-   * Step to save page content fo a file in a given path.
+   * {@inheritdoc}
    */
-  public function saveLastResponseToFile($path) {
-    $milliseconds = gettimeofday();
-    $filename = 'PageContent-' . date("Ymd--H-i-s") . '.' . $milliseconds['usec'];
-    $error_page_filepath = $path . '/' . $filename . '.html';
-    file_put_contents($error_page_filepath, $this->getSession()->getPage()->getContent());
-  }
-
-  /**
-   * @Then I wait for :seconds second(s)
-   *
-   * Wait seconds before the next step.
-   *
-   * @param int|string $seconds
-   *   Number of seconds to wait. Must be an integer value.
-   */
-  public function iWaitForSeconds($seconds) {
-    if (!filter_var($seconds, FILTER_VALIDATE_INT) !== false) {
-      throw new \InvalidArgumentException("Expected a valid integer number of seconds but given value \"$seconds\" is invalid.");
+  public function createScreenshot($file_name, $message, $ext = TRUE) {
+    $file_path = parent::createScreenshot($file_name, $message, $ext);
+    $file_base_name = basename($file_path);
+    if ($url = $this->getScreenshotsUrl()) {
+      print 'Screenshot url:' . $url . DIRECTORY_SEPARATOR . $file_base_name . "\n";
     }
-    sleep($seconds);
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createScreenshotsForErrors($file_name, $message, $result) {
+    $file_base_name = basename($file_name);
+    $this->saveReport($file_base_name, $result);
+  }
+
 }
