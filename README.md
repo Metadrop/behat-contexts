@@ -7,9 +7,21 @@ This repository is based on [Nuvole drupal extension](https://github.com/nuvolew
 
 ## Install
 
-Install with [Composer](http://getcomposer.org) with the following command:
+Install with [Composer](http://getcomposer.org):
+
+1) Add this lines in "repositories" entry of your composer.json:
+
+```json
+{
+    "type": "vcs",
+    "url": "https://github.com/mistermoper/drupal-behat"
+}
+```
+
+2) Require package with composer require:
 
 `composer require metadrop/behat-contexts`
+
 
 ## Configure
 

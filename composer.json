@@ -5,12 +5,6 @@
     "require": {
         "nuvoleweb/drupal-behat": "dev-fb-screenshotcontext-improvements"
     },
-    "repositories": [
-      {
-        "type": "vcs",
-        "url": "https://github.com/mistermoper/drupal-behat"
-      }
-    ],
     "authors": [
         {
             "name": "Metadrop",
