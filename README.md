@@ -9,7 +9,7 @@ This repository is based on [Nuvole drupal extension](https://github.com/nuvolew
 
 Install with [Composer](http://getcomposer.org):
 
-1) Add this lines in "repositories" entry of your composer.json:
+1) Add these lines in "repositories" entry of your composer.json:
 
 ```json
 {
