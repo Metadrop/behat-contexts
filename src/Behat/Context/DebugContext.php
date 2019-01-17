@@ -324,7 +324,7 @@ class DebugContext extends NuvoleScreenshotContext implements SnippetAcceptingCo
   /**
    * {@inheritdoc}
    */
-  public function createScreenshotsForErrors($file_name, $message, $result) {
+  public function createScreenshotsForErrors($file_name, $message, TestResult $result) {
     $file_base_name = basename($file_name);
     $this->saveReport($file_base_name, $result);
   }
