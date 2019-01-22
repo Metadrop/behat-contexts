@@ -5,6 +5,14 @@ namespace Metadrop\Behat\Cores;
 interface CoreInterface {
 
   /**
+   * Clear page caches.
+   *
+   * @param string $path
+   *   Path.
+   */
+  public function pageCacheClear($path);
+
+  /**
    * Clear cache.
    *
    * @param string $cid

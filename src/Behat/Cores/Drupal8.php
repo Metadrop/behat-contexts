@@ -20,6 +20,13 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
+  public function pageCacheClear($path) {
+    $this->cacheClear($path, 'page');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function cacheClear($cid, $bin = 'cache') {
     \Drupal::cache($bin)->delete($cid);
   }
