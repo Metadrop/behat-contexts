@@ -20,7 +20,7 @@ class CacheContext extends RawDrupalContext {
       $path = $base_url . '/' . $path;
     }
 
-    $this->getCore()->cacheClear($path, 'page');
+    $this->getCore()->pageCacheClear($path);
   }
 
   /**

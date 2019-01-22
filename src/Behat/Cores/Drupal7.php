@@ -18,6 +18,13 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
+  public function pageCacheClear($path) {
+    $this->cacheClear($path, 'cache_page');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function cacheClear($cid, $bin = 'cache') {
     cache_clear_all($cid, $bin, TRUE);
   }
@@ -54,8 +61,7 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
     $result = $query->execute();
     $uid    = $result->fetchField();
 
-    $account = user_load($uid, $reset);
-    return $account;
+    return !empty($uid) ? user_load($uid, $reset) : NULL;
   }
 
   /**
