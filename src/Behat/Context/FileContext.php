@@ -18,7 +18,7 @@ class FileContext extends RawDrupalContext {
    */
   public function cleanFiles() {
     foreach ($this->files as $k => $v) {
-      file_delete($v);
+      $this->getCore()->fileDelete($v);
     }
   }
 
