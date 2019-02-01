@@ -141,4 +141,11 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     throw new PendingException('Node access grants not implemented yet!');
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function fileDelete($fid) {
+    file_delete($fid);
+  }
+
 }

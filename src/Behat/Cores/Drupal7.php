@@ -153,4 +153,12 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
     node_access_acquire_grants($node);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function fileDelete($fid) {
+    $file = file_load($fid);
+    file_delete($file);
+  }
+
 }

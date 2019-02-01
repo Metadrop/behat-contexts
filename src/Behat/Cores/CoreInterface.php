@@ -136,4 +136,12 @@ interface CoreInterface {
    */
   public function nodeAccessAcquireGrants($node);
 
+  /**
+   * Delete file.
+   *
+   * @param int $fid
+   *  File id.
+   */
+  public function fileDelete($fid);
+
 }
