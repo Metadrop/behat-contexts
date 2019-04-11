@@ -99,8 +99,13 @@ class EntityContext extends RawDrupalContext {
     return $errors;
   }
 
+  /**
+   *  Replacement tokens.
+   *
+   * @param array|mixed $fields
+   *   Fields to replace.
+   */
   protected function replaceTokens($values) {
-    parent::replaceTokens($values);
     foreach ($values as $key => $value) {
       if (strpos($value, 'entity-replacement') === 0) {
         $token_pieces = explode(':', $value);
