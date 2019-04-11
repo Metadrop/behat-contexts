@@ -93,7 +93,7 @@ class DebugContext extends NuvoleScreenshotContext implements SnippetAcceptingCo
    * @var completed file name error.
    */
   protected $filenameTemplate;
-  
+
   /**
    * Constructor.
    *
@@ -271,23 +271,26 @@ class DebugContext extends NuvoleScreenshotContext implements SnippetAcceptingCo
    * @Then capture full page with a width of :width
    */
   public function captureFullPageWithAWidthOf($width) {
-    $this->captureFullPageWithWidthOfToWithName($width, $this->getScreenshotsPath(), $filename = NULL);
+    $this->captureFullPageWithWidthOfToWithName($width, $this->getScreenshotsPath(), $this->generateFilenameDateBased());
   }
 
   /**
    * @Then capture full page with a width of :width with name :filename
    */
   public function captureFullPageWithAWidthOfWithFilename($width, $filename) {
-    $this->captureFullPageWithWidthOfToWithName($width, $this->getScreenshotsPath(), $filename);
+    $this->captureFullPageWithWidthOfToWithName($width, $this->getScreenshotsPath(), $this->generateFilenameDateBased());
+  }
+
+  public function generateFilenameDateBased() {
+    $milliseconds = gettimeofday();
+    return 'Screenshot-' . date("Ymd--H-i-s") . '.' . $milliseconds['usec'] . '.png';
   }
 
   /**
    * @Then capture full page with a width of :width to :path
    */
   public function captureFullPageWithWidthOfTo($width, $path) {
-    $milliseconds = gettimeofday();
-    $filename = 'Screenshot-' . date("Ymd--H-i-s") . '.' . $milliseconds['usec'] . '.png';
-    $this->captureFullPageWithWidthOfToWithName($width, $this->getScreenshotAbsolutePath($path), $filename);
+    $this->captureFullPageWithWidthOfToWithName($width, $this->getScreenshotAbsolutePath($path), $this->generateFilenameDateBased());
   }
 
   /**

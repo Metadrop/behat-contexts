@@ -158,7 +158,10 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
    */
   public function fileDelete($fid) {
     $file = file_load($fid);
-    file_delete($file);
+    if ($file) {
+      file_delete($file);
+    }
+  }
 
  /**
    *  {@inheritdoc}
