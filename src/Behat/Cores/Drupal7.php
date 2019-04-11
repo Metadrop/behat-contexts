@@ -159,6 +159,33 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
   public function fileDelete($fid) {
     $file = file_load($fid);
     file_delete($file);
+
+ /**
+   *  {@inheritdoc}
+   */
+  public function checkEntityFields($entity, $fields) {
+    throw new PendingException('Pending to implement method in Drupal 7');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function replacementEntityTokens(&$values) {
+    throw new PendingException('Pending to implement method in Drupal 7');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function checkEntityValues($entity_type, $field_name, $value, TableNode $values, $throw_error_on_empty = FALSE) {
+    throw new PendingException('Pending to implement method in Drupal 7');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEntityByField($entity_type, $field_name, $value) {
+    throw new PendingException('Pending to implement method in Drupal 7');
   }
 
 }

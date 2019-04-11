@@ -10,6 +10,7 @@ use Webmozart\Assert\Assert;
 use Behat\Behat\Tester\Exception\PendingException;
 use Drupal\user\Entity\User;
 use Drupal\paragraphs\Entity\Paragraph;
+use Drupal\Core\Entity\EntityInterface;
 
 class Drupal8 extends OriginalDrupal8 implements CoreInterface {
 
@@ -148,4 +149,103 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     file_delete($fid);
   }
 
+ /**
+   * {@inheritdoc}
+   */
+  public function checkEntityValues($entity_type, $field_name, $value, $fields, $throw_error_on_empty = TRUE) {
+
+    $query = \Drupal::entityQuery($entity_type);
+    $query->condition($field_name, $value);
+    $entity_ids = $query->execute();
+    rsort($entity_ids);
+    $entity_id = reset($entity_ids);
+    $entity = \Drupal::entityTypeManager()->getStorage($entity_type)->load($entity_id);
+    if (empty($entity) && !($entity instanceof EntityInterface)) {
+      throw new \Exception('Entity of type ' . $entity_type . ' with ' . $field_name . ':  ' . $value . ' not found.');
+    }
+    $this->replacementEntityTokens($fields);
+    return $errors;
+  }
+
+  /**
+   *  {@inheritdoc}
+   */
+  public function checkEntityFields($entity, $fields) {
+    $errors = [];
+
+    foreach ($fields as $field => $value) {
+
+      $entity_value = $field == 'roles' ? explode(', ', $entity->get($field)->getString()) : $entity->get($field)->getString();
+
+      if (is_string($value) && is_string($entity_value)) {
+        $entity_value = mb_strtolower($entity_value);
+        $entity_value = strip_tags($entity_value);
+        $entity_value = preg_replace("/\r|\n/", "", $entity_value);
+        if (mb_strtolower($value) != $entity_value) {
+          $errors[] = ' - Field ' . $field . ': Expected "' . $value . '"; Got "' . $entity_value . '"';
+        }
+      }
+
+      if (is_array($entity_value) && !in_array($value, $entity_value)) {
+        $errors[] = ' - Field ' . $field . ': Expected "' . $value . '"; Got "' . print_r($entity_value, TRUE) . '"';
+      }
+
+      if (empty($entity_value) && !empty($value)) {
+        $errors[] = ' - Field ' . $field . ': Expected "' . $value . '"; Got empty.';
+      }
+    }
+    return $errors;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function replacementEntityTokens(&$values) {
+    // Get entity type list.
+    $entity_types = array_keys(\Drupal::entityManager()->getDefinitions());
+    foreach ($values as $key => $value) {
+      if (strpos($value, 'entity-replacement') === 0) {
+        $token_pieces = explode(':', $value);
+        array_shift($token_pieces);
+        $entity_type = $token_pieces[0];
+        $field_key = $token_pieces[1];
+        $field_value = $token_pieces[2];
+        $destiny_replacement = $token_pieces[3];
+        $keys_exists = isset($entity_type) && isset($field_key) && isset($field_value) && isset($destiny_replacement);
+        if (!$keys_exists || !in_array($entity_type, $entity_types)) {
+          throw new Exception('Token or entity values are not valid!');
+        }
+
+        $query = \Drupal::entityQuery($entity_type);
+        $query->condition($field_key, $field_value);
+        $entities_ids = $query->execute();
+        rsort($entities_ids);
+        $entity_id = end($entities_ids);
+        if (!empty($entity_id)) {
+          $entity = \Drupal::entityTypeManager()->getStorage($entity_type)->load($entity_id);
+          $destiny_value = $entity->hasField($destiny_replacement) ? $entity->get($destiny_replacement)->getString() : NULL;
+          $values[$key] = $destiny_value;
+        }
+
+      }
+    }
+  }
+
+  /**
+   *
+   * @param type $entity_type
+   * @param type $field_name
+   * @param type $value
+   * @return type{@inheritdoc}
+   */
+  public function getEntityByField($entity_type, $field_name, $value) {
+    $query = \Drupal::entityQuery($entity_type);
+    $query->condition($field_name, $value);
+    $entity_ids = $query->execute();
+    rsort($entity_ids);
+    $entity_id = reset($entity_ids);
+
+    $entity = \Drupal::entityTypeManager()->getStorage($entity_type)->load($entity_id);
+    return (!empty($entity) && ($entity instanceof EntityInterface)) ? $entity : NULL;
+  }
 }

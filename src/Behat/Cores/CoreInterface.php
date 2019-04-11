@@ -144,4 +144,30 @@ interface CoreInterface {
    */
   public function fileDelete($fid);
 
+  /**
+   * Check entity fields.
+   *
+   * @param mixed $entity
+   *   Entity.
+   * @param array|mixed $fields
+   *   Field, field name => value.
+   */
+  public function checkEntityFields($entity, $fields);
+
+  /**
+   * Replacement tokens entity.
+   *
+   * Token: entity-replacement:entity_type:field_key:field_value:destiny_field.
+   * Example | entity-replacement:user:mail:behat@metadrop.net:uid |
+   */
+  public function replacementEntityTokens(&$values);
+
+  /**
+   *
+   * @param type $entity_type
+   * @param type $field_name
+   * @param type $valueGet entity by field and value.
+   */
+  public function getEntityByField($entity_type, $field_name, $value);
+
 }
