@@ -144,4 +144,34 @@ interface CoreInterface {
    */
   public function fileDelete($fid);
 
+  /**
+   * Obtain entity by field value.
+   *
+   * @param string $entity_type
+   *   Entity type.
+   * @param string $field_name
+   *   Field name.
+   * @param string $value
+   *   Field value.
+   *
+   * @return \stdClass
+   *   Entity.
+   */
+  public function getEntityByField($entity_type, $field_name, $value);
+
+  /**
+   * Obtain entity value.
+   *
+   * @param string $field_name
+   *   Field name.
+   * @param \stdClass $entity
+   *   Entity.
+   * @param string $fallback
+   *   Fallback (optional).
+   *
+   * @return string
+   *   Entity field value.
+   */
+  public function getEntityFieldValue($field_name, \stdClass $entity, $fallback = NULL);
+
 }
