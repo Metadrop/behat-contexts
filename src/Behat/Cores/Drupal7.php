@@ -8,7 +8,6 @@ use Webmozart\Assert\Assert;
 use Metadrop\Behat\Cores\Traits\CronTrait;
 use Metadrop\Behat\Cores\Traits\FileTrait;
 
-
 class Drupal7 extends OriginalDrupal7 implements CoreInterface {
 
   use UsersTrait;
@@ -190,5 +189,14 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
   public function getEntityByField($entity_type, $field_name, $value) {
     throw new PendingException('Pending to implement method in Drupal 7');
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEditableConfig($name) {
+    throw new PendingException('Pending to implement method in Drupal 7');
+  }
+
+
 
 }

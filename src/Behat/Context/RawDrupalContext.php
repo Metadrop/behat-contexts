@@ -24,4 +24,12 @@ abstract class RawDrupalContext extends NuvoleRawDrupalContext {
     }
   }
 
+  /**
+   *  Replacement tokens.
+   *
+   * @param array|mixed $fields
+   *   Fields to replace.
+   */
+  protected function replaceTokens($values);
+
 }
