@@ -3,7 +3,6 @@
 namespace Metadrop\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
-use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Class EntityContext.
