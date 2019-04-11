@@ -7,6 +7,7 @@ use Metadrop\Behat\Cores\Traits\UsersTrait;
 use Webmozart\Assert\Assert;
 use Metadrop\Behat\Cores\Traits\CronTrait;
 use Metadrop\Behat\Cores\Traits\FileTrait;
+use Behat\Behat\Tester\Exception\PendingException;
 
 class Drupal7 extends OriginalDrupal7 implements CoreInterface {
 
@@ -162,24 +163,10 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
     }
   }
 
- /**
-   *  {@inheritdoc}
-   */
-  public function checkEntityFields($entity, $fields) {
-    throw new PendingException('Pending to implement method in Drupal 7');
-  }
-
   /**
    * {@inheritdoc}
    */
-  public function replacementEntityTokens(&$values) {
-    throw new PendingException('Pending to implement method in Drupal 7');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function checkEntityValues($entity_type, $field_name, $value, TableNode $values, $throw_error_on_empty = FALSE) {
+  public function getEditableConfig($name) {
     throw new PendingException('Pending to implement method in Drupal 7');
   }
 
@@ -193,10 +180,7 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function getEditableConfig($name) {
+  public function getEntityFieldValue($field_name, \stdClass $entity, $fallback = NULL) {
     throw new PendingException('Pending to implement method in Drupal 7');
   }
-
-
-
 }

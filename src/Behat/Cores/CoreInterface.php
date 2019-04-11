@@ -145,29 +145,33 @@ interface CoreInterface {
   public function fileDelete($fid);
 
   /**
-   * Check entity fields.
+   * Obtain entity by field value.
    *
-   * @param mixed $entity
+   * @param string $entity_type
+   *   Entity type.
+   * @param string $field_name
+   *   Field name.
+   * @param string $value
+   *   Field value.
+   *
+   * @return \stdClass
    *   Entity.
-   * @param array|mixed $fields
-   *   Field, field name => value.
-   */
-  public function checkEntityFields($entity, $fields);
-
-  /**
-   * Replacement tokens entity.
-   *
-   * Token: entity-replacement:entity_type:field_key:field_value:destiny_field.
-   * Example | entity-replacement:user:mail:behat@metadrop.net:uid |
-   */
-  public function replacementEntityTokens(&$values);
-
-  /**
-   *
-   * @param type $entity_type
-   * @param type $field_name
-   * @param type $valueGet entity by field and value.
    */
   public function getEntityByField($entity_type, $field_name, $value);
+
+  /**
+   * Obtain entity value.
+   *
+   * @param string $field_name
+   *   Field name.
+   * @param \stdClass $entity
+   *   Entity.
+   * @param string $fallback
+   *   Fallback (optional).
+   *
+   * @return string
+   *   Entity field value.
+   */
+  public function getEntityFieldValue($field_name, \stdClass $entity, $fallback = NULL);
 
 }

@@ -149,6 +149,9 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     file_delete($fid);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getEntityByField($entity_type, $field_name, $value) {
     $query = \Drupal::entityQuery($entity_type);
     $query->condition($field_name, $value);
@@ -160,7 +163,10 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     return (!empty($entity) && ($entity instanceof EntityInterface)) ? $entity : NULL;
   }
 
-  protected function getEntityValue($field, $entity, $fallback = NULL) {
+  /**
+   * {@inheritdoc}
+   */
+  public function getEntityValue($field, $entity, $fallback = NULL) {
     if ($entity->hasField($field)) {
       $fallback = ($field == 'roles') ? explode(', ', $entity->get($field)->getString()) : $entity->get($field)->getString();
     }

@@ -81,7 +81,7 @@ class EntityContext extends RawDrupalContext {
   protected function checkEntityValues($entity, $fields) {
     $errors = [];
     foreach ($fields as $field => $value) {
-      $entity_value = $this->getCore()->getEntityValue($field, $entity);
+      $entity_value = $this->getCore()->getEntityFieldValue($field, $entity);
       if (is_string($value) && is_string($entity_value)) {
         $entity_value = mb_strtolower($entity_value);
         $entity_value = strip_tags($entity_value);
@@ -119,7 +119,7 @@ class EntityContext extends RawDrupalContext {
 
         $entity = $this->getEntityByField($entity_type, $field_key, $value);
         if (!empty($entity)) {
-          $values[$key] = $this->getCore()->getEntityValue($field_key, $entity, $values[$key]);
+          $values[$key] = $this->getCore()->getEntityFieldValue($field_key, $entity, $values[$key]);
         }
 
       }
