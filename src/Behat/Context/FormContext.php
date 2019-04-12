@@ -32,8 +32,8 @@ class FormContext extends RawMinkContext {
       throw new \InvalidArgumentException("Could not find the form element \"$label\" of type \"$type\"");
     }
 
-    // Check required class.
-    $xpath_required = "//label[contains(text(), '{$label}')]/..//{$type}[contains(@class, 'required')]";
+    // Check required class or attribute required.
+    $xpath_required = "(//label[contains(text(), '{$label}')]/..//{$type}[contains(@required, 'required')] | //label[contains(text(), '{$label}')]/..//{$type}[contains(@class, 'required')])";
     $element_required = $page->find('xpath', $xpath_required);
 
     return NULL !== $element_required;
