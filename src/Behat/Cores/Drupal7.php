@@ -183,4 +183,11 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
   public function getEntityFieldValue($field_name, $entity, $fallback = NULL) {
     throw new PendingException('Pending to implement method in Drupal 7');
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEntityTypes() {
+    throw new PendingException('Pending to implement method in Drupal 7');
+  }
 }

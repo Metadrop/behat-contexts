@@ -174,4 +174,12 @@ interface CoreInterface {
    */
   public function getEntityFieldValue($field_name, $entity, $fallback = NULL);
 
+  /**
+   * Get entity types availables.
+   *
+   * @return array|mixed
+   *   Entity types.
+   */
+  public function getEntityTypes();
+
 }

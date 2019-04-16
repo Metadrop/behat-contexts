@@ -173,4 +173,11 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     return $fallback;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getEntityTypes() {
+    return array_keys(\Drupal::entityManager()->getDefinitions());
+  }
+
 }
