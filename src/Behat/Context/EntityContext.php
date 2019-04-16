@@ -106,7 +106,7 @@ class EntityContext extends RawDrupalContext {
    */
   protected function replaceTokens($values) {
      // Get entity type list.
-    $entity_types = array_keys(\Drupal::entityManager()->getDefinitions());
+    $entity_types = $this->getCore()->getEntityTypes();
     foreach ($values as $key => $value) {
       if (strpos($value, 'entity-replacement') === 0) {
         $token_pieces = explode(':', $value);
