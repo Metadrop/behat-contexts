@@ -2,6 +2,9 @@
 
 namespace Metadrop\Behat\Cores\Traits;
 
+/**
+ * Trait CronTrait.
+ */
 trait CronTrait {
 
   /**
