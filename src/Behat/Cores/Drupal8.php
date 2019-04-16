@@ -10,6 +10,7 @@ use Webmozart\Assert\Assert;
 use Behat\Behat\Tester\Exception\PendingException;
 use Drupal\user\Entity\User;
 use Drupal\paragraphs\Entity\Paragraph;
+use Drupal\Core\Entity\EntityInterface;
 
 class Drupal8 extends OriginalDrupal8 implements CoreInterface {
 
@@ -146,6 +147,37 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    */
   public function fileDelete($fid) {
     file_delete($fid);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEntityByField($entity_type, $field_name, $value) {
+    $query = \Drupal::entityQuery($entity_type);
+    $query->condition($field_name, $value);
+    $entity_ids = $query->execute();
+    rsort($entity_ids);
+    $entity_id = reset($entity_ids);
+
+    $entity = \Drupal::entityTypeManager()->getStorage($entity_type)->load($entity_id);
+    return (!empty($entity) && ($entity instanceof EntityInterface)) ? $entity : NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEntityFieldValue($field, $entity, $fallback = NULL) {
+    if ($entity->hasField($field)) {
+      $fallback = ($field == 'roles') ? explode(', ', $entity->get($field)->getString()) : $entity->get($field)->getString();
+    }
+    return $fallback;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEntityTypes() {
+    return array_keys(\Drupal::entityManager()->getDefinitions());
   }
 
 }
