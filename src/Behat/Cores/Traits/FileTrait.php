@@ -1,8 +1,10 @@
 <?php
 
-
 namespace Metadrop\Behat\Cores\Traits;
 
+/**
+ * Trait FileTrait.
+ */
 trait FileTrait {
 
   /**
@@ -22,7 +24,7 @@ trait FileTrait {
     $destination = $directory . '/' . basename($file_path);
 
     if (!file_exists($file_path)) {
-      throw new \Exception("Error: file " . basename($file_path) ." not found");
+      throw new \Exception("Error: file " . basename($file_path) . " not found");
     }
     else {
       $data = file_get_contents($file_path);

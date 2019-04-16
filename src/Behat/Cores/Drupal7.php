@@ -9,6 +9,9 @@ use Metadrop\Behat\Cores\Traits\CronTrait;
 use Metadrop\Behat\Cores\Traits\FileTrait;
 use Behat\Behat\Tester\Exception\PendingException;
 
+/**
+ * Class Drupal7.
+ */
 class Drupal7 extends OriginalDrupal7 implements CoreInterface {
 
   use UsersTrait;
@@ -101,7 +104,7 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
     $keys = array_keys($result[$entity_type]);
     $id = reset($keys);
 
-    if (empty($id)){
+    if (empty($id)) {
       throw new \Exception("Can't take last one");
     }
 
@@ -190,4 +193,5 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
   public function getEntityTypes() {
     throw new PendingException('Pending to implement method in Drupal 7');
   }
+
 }

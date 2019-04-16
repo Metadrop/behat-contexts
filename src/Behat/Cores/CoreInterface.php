@@ -2,6 +2,9 @@
 
 namespace Metadrop\Behat\Cores;
 
+/**
+ * Class CoreInterface.
+ */
 interface CoreInterface {
 
   /**
@@ -140,7 +143,7 @@ interface CoreInterface {
    * Delete file.
    *
    * @param int $fid
-   *  File id.
+   *   File id.
    */
   public function fileDelete($fid);
 
