@@ -49,7 +49,7 @@ class EntityContext extends RawDrupalContext {
    *
    * Example:
    * And the 'user' with field 'mail' and value 'behat@metadrop.net' should have the following values:
-   *  | mail                | uid                                                  |
+   *  | mail                | uid                                                 |
    *  | behat@metadrop.net  | entity-replacement:user:mail:behat@metadrop.net:uid |
    */
   public function checkEntityTestValues($entity_type, $field_name, $value, TableNode $values, $throw_error_on_empty = TRUE) {
@@ -59,10 +59,9 @@ class EntityContext extends RawDrupalContext {
     $entity = $this->getCore()->getEntityByField($entity_type, $field_name, $value);
 
     // Check entity.
-    if (isset($entity)) {
+    if (!isset($entity)) {
       throw new \Exception('The ' . $entity_type . ' with ' . $field_name . ':  ' . $value . ' not found.');
     }
-
     // Make field tokens replacements.
     $fields = $this->replaceTokens($fields);
 
@@ -106,6 +105,8 @@ class EntityContext extends RawDrupalContext {
    *   Fields to replace.
    */
   protected function replaceTokens($values) {
+     // Get entity type list.
+    $entity_types = array_keys(\Drupal::entityManager()->getDefinitions());
     foreach ($values as $key => $value) {
       if (strpos($value, 'entity-replacement') === 0) {
         $token_pieces = explode(':', $value);
@@ -120,10 +121,10 @@ class EntityContext extends RawDrupalContext {
         if (!$keys_exists || !in_array($entity_type, $entity_types)) {
           throw new \Exception('Token or entity values are not valid!');
         }
+        $entity = $this->getCore()->getEntityByField($entity_type, $field_key, $field_value);
 
-        $entity = $this->getEntityByField($entity_type, $field_key, $value);
         if (!empty($entity)) {
-          $values[$key] = $this->getCore()->getEntityFieldValue($field_key, $entity, $values[$key]);
+          $values[$key] = $this->getCore()->getEntityFieldValue($destiny_replacement, $entity, $values[$key]);
         }
 
       }

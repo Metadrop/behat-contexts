@@ -180,7 +180,7 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function getEntityFieldValue($field_name, \stdClass $entity, $fallback = NULL) {
+  public function getEntityFieldValue($field_name, $entity, $fallback = NULL) {
     throw new PendingException('Pending to implement method in Drupal 7');
   }
 }

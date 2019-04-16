@@ -164,7 +164,7 @@ interface CoreInterface {
    *
    * @param string $field_name
    *   Field name.
-   * @param \stdClass $entity
+   * @param mixed $entity
    *   Entity.
    * @param string $fallback
    *   Fallback (optional).
@@ -172,6 +172,6 @@ interface CoreInterface {
    * @return string
    *   Entity field value.
    */
-  public function getEntityFieldValue($field_name, \stdClass $entity, $fallback = NULL);
+  public function getEntityFieldValue($field_name, $entity, $fallback = NULL);
 
 }

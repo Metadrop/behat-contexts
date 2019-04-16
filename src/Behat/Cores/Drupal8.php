@@ -166,7 +166,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function getEntityFieldValue($field, \stdClass $entity, $fallback = NULL) {
+  public function getEntityFieldValue($field, $entity, $fallback = NULL) {
     if ($entity->hasField($field)) {
       $fallback = ($field == 'roles') ? explode(', ', $entity->get($field)->getString()) : $entity->get($field)->getString();
     }
