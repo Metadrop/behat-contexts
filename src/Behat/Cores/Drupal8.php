@@ -12,6 +12,9 @@ use Drupal\user\Entity\User;
 use Drupal\paragraphs\Entity\Paragraph;
 use Drupal\Core\Entity\EntityInterface;
 
+/**
+ * Class Drupal8.
+ */
 class Drupal8 extends OriginalDrupal8 implements CoreInterface {
 
   use UsersTrait;

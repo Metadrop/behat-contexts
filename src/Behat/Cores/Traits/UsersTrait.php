@@ -2,6 +2,9 @@
 
 namespace Metadrop\Behat\Cores\Traits;
 
+/**
+ * Trait UsersTrait.
+ */
 trait UsersTrait {
 
   /**
@@ -12,7 +15,7 @@ trait UsersTrait {
    *
    * @param string $name
    *   The identifier
-   *   Examples: "admin", "12", "example@example.com"
+   *   Examples: "admin", "12", "example@example.com".
    *
    * @return string
    *   The property

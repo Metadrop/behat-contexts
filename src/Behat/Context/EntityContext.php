@@ -76,6 +76,17 @@ class EntityContext extends RawDrupalContext {
     }
   }
 
+  /**
+   * Check entity values.
+   *
+   * @param mixed $entity
+   *   Entity.
+   * @param array|mixed $fields
+   *   Fields to check.
+   *
+   * @return array|mixed
+   *   Errors.
+   */
   protected function checkEntityValues($entity, $fields) {
     $errors = [];
     foreach ($fields as $field => $value) {
@@ -99,13 +110,13 @@ class EntityContext extends RawDrupalContext {
   }
 
   /**
-   *  Replacement tokens.
+   * Replacement tokens.
    *
-   * @param array|mixed $fields
+   * @param array|mixed $values
    *   Fields to replace.
    */
   protected function replaceTokens($values) {
-     // Get entity type list.
+    // Get entity type list.
     $entity_types = $this->getCore()->getEntityTypes();
     foreach ($values as $key => $value) {
       if (strpos($value, 'entity-replacement') === 0) {
@@ -131,4 +142,5 @@ class EntityContext extends RawDrupalContext {
     }
     return $values;
   }
+
 }
