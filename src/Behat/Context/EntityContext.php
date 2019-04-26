@@ -3,11 +3,38 @@
 namespace Metadrop\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
+use Behat\Behat\Context\SnippetAcceptingContext;
 
 /**
  * Class EntityContext.
  */
-class EntityContext extends RawDrupalContext {
+class EntityContext extends RawDrupalContext implements SnippetAcceptingContext {
+
+  /**
+   * Constructor.
+   *
+   * @param array|mixed $parameters
+   *   Parameters.
+   */
+  public function __construct($parameters = NULL) {
+    // Default values.
+    $defaults = array(
+      'purge_entities' => [
+        'node',
+        'user',
+        ],
+    );
+
+    // Collect received parameters.
+    $this->customParameters = array();
+    if (!empty($parameters)) {
+      // Filter any invalid parameters.
+      $this->customParameters = array_intersect_key($parameters, $defaults);
+    }
+
+    // Apply default values.
+    $this->customParameters += $defaults;
+  }
 
   /**
    * Go to last entity created.
@@ -141,6 +168,24 @@ class EntityContext extends RawDrupalContext {
       }
     }
     return $values;
+  }
+
+  /**
+   * Purge entities.
+   *
+   * @BeforeScenario @purgeEntities
+   */
+  public function purgeEntities() {
+    $condition_key = 'created';
+    // @TODO: Save request time before escenario.
+    // Get the request time after scenario and delete entities if the
+    // entities were created after scenario execution.
+    //$condition_value = REQUEST_TIME;
+
+    foreach ($this->customParameters['purge_entities'] as $entity_type) {
+      $this->getCore()->deleteEntities($entity_type, $condition_key, $condition_value, '<=');
+    }
+
   }
 
 }
