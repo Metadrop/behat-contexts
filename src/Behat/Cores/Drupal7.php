@@ -194,4 +194,11 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
     throw new PendingException('Pending to implement method in Drupal 7');
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function deleteEntities($entity_type, $condition_key, $condition_value, $condition_operand = 'LIKE') {
+    throw new PendingException('Pending to implement method in Drupal 7');
+  }
+
 }

@@ -185,4 +185,18 @@ interface CoreInterface {
    */
   public function getEntityTypes();
 
+  /**
+   * Delete entities by condition.
+   *
+   * @param string $entity_type
+   *   Entity type.
+   * @param string $condition_key
+   *   Condition key.
+   * @param string $condition_value
+   *   Condition value.
+   * @param string $condition_operand
+   *   Condition operand.
+   */
+  public function deleteEntities($entity_type, $condition_key, $condition_value, $condition_operand = 'LIKE');
+
 }
