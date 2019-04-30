@@ -11,29 +11,34 @@ use Behat\Behat\Context\SnippetAcceptingContext;
 class EntityContext extends RawDrupalContext implements SnippetAcceptingContext {
 
   /**
+   * time before scenario.
+   *
+   * @var string
+   */
+  protected $timeBeforeScenario = NULL;
+
+  /**
+   * Custom Params.
+   *
+   * @var array|mixed
+   */
+  protected $customParameters = [];
+
+  /**
    * Constructor.
    *
    * @param array|mixed $parameters
    *   Parameters.
    */
   public function __construct($parameters = NULL) {
-    // Default values.
-    $defaults = array(
-      'purge_entities' => [
-        'node',
-        'user',
-        ],
-    );
 
     // Collect received parameters.
-    $this->customParameters = array();
+    $this->customParameters = [];
     if (!empty($parameters)) {
       // Filter any invalid parameters.
-      $this->customParameters = array_intersect_key($parameters, $defaults);
+      $this->customParameters = $parameters;
     }
 
-    // Apply default values.
-    $this->customParameters += $defaults;
   }
 
   /**
@@ -171,19 +176,28 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
   }
 
   /**
-   * Purge entities.
+   * Record time before scenario purge entities.
    *
    * @BeforeScenario @purgeEntities
    */
+  public function recordTimeBeforeScenario() {
+    $this->timeBeforeScenario = REQUEST_TIME;
+  }
+
+  /**
+   * Purge entities.
+   *
+   * @AfterScenario @purgeEntities
+   */
   public function purgeEntities() {
     $condition_key = 'created';
-    // @TODO: Save request time before escenario.
     // Get the request time after scenario and delete entities if the
     // entities were created after scenario execution.
-    //$condition_value = REQUEST_TIME;
+    $condition_value = $this->timeBeforeScenario;
+    $purge_entities = !isset($this->customParameters['purge_entities']) ? [] : $this->customParameters['purge_entities'];
 
-    foreach ($this->customParameters['purge_entities'] as $entity_type) {
-      $this->getCore()->deleteEntities($entity_type, $condition_key, $condition_value, '<=');
+    foreach ($purge_entities as $entity_type) {
+      $this->getCore()->deleteEntities($entity_type, $condition_key, $condition_value, '>=');
     }
 
   }
