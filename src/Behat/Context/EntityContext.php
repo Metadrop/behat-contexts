@@ -3,11 +3,43 @@
 namespace Metadrop\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
+use Behat\Behat\Context\SnippetAcceptingContext;
 
 /**
  * Class EntityContext.
  */
-class EntityContext extends RawDrupalContext {
+class EntityContext extends RawDrupalContext implements SnippetAcceptingContext {
+
+  /**
+   * Time before scenario.
+   *
+   * @var string
+   */
+  protected $timeBeforeScenario = NULL;
+
+  /**
+   * Custom Params.
+   *
+   * @var array|mixed
+   */
+  protected $customParameters = [];
+
+  /**
+   * Constructor.
+   *
+   * @param array|mixed $parameters
+   *   Parameters.
+   */
+  public function __construct($parameters = NULL) {
+
+    // Collect received parameters.
+    $this->customParameters = [];
+    if (!empty($parameters)) {
+      // Filter any invalid parameters.
+      $this->customParameters = $parameters;
+    }
+
+  }
 
   /**
    * Go to last entity created.
@@ -141,6 +173,41 @@ class EntityContext extends RawDrupalContext {
       }
     }
     return $values;
+  }
+
+  /**
+   * Record time before scenario purge entities.
+   *
+   * @BeforeScenario @purgeEntities
+   */
+  public function recordTimeBeforeScenario() {
+    $this->timeBeforeScenario = REQUEST_TIME;
+  }
+
+  /**
+   * Purge entities.
+   *
+   * Define entities to delete in behat.yml.
+   * Example:
+   * - Metadrop\Behat\Context\EntityContext:
+   *        parameters:
+   *          'purge_entities':
+   *            - user
+   *            - custom_entity
+   *
+   * @AfterScenario @purgeEntities
+   */
+  public function purgeEntities() {
+    $condition_key = 'created';
+    // Get the request time after scenario and delete entities if the
+    // entities were created after scenario execution.
+    $condition_value = $this->timeBeforeScenario;
+    $purge_entities = !isset($this->customParameters['purge_entities']) ? [] : $this->customParameters['purge_entities'];
+
+    foreach ($purge_entities as $entity_type) {
+      $this->getCore()->deleteEntities($entity_type, $condition_key, $condition_value, '>=');
+    }
+
   }
 
 }

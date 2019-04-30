@@ -183,4 +183,18 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     return array_keys(\Drupal::entityManager()->getDefinitions());
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function deleteEntities($entity_type, $condition_key, $condition_value, $condition_operand = 'LIKE') {
+    $database = \Drupal::database();
+    $query = \Drupal::entityQuery($entity_type);
+    $condition_scaped = strtoupper($condition_operand) == 'LIKE' ? '%' . $database->escapeLike($condition_value) . '%' : $condition_value;
+    $query->condition($condition_key, $condition_scaped, $condition_operand);
+    $entities_ids = $query->execute();
+    $controller = \Drupal::entityManager()->getStorage($entity_type);
+    $entities = $controller->loadMultiple($entities_ids);
+    $controller->delete($entities);
+  }
+
 }
