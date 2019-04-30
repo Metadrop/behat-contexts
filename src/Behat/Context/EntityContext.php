@@ -11,7 +11,7 @@ use Behat\Behat\Context\SnippetAcceptingContext;
 class EntityContext extends RawDrupalContext implements SnippetAcceptingContext {
 
   /**
-   * time before scenario.
+   * Time before scenario.
    *
    * @var string
    */
@@ -186,6 +186,14 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
 
   /**
    * Purge entities.
+   *
+   * Define entities to delete in behat.yml.
+   * Example:
+   * - Metadrop\Behat\Context\EntityContext:
+   *        parameters:
+   *          'purge_entities':
+   *            - user
+   *            - custom_entity
    *
    * @AfterScenario @purgeEntities
    */
