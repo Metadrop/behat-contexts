@@ -130,6 +130,11 @@ default:
               'error_reporting_path': '/var/www/html/docroot/sites/default/files/behat/errors'
               'screenshots_path': '/var/www/html/docroot/sites/default/files/behat/screenshots'
               'page_contents_path': '/var/www/html/docroot/sites/default/files/behat/pages'
+        - Metadrop\Behat\Context\EntityContext:
+            parameters:
+              'purge_entities':
+                - user
+                - custom_entity
 ```
 
 **Parameters**
