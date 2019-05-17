@@ -8,7 +8,7 @@
 namespace Metadrop\Behat\Context;
 
 use Behat\Behat\Context\SnippetAcceptingContext;
-use Drupal\DrupalExtension\Context\RawDrupalContext;
+#use Drupal\DrupalExtension\Context\RawDrupalContext;
 
 /**
  * Utilities for testing organic groups.
