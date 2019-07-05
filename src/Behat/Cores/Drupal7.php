@@ -177,21 +177,38 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
    * {@inheritdoc}
    */
   public function getEntityByField($entity_type, $field_name, $value) {
-    throw new PendingException('Pending to implement method in Drupal 7');
+    $query = new \EntityFieldQuery();
+    $query->entityCondition('entity_type', $entity_type)
+      ->propertyCondition($field_name, $value)
+      ->entityOrderBy('entity_id', 'DESC')
+      ->range(0, 1);
+
+    $result = $query->execute();
+    $entity_wrapper = NULL;
+    if (!empty($result)) {
+      $user = reset($result);
+      $entity_id = array_keys($user)[0];
+      $entity_wrapper = entity_metadata_wrapper($entity_type, $entity_id);
+    }
+
+    return $entity_wrapper;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getEntityFieldValue($field_name, $entity, $fallback = NULL) {
-    throw new PendingException('Pending to implement method in Drupal 7');
+    if (isset($entity->{$field_name})) {
+      $fallback = ($field_name == 'roles') ? $entity->value()->{$field_name} : $entity->{$field_name}->value();
+    }
+    return $fallback;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getEntityTypes() {
-    throw new PendingException('Pending to implement method in Drupal 7');
+    return array_keys(entity_get_info());
   }
 
   /**
