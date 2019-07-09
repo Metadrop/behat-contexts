@@ -198,7 +198,7 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
    * {@inheritdoc}
    */
   public function getEntityFieldValue($field_name, $entity, $fallback = NULL) {
-    if ($entity instanceof \EntityDrupalWrapper && isset($entity->{$field_name})) {
+    if (($entity instanceof \EntityMetadataWrapper || $entity instanceof \EntityStructureWrapper) && isset($entity->{$field_name})) {
       $fallback = ($field_name == 'roles') ? $entity->value()->{$field_name} : $entity->{$field_name}->value();
     }
     return $fallback;
