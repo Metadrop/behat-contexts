@@ -52,15 +52,8 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
    * @USECORE
    */
   public function goToTheLastEntityCreated($entity_type, $bundle = NULL, $subpath = NULL) {
-    $last_entity = $this->getCore()->getLastEntityId($entity_type, $bundle);
-    if (empty($last_entity)) {
-      throw new \Exception("Imposible to go to path: the entity does not exists");
-    }
-
-    $entity = $this->getCore()->entityLoadSingle($entity_type, $last_entity);
-    if (!empty($entity)) {
-      $uri = $this->getCore()->entityUri($entity_type, $entity);
-      $path = empty($subpath) ? $uri : $uri . '/' . $subpath;
+    $path = $this->getCore()->buildEntityUri($entity_type, $bundle, $subpath);
+    if (!empty($path)) {
       $this->getSession()->visit($this->locatePath($path));
     }
   }
