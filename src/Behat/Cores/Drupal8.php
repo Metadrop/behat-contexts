@@ -6,6 +6,7 @@ use NuvoleWeb\Drupal\Driver\Cores\Drupal8 as OriginalDrupal8;
 use Metadrop\Behat\Cores\Traits\UsersTrait;
 use Metadrop\Behat\Cores\Traits\CronTrait;
 use Metadrop\Behat\Cores\Traits\FileTrait;
+use Metadrop\Behat\Cores\Traits\EntityTrait;
 use Webmozart\Assert\Assert;
 use Behat\Behat\Tester\Exception\PendingException;
 use Drupal\user\Entity\User;
@@ -20,6 +21,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   use UsersTrait;
   use CronTrait;
   use FileTrait;
+  use EntityTrait;
 
   /**
    * {@inheritdoc}
@@ -101,7 +103,8 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    * {@inheritdoc}
    */
   public function entityUri($entity_type, $entity) {
-    return $entity->toUrl()->getInternalPath();
+    $path = $entity->toUrl()->getInternalPath();
+    return $path;
   }
 
   /**

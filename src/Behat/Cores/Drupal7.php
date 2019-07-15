@@ -2,6 +2,7 @@
 
 namespace Metadrop\Behat\Cores;
 
+use Metadrop\Behat\Cores\Traits\EntityTrait;
 use NuvoleWeb\Drupal\Driver\Cores\Drupal7 as OriginalDrupal7;
 use Metadrop\Behat\Cores\Traits\UsersTrait;
 use Webmozart\Assert\Assert;
@@ -17,6 +18,7 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
   use UsersTrait;
   use CronTrait;
   use FileTrait;
+  use EntityTrait;
 
   /**
    * {@inheritdoc}
