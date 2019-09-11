@@ -4,7 +4,7 @@ namespace Metadrop\Behat\Context;
 
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Mink\Exception\ElementNotFoundException;
-use Drupal\DrupalExtension\Context\RawDrupalContext;
+use NuvoleWeb\Drupal\DrupalExtension\Context\RawMinkContext;
 use Behat\Mink\Exception\ExpectationException;
 
 /**
@@ -15,7 +15,7 @@ use Behat\Mink\Exception\ExpectationException;
 /**
  * Adds steps for UI elements.
  */
-class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
+class UIContext extends RawMinkContext implements SnippetAcceptingContext {
 
   /**
    * Context parameters.
@@ -35,28 +35,10 @@ class UIContext extends RawDrupalContext implements SnippetAcceptingContext {
   }
 
   /**
-   * Step fill CKEditor.
-   *
-   * @Then I fill in CKEditor on field :locator with :value
-   */
-  public function iFillInCkEditorOnFieldWith($locator, $value) {
-    $el = $this->getSession()->getPage()->findField($locator);
-
-    if (empty($el)) {
-      throw new ExpectationException('Could not find CKEditor with locator: ' . $locator, $this->getSession());
-    }
-
-    $fieldId = $el->getAttribute('id');
-    if (empty($fieldId)) {
-      throw new Exception('Could not find an id for field with locator: ' . $locator);
-    }
-
-    $this->getSession()
-      ->executeScript("CKEDITOR.instances[\"$fieldId\"].setData(\"$value\");");
-  }
-
-  /**
    * Step to fill a Chosen select form element.
+   *
+   * @TODO: compare method with nuvole drupal-extension, drop from here if
+   * nuvole method works!
    *
    * It doesn't work when multiple selection is enabled.
    *

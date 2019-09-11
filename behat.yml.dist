@@ -1,0 +1,57 @@
+default:
+  suites:
+    default:
+      paths:
+        - %paths.base%/tests/features
+      contexts:
+        - Drupal\DrupalExtension\Context\MinkContext:
+        - Drupal\DrupalExtension\Context\MessageContext:
+        - Drupal\DrupalExtension\Context\MarkupContext
+        - Drupal\DrupalExtension\Context\DrushContext
+        - Metadrop\Behat\Context\CacheContext
+        - Metadrop\Behat\Context\ContentAuthoredContext
+        - Metadrop\Behat\Context\CronContext
+        - Metadrop\Behat\Context\DebugContext:
+            parameters:
+              'report_on_error': true
+              'error_reporting_path': "/var/www/html/docroot/sites/default/files/behat/errors"
+              'error_reporting_url': "http://metadropnet.docker.localhost:8000/sites/default/files/behat/errors"
+              'screenshots_path':  "/var/www/html/docroot/sites/default/files/behat/screenshots"
+              'page_contents_path': "/var/www/html/docroot/sites/default/files/behat/pages"
+        - Metadrop\Behat\Context\FileContext
+        - Metadrop\Behat\Context\FormContext
+        - Metadrop\Behat\Context\EntityContext
+        - Metadrop\Behat\Context\NodeAccessContext
+        - Metadrop\Behat\Context\ParagraphsContext
+        - Metadrop\Behat\Context\UIContext:
+            parameters:
+              scroll_offset: -100
+        - Metadrop\Behat\Context\UrlContext
+        - Metadrop\Behat\Context\UsersContext
+        - Metadrop\Behat\Context\WaitingContext
+
+     filters:
+        tags: "~@exclude"
+  extensions:
+    Behat\MinkExtension:
+      goutte: ~
+      selenium2:
+        wd_host: 'http://selenium:4444/wd/hub'
+      javascript_session: selenium2
+      base_url: "${drupal.base_url}"
+    NuvoleWeb\Drupal\DrupalExtension:
+      # Change this if you use a custom services.yml
+      services: "vendor/metadrop/behat-contexts/services.yml"
+      api_driver: "drupal"
+      drupal:
+        # Change this to the absolute path to Drupal install.
+        drupal_root: "${drupal.root}"
+      region_map:
+        left sidebar: "#sidebar-first"
+        content: "#content"
+      selectors:
+        error_message_selector: '.messages--error'
+      text:
+        node_submit_label: "Save and publish"
+  formatters:
+    progress: ~

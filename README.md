@@ -3,19 +3,71 @@
 
 Contexts that we use with Behat 3.x tests on Drupal sites.
 
+This repository is based on [Nuvole drupal extension](https://github.com/nuvoleweb/drupal-behat).
+
 ## Install
 
-This contexts use the Drupal Extension [Drupal Extension](https://www.drupal.org/project/drupalextension), so it should be installed in your system.
+Install with [Composer](http://getcomposer.org):
 
-Put this repository in the bootstrap directory of your project. A Drupal 7 project using Drupal Extension this directory may be located in sites/all/tests/behat/bootstrap. So, directory Metadrop of this repository should be in that bootstrap directory. Contexts will be autoladed.
+1) Add these lines in "repositories" entry of your composer.json:
 
-@TODO: Improve installation method, use some standard way.
+```json
+{
+    "type": "vcs",
+    "url": "https://github.com/mistermoper/drupal-behat"
+}
+```
+
+2) Require package with composer require:
+
+`composer require metadrop/behat-contexts`
+
 
 ## Configure
 
-Each context may have its own configuration, see each context section.
+Each context may have its own configuration. [Here is an example](https://github.com/Metadrop/behat-contexts/blob/dev/behat.yml.dist) with all the contexts added.
 
 ## Contexts
+
+### Cache context
+
+Steps to clear caches.
+
+#### Steps
+
+- Given :path page cache is flushed
+  Clear specific page caches.
+
+- Given :view view data cache is flushed
+  Clear caches for a specific view. Only available for Drupal 7, pending to implement in D8. 
+
+### Content authored context
+
+Allow created content owned by logged in user.
+
+#### Steps
+
+ - Given own :type content:
+   Create content with the author as the current user.
+
+### Cron context
+
+Helpers to execute cron.
+
+#### Steps
+
+ - Given I run elysia cron
+   Run elysia cron. Only for D7.
+
+ - Given I run the elysia cron :job job
+   Run elysia-cron-job. Only for D7.
+
+ - Given I run the cron of Search API
+   Run search api cron. Only for D7.
+
+ - Given I run the cron of Search API Solr
+   Run search api solr cron. Only for D7.
+
 
 ### DebugContext
 
@@ -66,97 +118,110 @@ This report includes:
 ```
 default:
   autoload:
-    '': "%paths.base%/../all/tests/behat/bootstrap"
+    ...
   suites:
     default:
-      paths:
-        - "%paths.base%/../all/tests/behat/features"
+      ...
       contexts:
         - Metadrop\Behat\Context\DebugContext:
             parameters:
               'report_on_error': true
-              'error_reporting_path': '/var/error_reports/tests/reports'
-              'screenshots_path': '/var/error_reports/tests/screenshots'
-              'page_contents_path': '/var/error_reports/tests/pages'
+              'error_reporting_url': 'https://example.com/sites/default/files/behat/errors'
+              'error_reporting_path': '/var/www/html/docroot/sites/default/files/behat/errors'
+              'screenshots_path': '/var/www/html/docroot/sites/default/files/behat/screenshots'
+              'page_contents_path': '/var/www/html/docroot/sites/default/files/behat/pages'
+        - Metadrop\Behat\Context\EntityContext:
+            parameters:
+              'purge_entities':
+                - user
+                - custom_entity
 ```
 
 **Parameters**
   - report_on_error: If _true_ error reports are generated on failed steps.
-  - error_reporting_path: Path where reports are saved.
+  - error_reporting_path: Path where reports are saved. 
+  - error_reporting_url: Url where the error screenshots will be shown. As we can see in example, the url must point to the directory where we save the reports, and the directory must be accesible through website.
   - screenshots_path: Path where screenshots are saved. Report screenshots are saved in the report path, here only screenshots from _capture full page_ steps are saved.
   - page_contents_path: Path where page contents are saved. Report page contents are saved in the report path, here only page contents from _save page content_ steps are saved.
 
+### Entity Context
 
+Agnostic steps related with entities.
 
-### BrowserSizeContext
+#### Steps
+ - Given I go to the last entity :entity created
+   Go to last entity created.
 
-This contexts allows to resize the browser to a given set of sizes. It should be used with a real browser driver like Selenium. Its main purpose is to ease tests that depends on window size.
+ - Given I go to the last entity :entity with :bundle bundle created
+   Go to the last entity created from a specific bundle.
 
-Keep in mind  that browser window size may not change between scenarios or features, even differnet test execution. For example, if you use PhantomJS the same browser is used for all tests execution (given that PhantomJS is not terminated and executed again). So if a test changes the window size next tests with the @javadcript tag will be performed with that window size.
+ - Given I go to :subpath of the last entity :entity created
+   Go to last entity created subpath (s.e.:node/1/edit).
 
+ - Given I go to :subpath of the last entity :entity with :bundle bundle created.
+   Go to last entity created subpath (s.e.:node/1/edit) from a specific bundle.
+
+### File context
+
+Create files in drupal.
 
 #### Steps
 
-- Given (that )browser window size is :size size
+   - Given file with name :filename
+     Create file in drupal file system. Files are extracted from files_path set in behat.
 
-  Changes window broeser size to the given size. The size must be one of the default ones or one of the sizes declared in the configuration.
+   - Given file with name :filename in the :directory directory
+     Create file in drupal file system in a specific directory. Directory must start with file system (public:// , private://). Default is public:// .
 
+### Form Context
 
-#### Configuration
-
-Add BrowserSizeContext to your suite.
-
-To declare sizes and make them available use the context params:
-
-```
-- Metadrop\Behat\Context\BrowserSizeContext:
-    parameters:
-      sizes:
-        Default:
-          width: 1200
-          height: 800
-        Full:
-          width: 1200
-          height: 800
-        My custom size:
-          width: 1440
-          height: 960
-```
-
-The context has some default values. If a size is defined with same name as one of the default sizes the dimensions are overwritten. If a completely new size is defined is simply added to the available size.
-
-
-
-### DrupalExtendedContext
-
-  This context extends DrupalRawContext with steps related to Drupal and its modules.
-
+Steps for form elements.
 
 #### Steps
 
-- Then form :type element :label should be required
+   - Then form :type element :label should be required
+     Check a form element of a specific type (s.e.: input, select) with label is required.
 
-  Checks a form element is required. File input type is not supported.
+   - Then form :type element :label should not be required
+     Check a form element of a specific type (s.e.: input, select) with label isn't required.
 
-- Then form :type element :label should not be required
+### Node Access context
 
-  Checks a form element is required. File input type is not supported.
+Steps related with node access system. Only for D7.
 
-- Given I run elysia cron
+#### Steps
 
-  Runs Elysia cron.
+   - Given the access of last node created is refreshed
+     Refresh node grants from the last node.
 
+   - @Given the access of last node created with :bundle bundle is refreshed
+     Refresh node grants from the last node of a specific content type.
 
-#### Configuration
+### Paragraphs context
 
-No configuration needed.
+Steps to attach paragraphs to content.
 
+#### Steps
+
+   - Given paragraph of :paragraph_type type referenced on the :field_paragraph field of the last content:
+     Create a paragraph with fields and attach it to the last node created.
+
+### Url Context
+
+Steps to check url values
+
+#### Steps
+
+   - Then current url should have the ":param" param with ":value" value
+     Check an url has a specific value in a query parameter.
+
+   - Then current url should not have the ":param" param with ":value" value
+     Check an url hasn't a specific value in a query parameter.
 
 
 ### IUContext
 
   This context provides steps for certain UI elements.
-
 
 #### Steps
 
