@@ -59,6 +59,27 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
   }
 
   /**
+   * Delete the last entity created.
+   *
+   * @Given last entity :entity created is deleted
+   * @Given last entity :entity with :bundle bundle created is deleted
+   *
+   * @USECORE
+   */
+  public function deleteLastEntityCreated($entity_type, $bundle = NULL) {
+    $last_entity_id = $this->getCore()->getLastEntityId($entity_type, $bundle);
+
+    if (!empty($last_entity_id)) {
+      if (!$this->getCore()->entityDelete($entity_type, $last_entity_id)) {
+        throw new \Exception('The ' . $entity_type . ' with ' . $bundle . ' could not be deleted.');
+      }
+    }
+    else {
+      throw new \Exception('The ' . $entity_type . ' with ' . $bundle . ' not found.');
+    }
+  }
+
+  /**
    * Check entity fields.
    *
    * @Then the :entity_type with field :field_name and value :value should not have the following values:
@@ -202,5 +223,6 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
     }
 
   }
+
 
 }
