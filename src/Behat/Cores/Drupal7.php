@@ -223,4 +223,11 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
     throw new PendingException('Pending to implement method in Drupal 7');
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function entityDelete($entity_type, $entity_id) {
+    return entity_delete($entity_type, $entity_id);
+  }
+
 }
