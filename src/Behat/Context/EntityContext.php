@@ -70,7 +70,7 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
     $last_entity_id = $this->getCore()->getLastEntityId($entity_type, $bundle);
 
     if (!empty($last_entity_id)) {
-      if (!$this->getCore()->entityDelete($entity_type, $last_entity_id)) {
+      if ($this->getCore()->entityDelete($entity_type, $last_entity_id) === FALSE) {
         throw new \Exception('The ' . $entity_type . ' with ' . $bundle . ' could not be deleted.');
       }
     }
