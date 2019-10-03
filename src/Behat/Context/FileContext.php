@@ -47,11 +47,11 @@ class FileContext extends RawDrupalContext {
   }
 
   /**
-   * Get path for file in drupal 8.
+   * Get path for file.
    *
    * @param string $filename
    *   The name of the file to get.
-   * @param string directory
+   * @param string $directory
    *   A string containing the files scheme, usually "public://".
    *
    * @throws Exception
@@ -64,24 +64,10 @@ class FileContext extends RawDrupalContext {
    * @Given I visit file with name :filename in the :directory directory
    */
   public function visitFileWithName($filename, $directory = NULL) {
-    $public = 'public://';
-    $private = 'private://';
-
-    if (empty($directory) || strpos($directory, $public) !== FALSE) {
-      $realpath = \Drupal::service('file_system')->realpath($directory);
-      $path = str_replace(DRUPAL_ROOT, '', $realpath);
-      $destination = $path . '/' . basename($filename);
-    }
-
-    if (!empty($directory) && strpos($directory, $private) !== FALSE) {
-      $path = str_replace($private, '', $directory);
-      $destination = \Drupal\Core\Url::fromRoute('system.private_file_download', ['filepath' => $path . '/' . $filename], [
-        'relative' => TRUE,
-      ])->toString();
-    }
+    $destination = $this->getCore()->getFileDestination($filename, $directory);
 
     if ($destination === NULL) {
-      throw new \RuntimeException('Could not set the destination.');
+      throw new \RuntimeException('Could not set the correct destination.');
     }
 
     $this->visitPath($destination);
