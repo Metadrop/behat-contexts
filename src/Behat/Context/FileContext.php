@@ -3,13 +3,13 @@
 namespace Metadrop\Behat\Context;
 
 class FileContext extends RawDrupalContext {
-  
- /**
+
+  /**
    * Array of files to be cleaned up @AfterScenario.
    *
    * @var array
    */
-  protected $files = array();
+  protected $files = [];
 
   /**
    * Deletes Files after each Scenario.
@@ -58,28 +58,33 @@ class FileContext extends RawDrupalContext {
    *   Exception file not found.
    *
    * @throws Exception
-   *   Exception file could not be copied.
+   *   Exception destination not found.
    *
-   * @Given file get name :filename
-   * @Given file get name :filename in the :directory directory
+   * @Given I visit file with name :filename
+   * @Given I visit file with name :filename in the :directory directory
    */
   public function visitFileWithName($filename, $directory = NULL) {
     $public = 'public://';
     $private = 'private://';
 
-    if (empty($directory) || $directory === $public) {
+    if (empty($directory) || strpos($directory, $public) !== FALSE) {
       $realpath = \Drupal::service('file_system')->realpath($directory);
       $path = str_replace(DRUPAL_ROOT, '', $realpath);
       $destination = $path . '/' . basename($filename);
     }
 
-    if (!empty($directory) && $directory === $private) {
-      $destination = \Drupal\Core\Url::fromRoute('system.private_file_download', ['filepath' => $filename], [
+    if (!empty($directory) && strpos($directory, $private) !== FALSE) {
+      $path = str_replace($private, '', $directory);
+      $destination = \Drupal\Core\Url::fromRoute('system.private_file_download', ['filepath' => $path . '/' . $filename], [
         'relative' => TRUE,
       ])->toString();
     }
 
+    if ($destination === NULL) {
+      throw new \RuntimeException('Could not set the destination.');
+    }
+
     $this->visitPath($destination);
   }
-  
+
 }
