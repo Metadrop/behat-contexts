@@ -60,11 +60,11 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
    */
   public function loadUserByProperty($property, $value, $reset = TRUE) {
     $query = db_select('users');
-    $query->fields('users', array('uid'));
+    $query->fields('users', ['uid']);
     $query->condition($property, $value);
 
     $result = $query->execute();
-    $uid    = $result->fetchField();
+    $uid = $result->fetchField();
 
     return !empty($uid) ? user_load($uid, $reset) : NULL;
   }
@@ -156,6 +156,13 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
    */
   public function nodeAccessAcquireGrants($node) {
     node_access_acquire_grants($node);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFileDestination($filename, $directory) {
+    throw new PendingException('Pending to implement method in Drupal 7');
   }
 
   /**
