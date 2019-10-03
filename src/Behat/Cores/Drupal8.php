@@ -151,6 +151,29 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
+  public function getFileDestination($filename, $directory) {
+    $public = 'public://';
+    $private = 'private://';
+
+    if (empty($directory) || strpos($directory, $public) !== FALSE) {
+      $realpath = \Drupal::service('file_system')->realpath($directory);
+      $path = str_replace(DRUPAL_ROOT, '', $realpath);
+      $destination = $path . '/' . basename($filename);
+    }
+
+    if (!empty($directory) && strpos($directory, $private) !== FALSE) {
+      $path = str_replace($private, '', $directory);
+      $destination = \Drupal\Core\Url::fromRoute('system.private_file_download', ['filepath' => $path . '/' . $filename], [
+        'relative' => TRUE,
+      ])->toString();
+    }
+
+    return (!empty($destination)) ? $destination : NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function fileDelete($fid) {
     file_delete($fid);
   }
