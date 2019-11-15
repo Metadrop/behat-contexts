@@ -24,4 +24,33 @@ abstract class RawDrupalContext extends NuvoleRawDrupalContext {
     }
   }
 
+  /**
+   * Dispatch scope hooks.
+   *
+   * @param string $scope
+   *   The entity scope to dispatch.
+   * @param \stdClass $entity
+   *   The entity.
+   */
+  protected function dispatchHooks($scopeType, \stdClass $entity, $entity_type = NULL) {
+    $fullScopeClass = 'Drupal\\DrupalExtension\\Hook\\Scope\\' . $scopeType;
+    if (!class_exists($fullScopeClass)) {
+      $fullScopeClass = 'Metadrop\\Behat\\Hook\\Scope\\' . $scopeType;
+    }
+
+    $scope = new $fullScopeClass($this->getDrupal()->getEnvironment(), $this, $entity);
+    if (!empty($entity_type) && method_exists($fullScopeClass, 'setEntityType')) {
+      $scope->setEntityType($entity_type);
+    }
+    $callResults = $this->dispatcher->dispatchScopeHooks($scope);
+
+    // The dispatcher suppresses exceptions, throw them here if there are any.
+    foreach ($callResults as $result) {
+      if ($result->hasException()) {
+        $exception = $result->getException();
+        throw $exception;
+      }
+    }
+  }
+
 }
