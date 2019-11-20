@@ -4,8 +4,10 @@ namespace Metadrop\Behat\Hook\Scope;
 
 use Drupal\DrupalExtension\Hook\Scope\BaseEntityScope;
 
-abstract class EntityScope extends BaseEntityScope
-{
+/**
+ * Entity scope.
+ */
+abstract class EntityScope extends BaseEntityScope {
 
   protected $entityType;
 
@@ -13,6 +15,7 @@ abstract class EntityScope extends BaseEntityScope
    * Get the entity type.
    *
    * @return mixed
+   *   Entity type.
    */
   public function getEntityType() {
     return $this->entityType;
@@ -22,6 +25,7 @@ abstract class EntityScope extends BaseEntityScope
    * Set the entity type.
    *
    * @param mixed $entityType
+   *   Entity type.
    */
   public function setEntityType($entityType) {
     $this->entityType = $entityType;

@@ -2,12 +2,15 @@
 
 namespace Metadrop\Behat\Hook\Scope;
 
-use Drupal\DrupalExtension\Hook\Scope\BaseEntityScope;
+/**
+ * Scope before creating entities.
+ */
+class BeforeEntityCreateScope extends EntityScope {
 
-class BeforeEntityCreateScope extends EntityScope
-{
-  public function getName()
-  {
+  /**
+   * {@inheritdoc}
+   */
+  public function getName() {
     return self::BEFORE;
   }
 

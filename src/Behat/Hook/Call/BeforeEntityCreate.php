@@ -1,17 +1,19 @@
 <?php
 
-
 namespace Metadrop\Behat\Hook\Call;
+
 use Drupal\DrupalExtension\Hook\Call\EntityHook;
 use Drupal\DrupalExtension\Hook\Scope\EntityScope;
 
-class BeforeEntityCreate extends EntityHook
-{
+/**
+ * Hook before entity create.
+ */
+class BeforeEntityCreate extends EntityHook {
 
   /**
    * Initializes hook.
    */
-  public function __construct($filterString, $callable, $description = null) {
+  public function __construct($filterString, $callable, $description = NULL) {
     parent::__construct(EntityScope::BEFORE, $filterString, $callable, $description);
   }
 

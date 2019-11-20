@@ -25,7 +25,8 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
   protected $customParameters = [];
 
   protected $entities = [];
-/**
+
+  /**
    * Constructor.
    *
    * @param array|mixed $parameters
@@ -208,7 +209,7 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
    *        parameters:
    *          'purge_entities':
    *            - user
-   *            - custom_entity
+   *            - custom_entity.
    *
    * @AfterScenario @purgeEntities
    */
@@ -224,8 +225,11 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
     }
 
   }
+
   /**
-   * @Given :arg1 entity:
+   * Create entities.
+   *
+   * @Given :entity_type entity:
    */
   public function entity($entityType, TableNode $entitiesTable) {
     foreach ($entitiesTable->getHash() as $entityHash) {
@@ -234,7 +238,14 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
     }
   }
 
-
+  /**
+   * Create an entity.
+   *
+   * @param string $entity_type
+   *   Entity type.
+   * @param object $entity
+   *   Entity.
+   */
   public function entityCreate($entity_type, $entity) {
     $this->dispatchHooks('BeforeEntityCreateScope', $entity, $entity_type);
     $this->parseEntityFields($entity_type, $entity);
