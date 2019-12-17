@@ -208,4 +208,25 @@ interface CoreInterface {
    *   Entity id.
    */
   public function entityDelete($entity_type, $entity_id);
+
+  /**
+   * Get the value of a given state config.
+   *
+   * @param $key
+   *   The state state key to read.
+   *
+   * @return mixed
+   *   The value of the state key.
+   */
+  public function stateGet($key);
+
+  /**
+   * Set a value for a state key.
+   *
+   * @param $key
+   *   The state key.
+   * @param $value
+   *   The state value.
+   */
+  public function stateSet($key, $value);
 }

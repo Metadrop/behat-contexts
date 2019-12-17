@@ -200,4 +200,17 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     $controller->delete($entities);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function stateGet($key) {
+    return \Drupal::state()->get($key);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function stateSet($key, $value) {
+    \Drupal::state()->set($key, $value);
+  }
 }

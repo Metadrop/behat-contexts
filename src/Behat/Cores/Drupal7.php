@@ -73,7 +73,7 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
    * {@inheritdoc}
    */
   public function entityId($entity_type, $entity) {
-    list($entity_id) = entity_extract_ids($entity_type, $entity);
+    [$entity_id] = entity_extract_ids($entity_type, $entity);
     return $entity_id;
   }
 
@@ -228,6 +228,20 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
    */
   public function entityDelete($entity_type, $entity_id) {
     return entity_delete($entity_type, $entity_id);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function stateGet($key) {
+    throw new \Exception('State API does not exists in Drupal 7. This method is supported only in Drupal 8 or greater.');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function stateSet($key, $value) {
+    throw new \Exception('State API does not exists in Drupal 7. This method is supported only in Drupal 8 or greater.');
   }
 
 }
