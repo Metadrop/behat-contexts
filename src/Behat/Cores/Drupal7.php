@@ -73,7 +73,7 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
    * {@inheritdoc}
    */
   public function entityId($entity_type, $entity) {
-    [$entity_id] = entity_extract_ids($entity_type, $entity);
+    list($entity_id) = entity_extract_ids($entity_type, $entity);
     return $entity_id;
   }
 
