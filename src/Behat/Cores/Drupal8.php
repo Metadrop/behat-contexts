@@ -117,7 +117,10 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     $storage = \Drupal::entityTypeManager()->getStorage($entity_type);
     $query = $storage->getQuery();
 
-    $storage->buildPropertyQuery($query, $properties);
+    foreach ($properties as $property => $value) {
+      $query->condition($property, $value);
+    }
+
     $query->sort('created', 'DESC');
     $query->range(0, 1);
 
