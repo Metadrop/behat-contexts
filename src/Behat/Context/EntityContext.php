@@ -282,11 +282,27 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
   public function entityCreate($entity_type, $entity) {
     $this->dispatchHooks('BeforeEntityCreateScope', $entity, $entity_type);
     $this->parseEntityFields($entity_type, $entity);
-    $saved = \Drupal::entityTypeManager()
+    $entity = \Drupal::entityTypeManager()
       ->getStorage($entity_type)
-      ->create((array) $entity)
-      ->save();
-    $this->dispatchHooks('AfterEntityCreateScope', $entity, $entity_type);
+      ->create((array) $entity);
+
+    // Check if the field is an entity reference an allow values to be the
+    // labels of the referenced entities.
+    foreach ($entity as $field_name => $field) {
+      if ($field->getFieldDefinition()->getType() === 'entity_reference') {
+        $value = $field->getString();
+        if (is_numeric($value) === FALSE) {
+          $referenced_entity_type = $field->getFieldDefinition()->getSetting('target_type');
+          $referenced_entity = $this->getCore()->loadEntityByLabel($referenced_entity_type, $value);
+          if ($referenced_entity instanceof EntityInterface) {
+            $entity->get($field_name)->get(0)->setValue($referenced_entity->id());
+          }
+        }
+      }
+    }
+
+    $saved = $entity->save();
+    $this->dispatchHooks('AfterEntityCreateScope', (object) (array) $entity, $entity_type);
     $this->entities[] = $saved;
     return $saved;
   }
