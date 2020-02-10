@@ -4,6 +4,8 @@ namespace Metadrop\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Context\SnippetAcceptingContext;
+use Drupal\Core\Entity\Entity;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Class EntityContext.
@@ -121,6 +123,37 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
     }
     elseif (!$throw_error_on_empty && empty($errors)) {
       throw new \Exception('Entity values are correct, but it should not!');
+    }
+  }
+
+  /**
+   * Check entity fields loaded by label.
+   *
+   * @Then the :label :entity_type should have the following values:
+   *
+   * Example:
+   * And the 'Lorem ipsum sit amet' node should have the following values:
+   *  | field_bar   | field_foo  |
+   *  | Lorem       | ipsum      |
+   */
+  public function checkEntityByLabelTestValues($entity_type, $label, TableNode $values) {
+    $hash = $values->getHash();
+    $fields = $hash[0];
+
+    $entity = $this->getCore()->get($entity_type, $label);
+
+    // Check entity.
+    if (!$entity instanceof EntityInterface) {
+      throw new \Exception('The ' . $entity_type . ' with label ' . $label . ' was not found.');
+    }
+    // Make field tokens replacements.
+    $fields = $this->replaceTokens($fields);
+
+    // Check entity values and obtain the errors.
+    $errors = $this->checkEntityValues($entity, $fields);
+
+    if (!empty($errors)) {
+      throw new \Exception('Failed checking values: ' . implode(', ', $errors));
     }
   }
 
