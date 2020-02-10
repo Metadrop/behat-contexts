@@ -70,14 +70,14 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    *
    * @param string $entity_type
    *   The entity type.
-   * @param array $label
+   * @param string $label
    *   The label value.
    *
    * @return \Drupal\Core\Entity\EntityInterface|mixed
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public function loadEntityByLabel(string $entity_type, array $label) {
+  public function loadEntityByLabel(string $entity_type, string $label) {
     if ($entity_type === 'user') {
       $label_key = 'name';
     }
