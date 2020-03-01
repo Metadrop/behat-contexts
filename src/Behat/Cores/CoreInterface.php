@@ -219,4 +219,26 @@ interface CoreInterface {
    *   Entity id.
    */
   public function entityDelete($entity_type, $entity_id);
+
+  /**
+   * Obtain the URL to the dblog event summary.
+   *
+   * @param int $wid
+   *   Watchdog id.
+   * @return string
+   *   URL.
+   */
+  public function getDblogEventUrl(int $wid);
+
+  /**
+   * Obtain warnings and notices from watchdog logs.
+   *
+   * @param int $scenario_start_time
+   *   Scenario start time.
+   * @param bool $show_all
+   *   TRUE or FALSE, if $show_all is FALSE it will show
+   *   only php warnings and notices.
+   */
+  public function getWatchdogLogMessages(int $scenario_start_time, bool $show_all);
+
 }

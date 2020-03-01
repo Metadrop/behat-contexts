@@ -237,4 +237,27 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
     return entity_delete($entity_type, $entity_id);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getDblogEventUrl(int $wid) {
+    return url('/admin/reports/event/' . $log->wid, ['absolute' => TRUE]) . "\n";
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getWatchdogLogMessages(int $scenario_start_time, string $show_php_only) {
+    $query = db_select('watchdog', 'w')
+        ->fields('w', ['message', 'variables', 'type', 'wid'])
+        ->condition('severity', [4, 5], 'IN')
+        ->condition('timestamp', $scenario_start_time, '>=');
+
+    if ($show_php_only) {
+      $query->condition('type', 'php');
+    }
+
+    return $query->execute()->fetchAll();
+  }
+
 }
