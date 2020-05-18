@@ -2,6 +2,8 @@
 
 namespace Metadrop\Behat;
 
+use Behat\Mink\Session;
+
 /**
  * Trait to get a mink session previously initialized.
  *
@@ -10,19 +12,16 @@ namespace Metadrop\Behat;
 trait MinkContextSessionTrait {
 
   /**
-   * Returns session.
+   * Asserts a sesson has been started.
    *
-   * @param string|null $name name of the session OR active session will be used
-   *
-   * @return Session
+   * @param Session $session
+   *   Mink session.
    */
-  public function getSession($name = null)
+  public function assertSessionStarted(Session $session)
   {
-    $session = parent::getSession($name);
     if (!$session->isStarted()) {
       $session->start();
     }
-    return $session;
   }
 
 }
