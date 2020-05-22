@@ -3,7 +3,7 @@
 namespace Metadrop\Behat\Hook\Scope;
 
 /**
- * Scope before creating entities.
+ * Available scope before creating entities.
  */
 class BeforeEntityCreateScope extends EntityScope {
 

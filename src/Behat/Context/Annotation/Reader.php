@@ -11,6 +11,11 @@ use ReflectionMethod;
 /**
  * Annotated contexts reader.
  *
+ * This add the neccesary contexts to allow
+ * hook into entity creation phases: 
+ * - Before create the entity.
+ * - After create the entity.
+ *
  * @see \Behat\Behat\Context\Loader\AnnotatedLoader
  */
 class Reader implements AnnotationReader {

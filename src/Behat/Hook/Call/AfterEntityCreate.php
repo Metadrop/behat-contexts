@@ -6,7 +6,7 @@ use Drupal\DrupalExtension\Hook\Call\EntityHook;
 use Drupal\DrupalExtension\Hook\Scope\EntityScope;
 
 /**
- * Hook after entity create.
+ * Hook that is invoked after an entity is created.
  */
 class AfterEntityCreate extends EntityHook {
 

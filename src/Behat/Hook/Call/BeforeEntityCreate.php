@@ -6,7 +6,7 @@ use Drupal\DrupalExtension\Hook\Call\EntityHook;
 use Drupal\DrupalExtension\Hook\Scope\EntityScope;
 
 /**
- * Hook before entity create.
+ * Hook that is invoked before an entity is created.
  */
 class BeforeEntityCreate extends EntityHook {
 

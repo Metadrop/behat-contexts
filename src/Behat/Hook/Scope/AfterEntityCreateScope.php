@@ -3,7 +3,7 @@
 namespace Metadrop\Behat\Hook\Scope;
 
 /**
- * Scope after creating entities.
+ * Available scope after creating entities.
  */
 class AfterEntityCreateScope extends EntityScope {
 

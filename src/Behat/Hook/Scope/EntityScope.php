@@ -5,10 +5,15 @@ namespace Metadrop\Behat\Hook\Scope;
 use Drupal\DrupalExtension\Hook\Scope\BaseEntityScope;
 
 /**
- * Entity scope.
+ * Generic scope for entity hooks, that adds the entity type property.
  */
 abstract class EntityScope extends BaseEntityScope {
 
+  /**
+   * Entity type.
+   *
+   * @var string
+   */
   protected $entityType;
 
   /**
