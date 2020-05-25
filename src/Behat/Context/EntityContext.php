@@ -24,6 +24,8 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
    */
   protected $customParameters = [];
 
+  protected $entities = [];
+
   /**
    * Constructor.
    *
@@ -207,7 +209,7 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
    *        parameters:
    *          'purge_entities':
    *            - user
-   *            - custom_entity
+   *            - custom_entity.
    *
    * @AfterScenario @purgeEntities
    */
@@ -224,5 +226,40 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
 
   }
 
+  /**
+   * Create entities.
+   *
+   * @Given :entity_type entity:
+   */
+  public function entity($entityType, TableNode $entitiesTable) {
+    foreach ($entitiesTable->getHash() as $entityHash) {
+      $entity = (object) $entityHash;
+      $this->entityCreate($entityType, $entity);
+    }
+  }
+
+  /**
+   * Create an entity.
+   *
+   * During the entity creation, is possible to hook into before
+   * entity creation and after, using @beforeEntityCreate
+   * and @afterEntityCreate tags.
+   *
+   * @param string $entity_type
+   *   Entity type.
+   * @param object $entity
+   *   Entity.
+   */
+  public function entityCreate($entity_type, $entity) {
+    $this->dispatchHooks('BeforeEntityCreateScope', $entity, $entity_type);
+    $this->parseEntityFields($entity_type, $entity);
+    $saved = \Drupal::entityTypeManager()
+      ->getStorage($entity_type)
+      ->create((array) $entity)
+      ->save();
+    $this->dispatchHooks('AfterEntityCreateScope', $entity, $entity_type);
+    $this->entities[] = $saved;
+    return $saved;
+  }
 
 }
