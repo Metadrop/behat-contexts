@@ -90,6 +90,44 @@ class DrupalGroupsExtendedContext extends RawDrupalContext implements SnippetAcc
   }
 
   /**
+   * Adds content to Group
+   *
+   * @param string $title
+   *   Content title.
+   * @param string $bundle
+   *   Content title.
+   * @param string $group_type
+   *   Group type.
+   * @param string $group_name
+   *   Group name.
+   *
+   * @Given content :title with bundle :bundle is subscribed to the group of type :group_type with name :name
+   */
+  public function contentIsSubscribedToGroup($title, $bundle, $group_type, $group_name) {
+    $gid = $this->getEntityIdBylabel($group_type, $group_name);
+    if (empty($gid)) {
+      throw new \Exception($group_type . ' group with name ' . $group_name . ' doesn\'t exists!');
+    }
+    $properties = [
+      'type' => $bundle,
+      'title' => $title,
+    ];
+    $entities = \Drupal::entityTypeManager()->getStorage('node')->loadByProperties($properties);
+    if (empty($entities)) {
+      throw new \Exception('Content ' . $title . ' doesn\'t exists.');
+    }
+    $entity = reset($entities);
+
+    /** @var \Drupal\group\Entity\Group $group */
+    $group = Group::load($gid);
+
+    if (!$group) {
+      throw new \Exception("The Group does not exists.");
+    }
+      $group->addContent($entity, 'group_node:' . $entity->bundle());
+  }
+
+  /**
    * Subscribes user to group
    *
    * @param string $username
