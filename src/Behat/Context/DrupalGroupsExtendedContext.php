@@ -42,6 +42,30 @@ class DrupalGroupsExtendedContext extends RawDrupalContext implements SnippetAcc
   }
 
   /**
+   * Get entity by entity label.
+   *
+   * @param string $entity_type
+   *   Entity type.
+   * @param string $label
+   *   Label.
+   *
+   * @return \Drupal\group\Entity\Group
+   *   Entity.
+   */
+  public function getEntityBylabel($entity_type, $label) {
+    $properties = [
+      'type' => $entity_type,
+      'label' => $label
+    ];
+
+    $storage = \Drupal::entityTypeManager()->getStorage('group');
+    $result = $storage->loadByProperties($properties);
+    $entity = !empty($result) ? reset($result) : NULL;
+
+    return $entity ?: NULL;
+  }
+
+  /**
    * Subscribe user to group.
    *
    * @param string $group_type
@@ -65,6 +89,22 @@ class DrupalGroupsExtendedContext extends RawDrupalContext implements SnippetAcc
     else {
       $group->addMember($user);
     }
+  }
+
+  /**
+   * Sets the owner of a group.
+   *
+   * @param $username string
+   * @param $group_type string
+   * @param $group_name string
+   *
+   * @Given the user :user_name is the owner of the group type :group_type with name :group_name
+   */
+  public function groupSetOwnerByUserName($user_name, $group_type, $group_name) {
+    $user = user_load_by_name($user_name);
+    /** @var \Drupal\group\Entity\Group $group */
+    $group = $this->getEntityBylabel($group_type, $group_name);
+    $group->setOwnerId($user->id());
   }
 
   /**
