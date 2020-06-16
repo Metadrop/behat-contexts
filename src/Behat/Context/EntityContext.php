@@ -274,6 +274,10 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
   /**
    * Create an entity.
    *
+   * During the entity creation, is possible to hook into before
+   * entity creation and after, using @beforeEntityCreate
+   * and @afterEntityCreate tags.
+   *
    * @param string $entity_type
    *   Entity type.
    * @param object $entity

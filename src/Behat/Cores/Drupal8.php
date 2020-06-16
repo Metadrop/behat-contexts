@@ -66,6 +66,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   }
 
   /**
+
    * Load an entity by label.
    *
    * @param string $entity_type
@@ -235,6 +236,29 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    */
   public function nodeAccessAcquireGrants($node) {
     throw new PendingException('Node access grants not implemented yet!');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFileDestination($filename, $directory) {
+    $public = 'public://';
+    $private = 'private://';
+
+    if (empty($directory) || strpos($directory, $public) !== FALSE) {
+      $realpath = \Drupal::service('file_system')->realpath($directory);
+      $path = str_replace(DRUPAL_ROOT, '', $realpath);
+      $destination = $path . '/' . basename($filename);
+    }
+
+    if (!empty($directory) && strpos($directory, $private) !== FALSE) {
+      $path = str_replace($private, '', $directory);
+      $destination = \Drupal\Core\Url::fromRoute('system.private_file_download', ['filepath' => $path . '/' . $filename], [
+        'relative' => TRUE,
+      ])->toString();
+    }
+
+    return (!empty($destination)) ? $destination : NULL;
   }
 
   /**
