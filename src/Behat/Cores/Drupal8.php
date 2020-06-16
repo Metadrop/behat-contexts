@@ -308,7 +308,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     $condition_scaped = strtoupper($condition_operand) == 'LIKE' ? '%' . $database->escapeLike($condition_value) . '%' : $condition_value;
     $query->condition($condition_key, $condition_scaped, $condition_operand);
     $entities_ids = $query->execute();
-    $this->entityDelete($entities_ids);
+    $this->entityDeleteMultiple($entity_type, $entities_ids);
   }
 
   /**
