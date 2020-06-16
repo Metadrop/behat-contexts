@@ -66,6 +66,33 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   }
 
   /**
+
+   * Load an entity by label.
+   *
+   * @param string $entity_type
+   *   The entity type.
+   * @param string $label
+   *   The label value.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface|mixed
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   */
+  public function loadEntityByLabel(string $entity_type, string $label) {
+    if ($entity_type === 'user') {
+      $label_key = 'name';
+    }
+    else {
+      $label_key = \Drupal::entityTypeManager()
+        ->getStorage($entity_type)
+        ->getEntityType()
+        ->getKey('label');
+    }
+
+    return $this->loadEntityByProperties($entity_type, [$label_key => $label]);
+  }
+
+  /**
    * Load an entity by properties.
    *
    * @param string $entity_type
