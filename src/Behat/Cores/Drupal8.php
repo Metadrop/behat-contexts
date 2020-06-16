@@ -62,10 +62,100 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    * {@inheritdoc}
    */
   public function loadUserByProperty($property, $value, $reset = TRUE) {
-    $query = \Drupal::entityQuery('user');
-    $query->condition($property, $value);
-    $entity_ids = $query->execute();
-    return !empty($entity_ids) ? User::load(reset($entity_ids)) : NULL;
+    return $this->loadEntityByProperties('user', [$property => $value]);
+  }
+
+  /**
+
+   * Load an entity by label.
+   *
+   * @param string $entity_type
+   *   The entity type.
+   * @param string $label
+   *   The label value.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface|mixed
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   */
+  public function loadEntityByLabel(string $entity_type, string $label) {
+    if ($entity_type === 'user') {
+      $label_key = 'name';
+    }
+    else {
+      $label_key = \Drupal::entityTypeManager()
+        ->getStorage($entity_type)
+        ->getEntityType()
+        ->getKey('label');
+    }
+
+    return $this->loadEntityByProperties($entity_type, [$label_key => $label]);
+  }
+
+  /**
+   * Load an entity by properties.
+   *
+   * @param string $entity_type
+   *   The entity type.
+   * @param array $properties
+   *   The array of properties to search.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface|mixed
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   */
+  public function loadEntityByProperties(string $entity_type, array $properties) {
+    $entities = \Drupal::entityTypeManager()
+      ->getStorage($entity_type)
+      ->loadByProperties($properties);
+    if (!empty($entities)) {
+      $entity = current($entities);
+      if ($entity instanceof EntityInterface) {
+        return $entity;
+      }
+    }
+  }
+
+  /**
+   * Load the latest entity of a given type.
+   *
+   * @param string $entity_type
+   *   The entity type to search.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface|null
+   */
+  public function loadLatestEntity(string $entity_type) {
+    return $this->loadLatestEntityByProperties($entity_type);
+  }
+
+  /**
+   * Load the latest entity of a given type filtered by properties.
+   *
+   * @param string $entity_type
+   *   The entity type to search.
+   * @param array $properties
+   *   The properties to search for.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface|null
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   */
+  public function loadLatestEntityByProperties(string $entity_type, array $properties = []) {
+    $storage = \Drupal::entityTypeManager()->getStorage($entity_type);
+    $query = $storage->getQuery();
+
+    foreach ($properties as $property => $value) {
+      $query->condition($property, $value);
+    }
+
+    $query->sort('created', 'DESC');
+    $query->range(0, 1);
+
+    $results = $query->execute();
+    if (!empty($results)) {
+      $id = current($results);
+      return \Drupal::entityTypeManager()->getStorage($entity_type)->load($id);
+    }
   }
 
   /**
@@ -146,6 +236,29 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    */
   public function nodeAccessAcquireGrants($node) {
     throw new PendingException('Node access grants not implemented yet!');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFileDestination($filename, $directory) {
+    $public = 'public://';
+    $private = 'private://';
+
+    if (empty($directory) || strpos($directory, $public) !== FALSE) {
+      $realpath = \Drupal::service('file_system')->realpath($directory);
+      $path = str_replace(DRUPAL_ROOT, '', $realpath);
+      $destination = $path . '/' . basename($filename);
+    }
+
+    if (!empty($directory) && strpos($directory, $private) !== FALSE) {
+      $path = str_replace($private, '', $directory);
+      $destination = \Drupal\Core\Url::fromRoute('system.private_file_download', ['filepath' => $path . '/' . $filename], [
+        'relative' => TRUE,
+      ])->toString();
+    }
+
+    return (!empty($destination)) ? $destination : NULL;
   }
 
   /**

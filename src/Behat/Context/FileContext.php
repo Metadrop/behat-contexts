@@ -3,13 +3,13 @@
 namespace Metadrop\Behat\Context;
 
 class FileContext extends RawDrupalContext {
-  
- /**
+
+  /**
    * Array of files to be cleaned up @AfterScenario.
    *
    * @var array
    */
-  protected $files = array();
+  protected $files = [];
 
   /**
    * Deletes Files after each Scenario.
@@ -44,6 +44,33 @@ class FileContext extends RawDrupalContext {
     $path = $absolutePath . '/' . $filename;
 
     $this->files[] = $this->getCore()->createFileWithName($path, $directory);
+  }
+
+  /**
+   * Get path for file.
+   *
+   * @param string $filename
+   *   The name of the file to get.
+   * @param string $directory
+   *   A string containing the files scheme, usually "public://".
+   *
+   * @throws Exception
+   *   Exception file not found.
+   *
+   * @throws Exception
+   *   Exception destination not found.
+   *
+   * @Given I visit file with name :filename
+   * @Given I visit file with name :filename in the :directory directory
+   */
+  public function visitFileWithName($filename, $directory = NULL) {
+    $destination = $this->getCore()->getFileDestination($filename, $directory);
+
+    if ($destination === NULL) {
+      throw new \RuntimeException('Could not set the correct destination.');
+    }
+
+    $this->visitPath($destination);
   }
 
 }

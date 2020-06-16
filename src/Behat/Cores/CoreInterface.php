@@ -140,6 +140,17 @@ interface CoreInterface {
   public function nodeAccessAcquireGrants($node);
 
   /**
+   * Get file destionation.
+   * @param string $filename
+   *   The name of the file to get.
+   * @param string $directory
+   *   A string containing the files scheme, usually "public://".
+   *
+   * @return string|null
+   */
+  public function getFileDestination($filename, $directory);
+
+  /**
    * Delete file.
    *
    * @param int $fid

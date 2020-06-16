@@ -9,10 +9,15 @@ class WaitingContext extends RawMinkContext {
   /**
    * Wait for AJAX to finish.
    *
+   * The step "I wait for AJAX to finish at least :seconds seconds" deprecated
+   * because the meaning is wrong (this step waits :seconds AT MOST, not at
+   * least).
+   *
    * @param int $seconds
    *   Max time to wait for AJAX.
    *
    * @Given I wait for AJAX to finish at least :seconds seconds
+   * @Given I wait for AJAX to finish :seconds seconds at most
    *
    * @throws \Exception
    *   Ajax call didn't finish on time.
@@ -28,21 +33,31 @@ class WaitingContext extends RawMinkContext {
    * Wait for batch process.
    *
    * Wait until the id="updateprogress" element is gone,
-   * or timeout after 5 seconds (5,000 ms).
+   * or timeout after 30 seconds (30,000 ms).
+   *
+   * The step "I wait for the batch job to finish at least :seconds seconds"
+   * deprecated because the meaning is wrong (this step waits :seconds AT MOST,
+   * not at least).
    *
    * @param init $seconds
    *
    * @Given I wait for the batch job to finish
    * @Given I wait for the batch job to finish at least :seconds seconds
+   * @Given I wait for the batch job to finish :seconds seconds at most
    */
-  public function iWaitForTheBatchJobToFinish($seconds = 5) {
+  public function iWaitForTheBatchJobToFinish($seconds = 30) {
     $this->getSession()->wait($seconds * 1000, 'jQuery("#updateprogress").length === 0');
   }
 
   /**
    * @Then I wait for :seconds second(s)
    *
-   * Wait seconds before the next step.
+   * Wait seconds before the next step. Usually, this step should be avoided
+   * because it's not a good idea to depend on time for a step. If the system
+   * needs for whatever reason more time, the step will fail, and if previous
+   * action (the one we are waiting for) is completed soon we end with a test
+   * that needs more time that the time really needed. Try yo use a step that
+   * waits for a condition instead (although this is not always possible).
    *
    * @param int|string $seconds
    *   Number of seconds to wait. Must be an integer value.
