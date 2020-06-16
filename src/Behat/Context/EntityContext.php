@@ -254,7 +254,7 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
     $purge_entities = !isset($this->customParameters['purge_entities']) ? [] : $this->customParameters['purge_entities'];
 
     foreach ($purge_entities as $entity_type) {
-      $this->getCore()->deleteEntities($entity_type, $condition_key, $condition_value, '>=');
+      $this->getCore()->deleteEntitiesWithCondition($entity_type, $condition_key, $condition_value, '>=');
     }
 
   }
@@ -307,8 +307,19 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
 
     $saved = $entity->save();
     $this->dispatchHooks('AfterEntityCreateScope', (object) (array) $entity, $entity_type);
-    $this->entities[] = $saved;
+    $this->entities[$entity_type][] = $entity->id();
+
     return $saved;
   }
+
+  /**
+   * @AfterScenario
+   */
+  public function deleteGeneratedEntities() {
+    foreach ($this->entities as $entity_type => $ids) {
+      $this->getCore()->entityDeleteMultiple($entity_type, $ids);
+    }
+  }
+
 
 }

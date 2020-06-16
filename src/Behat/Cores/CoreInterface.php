@@ -208,7 +208,7 @@ interface CoreInterface {
    * @param string $condition_operand
    *   Condition operand.
    */
-  public function deleteEntities($entity_type, $condition_key, $condition_value, $condition_operand = 'LIKE');
+  public function deleteEntitiesWithCondition($entity_type, $condition_key, $condition_value, $condition_operand = 'LIKE');
 
    /**
    * Delete entities by condition.
@@ -219,4 +219,15 @@ interface CoreInterface {
    *   Entity id.
    */
   public function entityDelete($entity_type, $entity_id);
+
+  /**
+   * Delete a list of entities of the same entity type.
+   *
+   * @param string $entity_type
+   *   Entity type.
+   * @param array $entities_ids
+   *   Entity id list.
+   */
+  public function entityDeleteMultiple($entity_type, array $entities_ids);
+
 }
