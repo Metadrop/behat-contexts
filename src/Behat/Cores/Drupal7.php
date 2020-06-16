@@ -244,4 +244,19 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
     return entity_delete_multiple($entity_type, $entities_ids);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function loadEntityByLabel(string $entity_type, string $label)
+  {
+    throw new PendingException('Pending to implement method in Drupal 7');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function loadEntityByProperties(string $entity_type, array $properties) {
+    throw new PendingException('Pending to implement method in Drupal 7');
+  }
+
 }

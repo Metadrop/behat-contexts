@@ -230,4 +230,31 @@ interface CoreInterface {
    */
   public function entityDeleteMultiple($entity_type, array $entities_ids);
 
+  /**
+   * Load an entity with a specific label.
+   *
+   * @param string $entity_type
+   *   Entity type.
+   * @param string $label
+   *   Entity label.
+   *
+   * @return mixed
+   *   Entity.
+   */
+  public function loadEntityByLabel(string $entity_type, string $label);
+
+  /**
+   * Load an entity by properties.
+   *
+   * @param string $entity_type
+   *   The entity type.
+   * @param array $properties
+   *   The array of properties to search.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface|mixed
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   */
+  public function loadEntityByProperties(string $entity_type, array $properties);
+
 }

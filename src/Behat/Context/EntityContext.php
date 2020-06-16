@@ -52,11 +52,28 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
    * @Given I go to the last entity :entity with :bundle bundle created
    * @Given I go to :subpath of the last entity :entity created
    * @Given I go to :subpath of the last entity :entity with :bundle bundle created
-   *
-   * @USECORE
    */
   public function goToTheLastEntityCreated($entity_type, $bundle = NULL, $subpath = NULL) {
-    $path = $this->getCore()->buildEntityUri($entity_type, $bundle, $subpath);
+    $last_entity = $this->getCore()->getLastEntityId($entity_type, $bundle);
+    if (empty($last_entity)) {
+      throw new \Exception("Imposible to go to path: the entity does not exists");
+    }
+
+    $entity = $this->getCore()->entityLoadSingle($entity_type, $last_entity);
+    $path = $this->getCore()->buildEntityUri($entity_type, $entity, $subpath);
+    if (!empty($path)) {
+      $this->getSession()->visit($this->locatePath($path));
+    }
+  }
+  /**
+   * Go to a specific path of an entity with a specific label.
+   *
+   * @Given I go to the :entity_type entity with label :label
+   * @Given I go to :subpath of the :entity_type entity with label :label
+   */
+  public function goToTheEntityWithLabel($entity_type, $label, $subpath = NULL) {
+    $entity = $this->getCore()->loadEntityByLabel($entity_type, $label);
+    $path = $this->getCore()->buildEntityUri($entity_type, $entity, $subpath);
     if (!empty($path)) {
       $this->getSession()->visit($this->locatePath($path));
     }
@@ -67,8 +84,6 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
    *
    * @Given last entity :entity created is deleted
    * @Given last entity :entity with :bundle bundle created is deleted
-   *
-   * @USECORE
    */
   public function deleteLastEntityCreated($entity_type, $bundle = NULL) {
     $last_entity_id = $this->getCore()->getLastEntityId($entity_type, $bundle);
@@ -140,7 +155,7 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
     $hash = $values->getHash();
     $fields = $hash[0];
 
-    $entity = $this->getCore()->get($entity_type, $label);
+    $entity = $this->getCore()->loadEntityByLabel($entity_type, $label);
 
     // Check entity.
     if (!$entity instanceof EntityInterface) {
