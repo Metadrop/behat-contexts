@@ -226,7 +226,7 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function deleteEntities($entity_type, $condition_key, $condition_value, $condition_operand = 'LIKE') {
+  public function deleteEntitiesWithCondition($entity_type, $condition_key, $condition_value, $condition_operand = 'LIKE') {
     throw new PendingException('Pending to implement method in Drupal 7');
   }
 
@@ -235,6 +235,13 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
    */
   public function entityDelete($entity_type, $entity_id) {
     return entity_delete($entity_type, $entity_id);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function entityDeleteMultiple($entity_type, array $entities_ids) {
+    return entity_delete_multiple($entity_type, $entities_ids);
   }
 
 }

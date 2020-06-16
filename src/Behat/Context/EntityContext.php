@@ -221,7 +221,7 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
     $purge_entities = !isset($this->customParameters['purge_entities']) ? [] : $this->customParameters['purge_entities'];
 
     foreach ($purge_entities as $entity_type) {
-      $this->getCore()->deleteEntities($entity_type, $condition_key, $condition_value, '>=');
+      $this->getCore()->deleteEntitiesWithCondition($entity_type, $condition_key, $condition_value, '>=');
     }
 
   }
@@ -253,13 +253,28 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
   public function entityCreate($entity_type, $entity) {
     $this->dispatchHooks('BeforeEntityCreateScope', $entity, $entity_type);
     $this->parseEntityFields($entity_type, $entity);
-    $saved = \Drupal::entityTypeManager()
+
+    // @TODO: move to d8 core!
+    $entity_created = \Drupal::entityTypeManager()
       ->getStorage($entity_type)
-      ->create((array) $entity)
-      ->save();
+      ->create((array) $entity);
+    $entity_created->save();
+    $entity_id = $entity_created->id();
+
     $this->dispatchHooks('AfterEntityCreateScope', $entity, $entity_type);
-    $this->entities[] = $saved;
-    return $saved;
+
+    $this->entities[$entity_type] = $entity_id;
+
+    return $entity_id;
+  }
+
+  /**
+   * @AfterScenario
+   */
+  public function deleteGeneratedEntities() {
+    foreach ($this->entities as $entity_type => $ids) {
+      $this->getCore()->entityDeleteMultiple($entity_type, $ids);
+    }
   }
 
 }
