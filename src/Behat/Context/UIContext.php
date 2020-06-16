@@ -2,10 +2,15 @@
 
 namespace Metadrop\Behat\Context;
 
+use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Context\SnippetAcceptingContext;
+use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
 use NuvoleWeb\Drupal\DrupalExtension\Context\RawMinkContext;
 use Behat\Mink\Exception\ExpectationException;
+use Behat\Gherkin\Node\TableNode;
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use NuvoleWeb\Drupal\DrupalExtension\Context\ScreenShotContext;
 
 /**
  * @file
@@ -23,6 +28,11 @@ class UIContext extends RawMinkContext implements SnippetAcceptingContext {
    * @var array
    */
   protected $customParams;
+
+  /**
+   * @var \Metadrop\Behat\Context\WaitingContext
+   */
+  protected $waitingContext;
 
   /**
    * Constructor.
@@ -258,6 +268,104 @@ class UIContext extends RawMinkContext implements SnippetAcceptingContext {
   public function iSwitchOutOfAllFrames() {
     $this->getSession()->switchToIFrame();
     $this->iframe = NULL;
+  }
+
+  /**
+   * Gather neccesary subcontexts.
+   *
+   * @BeforeScenario
+   *
+   * @param BeforeScenarioScope $scope
+   *   Scope del scenario.
+   */
+  public function gatherWaitingContext(BeforeScenarioScope $scope) {
+    /** @var InitializedContextEnvironment $environment */
+    $environment = $scope->getEnvironment();
+    if ($environment->hasContextClass(WaitingContext::class)) {
+      $this->waitingContext = $environment->getContext(WaitingContext::class);
+    }
+  }
+
+  /**
+   * Fill a composed multiple field.
+   *
+   * @NOTE: This step has a strong dependency with the markup of the drupal base
+   * multiple fields, if the html is modified it may stop working.
+   *
+   * @Then I fill in multiple field :arg1 with the following values:
+   */
+  public function iFillInMultipleFieldWithTheFollowingValues($field_label, TableNode $table)
+  {
+    $xpath_base = sprintf('//table[contains(@class, "field-multiple-table")]/thead[contains(*, "%s")]/../tbody', $field_label);
+    $xpath_add_more_button = sprintf($xpath_base . '/../..//input[@type="submit"][contains(@class, "field-add-more-submit")]');
+    $field_items = iterator_to_array($table->getIterator());
+    $total_items = count($field_items);
+
+    if ($total_items > 1 && empty($this->waitingContext)) {
+      trigger_error(sprintf('In order to add multiple field items you need add %s context in your behat configuration.', WaitingContext::class));
+    }
+
+    foreach ($field_items as $delta =>  $field_item) {
+      $item_number = $delta + 1;
+      foreach ($field_item as $label => $value) {
+        $xpath_field_item = sprintf($xpath_base . '/tr[%d]/td//label[text()="%s"]/../*[self::input or self::select]', $item_number, $label);
+        $element = $this->getSession()->getPage()->find(
+          'xpath',
+          $xpath_field_item
+        );
+
+        if (empty($element)) {
+          throw new \Exception(sprintf('Cant find field "%s" in %s field at delta %s', $label, $field_label, $item_number));
+        }
+
+        $this->fillFieldUnknown($element, $value);
+      }
+
+      if ($item_number < $total_items) {
+        $add_more_button = $this->getSession()->getPage()->find('xpath', $xpath_add_more_button);
+        if (!empty($add_more_button)) {
+          $add_more_button->press();
+        }
+        else {
+          throw new \Exception("Can't find add more button.");
+        }
+        $this->waitingContext->iWaitForAjaxToFinish(5);
+      }
+
+    }
+  }
+
+  /**
+   * Set a value in a input in an unknown select field.
+   *
+   * Detect on the fly the type of input so it call the appropiate methods.
+   *
+   * @param NodeElement $element
+   *   Element.
+   * @param $value
+   *   Value.
+   *
+   * @throws ElementNotFoundException
+   */
+  protected function fillFieldUnknown(NodeElement $element, $value) {
+    switch ($element->getTagName()) {
+      case 'input':
+        switch ($element->getAttribute('type')) {
+          case 'checkbox':
+            $value == 1 ? $element->check() : $element->uncheck();
+            break 2;
+          case 'radio':
+            if ($value == 1) {
+              $value = $element->getAttribute('value');
+              $element->selectOption($value, FALSE);
+            }
+            break 2;
+        }
+
+      default:
+        $element->setValue($value);
+
+    }
   }
 
 }
