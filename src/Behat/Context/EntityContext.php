@@ -263,7 +263,7 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
 
     $this->dispatchHooks('AfterEntityCreateScope', $entity, $entity_type);
 
-    $this->entities[$entity_type] = $entity_id;
+    $this->entities[$entity_type][] = $entity_id;
 
     return $entity_id;
   }
