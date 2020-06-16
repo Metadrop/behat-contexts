@@ -93,16 +93,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   }
 
   /**
-   * Load an entity by properties.
-   *
-   * @param string $entity_type
-   *   The entity type.
-   * @param array $properties
-   *   The array of properties to search.
-   *
-   * @return \Drupal\Core\Entity\EntityInterface|mixed
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * {@inheritdoc}
    */
   public function loadEntityByProperties(string $entity_type, array $properties) {
     $entities = \Drupal::entityTypeManager()
