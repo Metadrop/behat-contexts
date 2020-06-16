@@ -4,6 +4,8 @@ namespace Metadrop\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Context\SnippetAcceptingContext;
+use Drupal\Core\Entity\Entity;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Class EntityContext.
@@ -121,6 +123,37 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
     }
     elseif (!$throw_error_on_empty && empty($errors)) {
       throw new \Exception('Entity values are correct, but it should not!');
+    }
+  }
+
+  /**
+   * Check entity fields loaded by label.
+   *
+   * @Then the :label :entity_type should have the following values:
+   *
+   * Example:
+   * And the 'Lorem ipsum sit amet' node should have the following values:
+   *  | field_bar   | field_foo  |
+   *  | Lorem       | ipsum      |
+   */
+  public function checkEntityByLabelTestValues($entity_type, $label, TableNode $values) {
+    $hash = $values->getHash();
+    $fields = $hash[0];
+
+    $entity = $this->getCore()->get($entity_type, $label);
+
+    // Check entity.
+    if (!$entity instanceof EntityInterface) {
+      throw new \Exception('The ' . $entity_type . ' with label ' . $label . ' was not found.');
+    }
+    // Make field tokens replacements.
+    $fields = $this->replaceTokens($fields);
+
+    // Check entity values and obtain the errors.
+    $errors = $this->checkEntityValues($entity, $fields);
+
+    if (!empty($errors)) {
+      throw new \Exception('Failed checking values: ' . implode(', ', $errors));
     }
   }
 
@@ -253,11 +286,27 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
   public function entityCreate($entity_type, $entity) {
     $this->dispatchHooks('BeforeEntityCreateScope', $entity, $entity_type);
     $this->parseEntityFields($entity_type, $entity);
-    $saved = \Drupal::entityTypeManager()
+    $entity = \Drupal::entityTypeManager()
       ->getStorage($entity_type)
-      ->create((array) $entity)
-      ->save();
-    $this->dispatchHooks('AfterEntityCreateScope', $entity, $entity_type);
+      ->create((array) $entity);
+
+    // Check if the field is an entity reference an allow values to be the
+    // labels of the referenced entities.
+    foreach ($entity as $field_name => $field) {
+      if ($field->getFieldDefinition()->getType() === 'entity_reference') {
+        $value = $field->getString();
+        if (is_numeric($value) === FALSE) {
+          $referenced_entity_type = $field->getFieldDefinition()->getSetting('target_type');
+          $referenced_entity = $this->getCore()->loadEntityByLabel($referenced_entity_type, $value);
+          if ($referenced_entity instanceof EntityInterface) {
+            $entity->get($field_name)->get(0)->setValue($referenced_entity->id());
+          }
+        }
+      }
+    }
+
+    $saved = $entity->save();
+    $this->dispatchHooks('AfterEntityCreateScope', (object) (array) $entity, $entity_type);
     $this->entities[] = $saved;
     return $saved;
   }
