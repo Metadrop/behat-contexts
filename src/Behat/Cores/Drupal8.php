@@ -319,4 +319,27 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     $controller->delete($entities);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getDblogEventUrl(int $wid) {
+    return Url::fromRoute('dblog.event', ['event_id' => $log->wid], ['absolute' => TRUE, 'base_url' => \Drupal::request()->getSchemeAndHttpHost()])->toString() . "\n";
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getWatchdogLogMessages(int $scenario_start_time, bool $show_php_only) {
+    $query = \Drupal::database()->select('watchdog', 'w')
+        ->fields('w', ['message', 'variables', 'type', 'wid'])
+        ->condition('severity', [4, 5], 'IN')
+        ->condition('timestamp', $scenario_start_time, '>=');
+
+    if ($show_php_only) {
+      $query->condition('type', 'php');
+    }
+
+    return $query->execute()->fetchAll();
+  }
+
 }
