@@ -239,6 +239,6 @@ interface CoreInterface {
    *   TRUE or FALSE, if $show_all is FALSE it will show
    *   only php warnings and notices.
    */
-  public function getWatchdogLogMessages(int $scenario_start_time, bool $show_all);
+  public function getDbLogMessages(int $scenario_start_time, bool $show_all);
 
 }
