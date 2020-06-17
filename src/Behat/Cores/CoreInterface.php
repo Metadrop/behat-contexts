@@ -221,6 +221,18 @@ interface CoreInterface {
   public function entityDelete($entity_type, $entity_id);
 
   /**
+   * Obtain warnings and notices from watchdog logs.
+   *
+   * @param int $scenario_start_time
+   *   Scenario start time.
+   * @param array $severities
+   *   Severities.
+   * @param array $types
+   *   Log types (php, access denied...).
+   */
+  public function getDbLogMessages(int $scenario_start_time, array $severities = [], array $types = []);
+
+  /**
    * Delete a list of entities of the same entity type.
    *
    * @param string $entity_type

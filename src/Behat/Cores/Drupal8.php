@@ -2,6 +2,7 @@
 
 namespace Metadrop\Behat\Cores;
 
+use Drupal\Core\Url;
 use NuvoleWeb\Drupal\Driver\Cores\Drupal8 as OriginalDrupal8;
 use Metadrop\Behat\Cores\Traits\UsersTrait;
 use Metadrop\Behat\Cores\Traits\CronTrait;
@@ -317,6 +318,25 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     $controller = \Drupal::entityManager()->getStorage($entity_type);
     $entities = $controller->loadMultiple($entities_ids);
     $controller->delete($entities);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDbLogMessages(int $scenario_start_time, array $severities = [], array $types = []) {
+    $query = \Drupal::database()->select('watchdog', 'w')
+        ->fields('w', ['message', 'variables', 'type', 'wid'])
+        ->condition('timestamp', $scenario_start_time, '>=');
+
+    if (!empty($severities)) {
+      $query->condition('severity', $severities, 'IN');
+    }
+
+    if (!empty($types)) {
+      $query->condition('type', $types, 'IN');
+    }
+
+    return $query->execute()->fetchAll();
   }
 
 }
