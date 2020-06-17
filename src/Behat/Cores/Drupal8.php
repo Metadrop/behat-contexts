@@ -2,6 +2,7 @@
 
 namespace Metadrop\Behat\Cores;
 
+use Drupal\Core\Url;
 use NuvoleWeb\Drupal\Driver\Cores\Drupal8 as OriginalDrupal8;
 use Metadrop\Behat\Cores\Traits\UsersTrait;
 use Metadrop\Behat\Cores\Traits\CronTrait;
@@ -322,21 +323,17 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function getDblogEventUrl(int $wid) {
-    return Url::fromRoute('dblog.event', ['event_id' => $log->wid], ['absolute' => TRUE, 'base_url' => \Drupal::request()->getSchemeAndHttpHost()])->toString() . "\n";
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getWatchdogLogMessages(int $scenario_start_time, bool $show_php_only) {
+  public function getDbLogMessages(int $scenario_start_time, array $severities = [], array $types = []) {
     $query = \Drupal::database()->select('watchdog', 'w')
         ->fields('w', ['message', 'variables', 'type', 'wid'])
-        ->condition('severity', [4, 5], 'IN')
         ->condition('timestamp', $scenario_start_time, '>=');
 
-    if ($show_php_only) {
-      $query->condition('type', 'php');
+    if (!empty($severities)) {
+      $query->condition('severity', $severities, 'IN');
+    }
+
+    if (!empty($types)) {
+      $query->condition('type', $types, 'IN');
     }
 
     return $query->execute()->fetchAll();

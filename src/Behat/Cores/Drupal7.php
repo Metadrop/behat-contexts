@@ -240,13 +240,6 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function getDblogEventUrl(int $wid) {
-    return url('/admin/reports/event/' . $log->wid, ['absolute' => TRUE]) . "\n";
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function entityDeleteMultiple($entity_type, array $entities_ids) {
     return entity_delete_multiple($entity_type, $entities_ids);
   }
@@ -254,14 +247,17 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function getWatchdogLogMessages(int $scenario_start_time, string $show_php_only) {
+  public function getDbLogMessages(int $scenario_start_time, array $severities = [], array $types = []) {
     $query = db_select('watchdog', 'w')
         ->fields('w', ['message', 'variables', 'type', 'wid'])
-        ->condition('severity', [4, 5], 'IN')
         ->condition('timestamp', $scenario_start_time, '>=');
 
-    if ($show_php_only) {
-      $query->condition('type', 'php');
+    if (!empty($severities)) {
+      $query->condition('severity', $severities, 'IN');
+    }
+
+    if (!empty($types)) {
+      $query->condition('type', $types, 'IN');
     }
 
     return $query->execute()->fetchAll();
