@@ -208,7 +208,7 @@ interface CoreInterface {
    * @param string $condition_operand
    *   Condition operand.
    */
-  public function deleteEntities($entity_type, $condition_key, $condition_value, $condition_operand = 'LIKE');
+  public function deleteEntitiesWithCondition($entity_type, $condition_key, $condition_value, $condition_operand = 'LIKE');
 
    /**
    * Delete entities by condition.
@@ -240,5 +240,42 @@ interface CoreInterface {
    *   only php warnings and notices.
    */
   public function getDbLogMessages(int $scenario_start_time, bool $show_all);
+
+  /**
+   * Delete a list of entities of the same entity type.
+   *
+   * @param string $entity_type
+   *   Entity type.
+   * @param array $entities_ids
+   *   Entity id list.
+   */
+  public function entityDeleteMultiple($entity_type, array $entities_ids);
+
+  /**
+   * Load an entity with a specific label.
+   *
+   * @param string $entity_type
+   *   Entity type.
+   * @param string $label
+   *   Entity label.
+   *
+   * @return mixed
+   *   Entity.
+   */
+  public function loadEntityByLabel(string $entity_type, string $label);
+
+  /**
+   * Load an entity by properties.
+   *
+   * @param string $entity_type
+   *   The entity type.
+   * @param array $properties
+   *   The array of properties to search.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface|mixed
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   */
+  public function loadEntityByProperties(string $entity_type, array $properties);
 
 }

@@ -23,13 +23,7 @@ trait EntityTrait {
    * @throws \Exception
    *   When the entity does not exists it throws an exception.
    */
-  public function buildEntityUri($entity_type, $bundle = NULL, $subpath = NULL) {
-    $last_entity = $this->getLastEntityId($entity_type, $bundle);
-    if (empty($last_entity)) {
-      throw new \Exception("Imposible to go to path: the entity does not exists");
-    }
-
-    $entity = $this->entityLoadSingle($entity_type, $last_entity);
+  public function buildEntityUri($entity_type, $entity, $subpath = NULL) {
     if (!empty($entity)) {
       $uri = $this->entityUri($entity_type, $entity);
       if (!empty($subpath)) {

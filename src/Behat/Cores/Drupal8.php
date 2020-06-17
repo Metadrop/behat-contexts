@@ -66,16 +66,34 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   }
 
   /**
-   * Load an entity by properties.
+
+   * Load an entity by label.
    *
    * @param string $entity_type
    *   The entity type.
-   * @param array $properties
-   *   The array of properties to search.
+   * @param string $label
+   *   The label value.
    *
    * @return \Drupal\Core\Entity\EntityInterface|mixed
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   */
+  public function loadEntityByLabel(string $entity_type, string $label) {
+    if ($entity_type === 'user') {
+      $label_key = 'name';
+    }
+    else {
+      $label_key = \Drupal::entityTypeManager()
+        ->getStorage($entity_type)
+        ->getEntityType()
+        ->getKey('label');
+    }
+
+    return $this->loadEntityByProperties($entity_type, [$label_key => $label]);
+  }
+
+  /**
+   * {@inheritdoc}
    */
   public function loadEntityByProperties(string $entity_type, array $properties) {
     $entities = \Drupal::entityTypeManager()
@@ -275,12 +293,27 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function deleteEntities($entity_type, $condition_key, $condition_value, $condition_operand = 'LIKE') {
+  public function deleteEntitiesWithCondition($entity_type, $condition_key, $condition_value, $condition_operand = 'LIKE') {
     $database = \Drupal::database();
     $query = \Drupal::entityQuery($entity_type);
     $condition_scaped = strtoupper($condition_operand) == 'LIKE' ? '%' . $database->escapeLike($condition_value) . '%' : $condition_value;
     $query->condition($condition_key, $condition_scaped, $condition_operand);
     $entities_ids = $query->execute();
+    $this->entityDeleteMultiple($entity_type, $entities_ids);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function entityDelete($entity_type, $entity_id) {
+    $controller = \Drupal::entityManager()->getStorage($entity_type);
+    $entity = $controller->load($entity_id);
+    $entity->delete();
+  }
+  /**
+   * {@inheritdoc}
+   */
+  public function entityDeleteMultiple($entity_type, array $entities_ids) {
     $controller = \Drupal::entityManager()->getStorage($entity_type);
     $entities = $controller->loadMultiple($entities_ids);
     $controller->delete($entities);

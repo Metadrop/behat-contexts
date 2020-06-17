@@ -10,6 +10,8 @@ parameters:
   drupal.driver.cores.8.class: Metadrop\Behat\Cores\Drupal8
   # Class responsible to inject service container instance in all contexts.
   drupal.behat.context_initializer.service_container.class: NuvoleWeb\Drupal\DrupalExtension\Context\Initializer\ServiceContainerInitializer
+  # Hook loader.
+  drupal.context.annotation.reader.class: Metadrop\Behat\Context\Annotation\Reader
 
 services:
   drupal.behat.component.resolution:
