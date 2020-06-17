@@ -50,7 +50,8 @@ class LogsContext extends RawDrupalContext {
 
     if ($module_is_enabled) {
       $log_types = $scope->getTestResult()->getResultCode() === TestResults::PASSED ? ['php'] : [];
-      $logs = $this->getCore()->getDbLogMessages($this->getScenarioStartTime(), [4, 5], $log_types);
+      // Filter by error, notice, and warning severity.
+      $logs = $this->getCore()->getDbLogMessages($this->getScenarioStartTime(), [3, 4, 5], $log_types);
       if (!empty($logs)) {
         $this->printWatchdogLogs($logs);
       }
