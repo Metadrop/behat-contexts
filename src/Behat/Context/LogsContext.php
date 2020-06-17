@@ -86,18 +86,21 @@ class LogsContext extends RawDrupalContext {
    *   Generated url.
    */
   protected function getDblogEventUrl(int $wid) {
-    // This is the only way to force the base url without making the core knowing about what the base url is.
     $options = ['absolute' => TRUE];
     if (!empty($this->baseUrl)) {
       $options['base_url'] = $this->baseUrl;
     }
 
+    // It is not possible to invoke core methods because the way the url generated is not compatible:
+    // - In Drupal 7 it's used the relative path.
+    // - In Drupal 8 it's used the routing system.
     if ($this->getCore() instanceof Drupal7) {
       return url('/admin/reports/event/' . $log->wid, $options);
     }
     else {
       return Url::fromRoute('dblog.event', ['event_id' => $wid], $options)->toString();
     }
+
   }
 
 }
