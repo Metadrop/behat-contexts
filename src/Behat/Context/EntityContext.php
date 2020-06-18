@@ -6,6 +6,9 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Drupal\Core\Entity\Entity;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Driver\BlackboxDriver;
+use Drupal\Driver\Exception\UnsupportedDriverActionException;
+use Symfony\Component\Serializer\Exception\UnsupportedException;
 
 /**
  * Class EntityContext.
@@ -267,6 +270,10 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
     // entities were created after scenario execution.
     $condition_value = $this->timeBeforeScenario;
     $purge_entities = !isset($this->customParameters['purge_entities']) ? [] : $this->customParameters['purge_entities'];
+
+    if ($this->getDriver() instanceof BlackboxDriver) {
+      throw new UnsupportedDriverActionException('No ability to purge entities, put @api in your scenario.', $this->getDriver());
+    }
 
     foreach ($purge_entities as $entity_type) {
       $this->getCore()->deleteEntitiesWithCondition($entity_type, $condition_key, $condition_value, '>=');
