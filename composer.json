@@ -3,7 +3,7 @@
     "description": "Contexts that we use with Behat 3.x tests on Drupal sites.",
     "type": "library",
     "require": {
-        "nuvoleweb/drupal-behat": "dev-i45-behat-4.x"
+        "nuvoleweb/drupal-behat": "dev-fb-drupal-extension-4.x"
     },
     "authors": [
         {
