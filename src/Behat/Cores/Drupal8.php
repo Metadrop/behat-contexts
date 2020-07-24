@@ -307,6 +307,9 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    * {@inheritdoc}
    */
   public function entityDelete($entity_type, $entity_id) {
+    if ($entity_id instanceof EntityInterface) {
+      $entity_id = $entity_id->id();
+    }
     $controller = \Drupal::entityManager()->getStorage($entity_type);
     $entity = $controller->load($entity_id);
     $entity->delete();
