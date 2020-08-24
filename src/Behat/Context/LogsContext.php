@@ -96,7 +96,7 @@ class LogsContext extends RawDrupalContext {
     // - In Drupal 7 it's used the relative path.
     // - In Drupal 8 it's used the routing system.
     if ($this->getCore() instanceof Drupal7) {
-      return url('/admin/reports/event/' . $log->wid, $options);
+      return url('/admin/reports/event/' . $wid, $options);
     }
     else {
       return Url::fromRoute('dblog.event', ['event_id' => $wid], $options)->toString();
