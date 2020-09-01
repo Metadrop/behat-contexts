@@ -2,6 +2,8 @@
 
 namespace Metadrop\Behat\Cores\Traits;
 
+use Drupal\Core\File\FileSystemInterface;
+
 /**
  * Trait FileTrait.
  */
@@ -18,7 +20,8 @@ trait FileTrait {
   public function createFileWithName($file_path, $directory = NULL) {
 
     if (empty($directory)) {
-      $directory = file_default_scheme() . '://';
+      $directory = \Drupal::config('system.file')
+          ->get('default_scheme') . '://';
     }
 
     $destination = $directory . '/' . basename($file_path);
@@ -28,7 +31,7 @@ trait FileTrait {
     }
     else {
       $data = file_get_contents($file_path);
-      $file = file_save_data($data, $destination, FILE_EXISTS_REPLACE);
+      $file = file_save_data($data, $destination, FileSystemInterface::EXISTS_REPLACE);
       if (!$file) {
         throw new \Exception("Error: file could not be copied to directory");
       }

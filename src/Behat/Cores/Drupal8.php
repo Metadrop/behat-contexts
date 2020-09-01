@@ -257,7 +257,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    * {@inheritdoc}
    */
   public function fileDelete($fid) {
-    file_delete($fid);
+    \Drupal::entityTypeManager()->getStorage('file')->load($fid)->delete();
   }
 
   /**
