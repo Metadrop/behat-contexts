@@ -318,8 +318,12 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
 
     // Check if the field is an entity reference an allow values to be the
     // labels of the referenced entities.
+    $reference_types = [
+      'entity_reference',
+      'file',
+    ];
     foreach ($entity as $field_name => $field) {
-      if ($field->getFieldDefinition()->getType() === 'entity_reference') {
+      if (in_array($field->getFieldDefinition()->getType(), $reference_types)) {
         $value = $field->getString();
         if (is_numeric($value) === FALSE) {
           $referenced_entity_type = $field->getFieldDefinition()->getSetting('target_type');
