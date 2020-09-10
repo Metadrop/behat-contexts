@@ -269,4 +269,17 @@ interface CoreInterface {
    */
   public function loadEntityByProperties(string $entity_type, array $properties);
 
+  /**
+   * Make string variable replacements.
+   *
+   * @param string $string
+   *   Message  with variables placeholders.
+   * @param array $params
+   *   List of variables replacements.
+   *
+   * @return string
+   *   Message with replacements.
+   */
+  public function formatString($string, array $params);
+
 }

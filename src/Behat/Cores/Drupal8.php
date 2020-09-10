@@ -13,6 +13,7 @@ use Behat\Behat\Tester\Exception\PendingException;
 use Drupal\user\Entity\User;
 use Drupal\paragraphs\Entity\Paragraph;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Component\Render\FormattableMarkup;
 
 /**
  * Class Drupal8.
@@ -357,6 +358,14 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     }
 
     return $query->execute()->fetchAll();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function formatString($string, array $params) {
+    $string = new FormattableMarkup($string, $params);
+    return $string;
   }
 
 }
