@@ -69,7 +69,8 @@ class LogsContext extends RawDrupalContext {
     foreach ($logs as $log) {
       $log_variables = unserialize($log->variables);
       $log->variables = !empty($log_variables) ? $log_variables : [];
-      $message = mb_strimwidth(format_string($log->message, $log->variables), 0, 200, '...');
+      $formatted_string =  $this->getCore()->formatString($log->message, $log->variables);
+      $message = mb_strimwidth($formatted_string, 0, 200, '...');
       print "[{$log->type}] "
           . $message
           . " | Details: " . $this->getDblogEventUrl($log->wid) . "\n";
