@@ -63,6 +63,14 @@ class I18nContext extends RawMinkContext implements Context {
   }
 
   /**
+   * @Given I press :button translated button in the :region( region)
+   */
+  public function assertRegionPressButton ($button, $region) {
+    $button = $this->getTranslatedText($button);
+    $this->minkContext->assertRegionPressButton($button, $region);
+  }
+
+  /**
    * @Then I (should )see the translated text :text
    */
   public function assertTranslatedTextVisible($text) {
