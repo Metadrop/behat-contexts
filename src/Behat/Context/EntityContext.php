@@ -158,7 +158,11 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
     $hash = $values->getHash();
     $fields = $hash[0];
 
-    $entity = $this->getCore()->loadEntityByLabel($entity_type, $label);
+    // Reset cache on load entities because this step is aim to be used many
+    // times after saving a content. If the saving process is triggered by a
+    // form, the reset of static cache would be done in a different process, so
+    // the main process would be getting the cached version of the entity.
+    $entity = $this->getCore()->loadEntityByLabel($entity_type, $label, TRUE);
 
     // Check entity.
     if (!$entity instanceof EntityInterface) {
@@ -314,8 +318,12 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
 
     // Check if the field is an entity reference an allow values to be the
     // labels of the referenced entities.
+    $reference_types = [
+      'entity_reference',
+      'file',
+    ];
     foreach ($entity as $field_name => $field) {
-      if ($field->getFieldDefinition()->getType() === 'entity_reference') {
+      if (in_array($field->getFieldDefinition()->getType(), $reference_types)) {
         $value = $field->getString();
         if (is_numeric($value) === FALSE) {
           $referenced_entity_type = $field->getFieldDefinition()->getSetting('target_type');

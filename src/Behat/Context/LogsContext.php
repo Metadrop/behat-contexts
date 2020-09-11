@@ -69,7 +69,8 @@ class LogsContext extends RawDrupalContext {
     foreach ($logs as $log) {
       $log_variables = unserialize($log->variables);
       $log->variables = !empty($log_variables) ? $log_variables : [];
-      $message = mb_strimwidth(format_string($log->message, $log->variables), 0, 200, '...');
+      $formatted_string =  $this->getCore()->formatString($log->message, $log->variables);
+      $message = mb_strimwidth($formatted_string, 0, 200, '...');
       print "[{$log->type}] "
           . $message
           . " | Details: " . $this->getDblogEventUrl($log->wid) . "\n";
@@ -96,7 +97,7 @@ class LogsContext extends RawDrupalContext {
     // - In Drupal 7 it's used the relative path.
     // - In Drupal 8 it's used the routing system.
     if ($this->getCore() instanceof Drupal7) {
-      return url('/admin/reports/event/' . $log->wid, $options);
+      return url('/admin/reports/event/' . $wid, $options);
     }
     else {
       return Url::fromRoute('dblog.event', ['event_id' => $wid], $options)->toString();

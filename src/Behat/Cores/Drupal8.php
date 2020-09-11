@@ -13,6 +13,7 @@ use Behat\Behat\Tester\Exception\PendingException;
 use Drupal\user\Entity\User;
 use Drupal\paragraphs\Entity\Paragraph;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Component\Render\FormattableMarkup;
 
 /**
  * Class Drupal8.
@@ -67,19 +68,20 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   }
 
   /**
-
    * Load an entity by label.
    *
    * @param string $entity_type
    *   The entity type.
    * @param string $label
    *   The label value.
+   * @param bool $reset_cache
+   *   Whether or not to reset the cache before loading the entity.
    *
    * @return \Drupal\Core\Entity\EntityInterface|mixed
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public function loadEntityByLabel(string $entity_type, string $label) {
+  public function loadEntityByLabel(string $entity_type, string $label, $reset_cache = FALSE) {
     if ($entity_type === 'user') {
       $label_key = 'name';
     }
@@ -90,16 +92,32 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
         ->getKey('label');
     }
 
-    return $this->loadEntityByProperties($entity_type, [$label_key => $label]);
+    return $this->loadEntityByProperties($entity_type, [$label_key => $label], $reset_cache);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function loadEntityByProperties(string $entity_type, array $properties) {
-    $entities = \Drupal::entityTypeManager()
-      ->getStorage($entity_type)
-      ->loadByProperties($properties);
+  public function loadEntityByProperties(string $entity_type, array $properties, $reset_cache = FALSE) {
+    /** @var \Drupal\Core\Entity\EntityStorageInterface $storage */
+    $storage = \Drupal::entityTypeManager()
+      ->getStorage($entity_type);
+    $entity_query = $storage->getQuery();
+    $entity_query->accessCheck(FALSE);
+    foreach ($properties as $name => $value) {
+      // Cast scalars to array so we can consistently use an IN condition.
+      $entity_query->condition($name, (array) $value, 'IN');
+    }
+    $result = $entity_query->execute();
+    if (empty($result)) {
+      return NULL;
+    }
+
+    if ($reset_cache) {
+      $storage->resetCache($result);
+    }
+
+    $entities = $storage->loadMultiple($result);
     if (!empty($entities)) {
       $entity = current($entities);
       if ($entity instanceof EntityInterface) {
@@ -307,7 +325,10 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    * {@inheritdoc}
    */
   public function entityDelete($entity_type, $entity_id) {
-    $controller = \Drupal::entityTypeManager()->getStorage($entity_type);
+    if ($entity_id instanceof EntityInterface) {
+      $entity_id = $entity_id->id();
+    }
+    $controller = \Drupal::entityManager()->getStorage($entity_type);
     $entity = $controller->load($entity_id);
     $entity->delete();
   }
@@ -337,6 +358,14 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     }
 
     return $query->execute()->fetchAll();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function formatString($string, array $params) {
+    $string = new FormattableMarkup($string, $params);
+    return $string;
   }
 
 }
