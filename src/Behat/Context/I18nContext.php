@@ -111,7 +111,7 @@ class I18nContext extends RawMinkContext implements Context {
    * @throws \Behat\Mink\Exception\DriverException
    * @throws \Behat\Mink\Exception\UnsupportedDriverActionException
    */
-  protected function getTranslatedText(string $text): string {
+  public function getTranslatedText(string $text): string {
     $langcode = $this->getCurrentPageLanguage();
     return t($text, [], ['langcode' => $langcode]);
   }
