@@ -381,7 +381,7 @@ class UIContext extends RawMinkContext implements SnippetAcceptingContext {
       $xpath
     );
     if (empty($element) || !($element instanceof NodeElement)) {
-      throw new \Exception("The input with label {$label}} was not found");
+      throw new \Exception("The input with label {$label} was not found");
     }
     $disabled =  $element->getAttribute('disabled');
     if (is_null($disabled) || $disabled != "disabled") {
