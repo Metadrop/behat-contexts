@@ -371,7 +371,7 @@ class UIContext extends RawMinkContext implements SnippetAcceptingContext {
   /**
    * Check selector is disabled or not.
    *
-   * @Then I check the input with :label is disabled
+   * @Then I check the input with :label label is disabled
    */
   public function inputIsDisabled($label) {
     $session = $this->getSession();
