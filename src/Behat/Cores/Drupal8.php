@@ -211,7 +211,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    * {@inheritdoc}
    */
   public function entityLoadSingle($entity_type, $id) {
-    $controller = \Drupal::entityManager()->getStorage($entity_type);
+    $controller = \Drupal::entityTypeManager()->getStorage($entity_type);
     $entity = $controller->load($id);
     Assert::notEq($entity, FALSE, 'Entity of type "' . $entity_type . '" with id "' . $id . '" does not exists.');
     return $entity;
@@ -306,7 +306,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    * {@inheritdoc}
    */
   public function getEntityTypes() {
-    return array_keys(\Drupal::entityManager()->getDefinitions());
+    return array_keys(\Drupal::entityTypeManager()->getDefinitions());
   }
 
   /**
@@ -328,7 +328,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     if ($entity_id instanceof EntityInterface) {
       $entity_id = $entity_id->id();
     }
-    $controller = \Drupal::entityManager()->getStorage($entity_type);
+    $controller = \Drupal::entityTypeManager()->getStorage($entity_type);
     $entity = $controller->load($entity_id);
     $entity->delete();
   }
@@ -336,7 +336,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    * {@inheritdoc}
    */
   public function entityDeleteMultiple($entity_type, array $entities_ids) {
-    $controller = \Drupal::entityManager()->getStorage($entity_type);
+    $controller = \Drupal::entityTypeManager()->getStorage($entity_type);
     $entities = $controller->loadMultiple($entities_ids);
     $controller->delete($entities);
   }
