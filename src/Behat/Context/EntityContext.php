@@ -240,7 +240,9 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
         if (!empty($entity)) {
           $values[$key] = $this->getCore()->getEntityFieldValue($destiny_replacement, $entity, $values[$key]);
         }
-
+        elseif (strpos($value, 'relative-date') === 0) {
+          $values[$key] = strtotime($value);
+        }
       }
     }
     return $values;
@@ -292,7 +294,8 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
    */
   public function entity($entityType, TableNode $entitiesTable) {
     foreach ($entitiesTable->getHash() as $entityHash) {
-      $entity = (object) $entityHash;
+      $fields = $this->replaceTokens($entityHash);
+      $entity = (object) $fields;
       $this->entityCreate($entityType, $entity);
     }
   }
