@@ -240,9 +240,9 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
         if (!empty($entity)) {
           $values[$key] = $this->getCore()->getEntityFieldValue($destiny_replacement, $entity, $values[$key]);
         }
-        elseif (strpos($value, 'relative-date') === 0) {
-          $values[$key] = strtotime($value);
-        }
+      }
+      elseif (strpos($value, 'relative-date') === 0) {
+        $values[$key] = strtotime($value);
       }
     }
     return $values;
