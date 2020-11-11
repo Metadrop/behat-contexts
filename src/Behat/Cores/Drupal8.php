@@ -42,6 +42,13 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
+  public function staticEntityCacheClear($entity_type_id, array $ids = NULL) {
+    \Drupal::entityTypeManager()->getStorage($entity_type_id)->resetCache($ids);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function viewsCacheClear($view_name) {
     throw new PendingException('Views cache clearing not implemented yet in Drupal 8!');
   }
