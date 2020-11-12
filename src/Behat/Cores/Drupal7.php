@@ -292,4 +292,18 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
     return format_string($string, $params);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function stateGet($key) {
+    throw new \Exception('State API does not exists in Drupal 7. This method is supported only in Drupal 8 or greater.');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function stateSet($key, $value) {
+    throw new \Exception('State API does not exists in Drupal 7. This method is supported only in Drupal 8 or greater.');
+  }
+
 }
