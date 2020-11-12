@@ -37,6 +37,13 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
+  public function staticEntityCacheClear($entity_type_id, array $ids = NULL) {
+    throw new \Exception('Clearing static entity cache is not implemented for Drupal 7');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function viewsCacheClear($view_name) {
     $this->cacheClear($view_name . ':', 'cache_views-data');
   }
