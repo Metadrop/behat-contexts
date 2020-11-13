@@ -8,6 +8,16 @@ namespace Metadrop\Behat\Cores;
 interface CoreInterface {
 
   /**
+   * {@inheritdoc}
+   */
+  public function getState($key);
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setState($key, $value);
+
+  /**
    * Clear page caches.
    *
    * @param string $path
