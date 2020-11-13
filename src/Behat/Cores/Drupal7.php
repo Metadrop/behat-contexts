@@ -256,8 +256,8 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
    */
   public function getDbLogMessages(int $scenario_start_time, array $severities = [], array $types = []) {
     $query = db_select('watchdog', 'w')
-        ->fields('w', ['message', 'variables', 'type', 'wid'])
-        ->condition('timestamp', $scenario_start_time, '>=');
+      ->fields('w', ['message', 'variables', 'type', 'wid'])
+      ->condition('timestamp', $scenario_start_time, '>=');
 
     if (!empty($severities)) {
       $query->condition('severity', $severities, 'IN');
@@ -273,8 +273,7 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function loadEntityByLabel(string $entity_type, string $label)
-  {
+  public function loadEntityByLabel(string $entity_type, string $label) {
     throw new PendingException('Pending to implement method in Drupal 7');
   }
 
@@ -290,6 +289,20 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
    */
   public function formatString($string, array $params) {
     return format_string($string, $params);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getState($key) {
+    throw new \Exception('State API does not exists in Drupal 7. This method is supported only in Drupal 8 or greater.');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setState($key, $value) {
+    throw new \Exception('State API does not exists in Drupal 7. This method is supported only in Drupal 8 or greater.');
   }
 
 }

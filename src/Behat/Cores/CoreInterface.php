@@ -8,6 +8,24 @@ namespace Metadrop\Behat\Cores;
 interface CoreInterface {
 
   /**
+   * Gets a value from Drupal's State API.
+   *
+   * @param string $key
+   *   The key of the data to retrieve from State API.
+   */
+  public function getState($key);
+
+  /**
+   * Sets a value from Drupal's State API.
+   *
+   * @param string $key
+   *   The key of the data to store.
+   * @param mixed $value
+   *   The data to store.
+   */
+  public function setState($key, $value);
+
+  /**
    * Clear page caches.
    *
    * @param string $path

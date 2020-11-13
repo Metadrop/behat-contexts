@@ -271,8 +271,8 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     if (!empty($directory) && strpos($directory, $private) !== FALSE) {
       $path = str_replace($private, '', $directory);
       $destination = \Drupal\Core\Url::fromRoute('system.private_file_download', ['filepath' => $path . '/' . $filename], [
-        'relative' => TRUE,
-      ])->toString();
+          'relative' => TRUE,
+        ])->toString();
     }
 
     return (!empty($destination)) ? $destination : NULL;
@@ -339,6 +339,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     $entity = $controller->load($entity_id);
     $entity->delete();
   }
+
   /**
    * {@inheritdoc}
    */
@@ -353,8 +354,8 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    */
   public function getDbLogMessages(int $scenario_start_time, array $severities = [], array $types = []) {
     $query = \Drupal::database()->select('watchdog', 'w')
-        ->fields('w', ['message', 'variables', 'type', 'wid'])
-        ->condition('timestamp', $scenario_start_time, '>=');
+      ->fields('w', ['message', 'variables', 'type', 'wid'])
+      ->condition('timestamp', $scenario_start_time, '>=');
 
     if (!empty($severities)) {
       $query->condition('severity', $severities, 'IN');
@@ -373,6 +374,20 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   public function formatString($string, array $params) {
     $string = new FormattableMarkup($string, $params);
     return $string;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getState($key) {
+    return \Drupal::state()->get($key);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setState($key, $value) {
+    \Drupal::state()->set($key, $value);
   }
 
 }
