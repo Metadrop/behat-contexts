@@ -39,8 +39,6 @@ trait StateContextTrait {
       $this->getCore()->stateSet($name, $value);
     }
     $this->state = [];
-
-     print "cleanState!!!221312!\n";
   }
 
   /**
