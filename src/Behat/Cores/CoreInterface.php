@@ -8,12 +8,17 @@ namespace Metadrop\Behat\Cores;
 interface CoreInterface {
 
   /**
-   * {@inheritdoc}
+   * Gets a value from Drupal's State API.
+   *
+   * @param string $key
+   *   The key of the data to retrieve from State API.
    */
   public function getState($key);
 
   /**
-   * {@inheritdoc}
+   * Sets a value from Drupal's State API.
+   * @param string $key
+   * @param string  $value
    */
   public function setState($key, $value);
 
