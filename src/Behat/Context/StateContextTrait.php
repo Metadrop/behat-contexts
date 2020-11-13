@@ -2,6 +2,12 @@
 
 namespace Metadrop\Behat\Context;
 
+/**
+ * Trait to add to FeatureContext classes to create State changing steps.
+ *
+ * Use this trait in your FeatureContext class and use the setState to easily
+ * create custom steps that modify Drupal State values.
+ */
 trait StateContextTrait {
 
   /**
