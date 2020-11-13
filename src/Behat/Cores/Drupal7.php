@@ -256,8 +256,8 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
    */
   public function getDbLogMessages(int $scenario_start_time, array $severities = [], array $types = []) {
     $query = db_select('watchdog', 'w')
-        ->fields('w', ['message', 'variables', 'type', 'wid'])
-        ->condition('timestamp', $scenario_start_time, '>=');
+      ->fields('w', ['message', 'variables', 'type', 'wid'])
+      ->condition('timestamp', $scenario_start_time, '>=');
 
     if (!empty($severities)) {
       $query->condition('severity', $severities, 'IN');
@@ -273,8 +273,7 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function loadEntityByLabel(string $entity_type, string $label)
-  {
+  public function loadEntityByLabel(string $entity_type, string $label) {
     throw new PendingException('Pending to implement method in Drupal 7');
   }
 
