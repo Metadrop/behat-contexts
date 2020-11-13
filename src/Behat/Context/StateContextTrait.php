@@ -36,7 +36,7 @@ trait StateContextTrait {
   public function cleanState() {
     // Revert config that was changed.
     foreach ($this->state as $name => $value) {
-      $this->getCore()->stateSet($name, $value);
+      $this->getCore()->setState($name, $value);
     }
     $this->state = [];
   }
@@ -52,8 +52,8 @@ trait StateContextTrait {
    * @Given I set the state key :key to :value
    */
   public function setState($key, $value) {
-    $backup = $this->getCore()->stateGet($key);
-    $this->getCore()->stateSet($key, $value);
+    $backup = $this->getCore()->getState($key);
+    $this->getCore()->setState($key, $value);
     $this->state[$key] = $backup;
   }
 

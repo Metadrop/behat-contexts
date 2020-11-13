@@ -378,14 +378,14 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function stateGet($key) {
+  public function getState($key) {
     return \Drupal::state()->get($key);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function stateSet($key, $value) {
+  public function setState($key, $value) {
     \Drupal::state()->set($key, $value);
   }
 }
