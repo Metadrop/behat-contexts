@@ -17,8 +17,11 @@ interface CoreInterface {
 
   /**
    * Sets a value from Drupal's State API.
+   *
    * @param string $key
-   * @param string  $value
+   *   The key of the data to store.
+   * @param mixed $value
+   *   The data to store.
    */
   public function setState($key, $value);
 
