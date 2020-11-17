@@ -39,33 +39,83 @@ class UsersContext extends RawDrupalContext {
    *   True if the user should NOT have the specific roles.
    */
   public function userRoleCheck($role, $user = NULL, $not = FALSE) {
-    if (empty($user)) {
+    // Because Behat process is alive during the whole test suite, we should
+    // clear user cache.
+    // @TODO: We may clear only the user being checked. However, the process
+    // to get the uid is not direct. Let's just clear the complete cache for
+    // now.
+    $this->getCore()->staticEntityCacheClear('user');
+
+    $account = $this->locateAccount($user);
+
+    if (!$account) {
+      throw new \Exception("Given user does not exist!");
+    }
+
+    $roles_to_check = $this->roleString2Array($role);
+
+    // Get current roles for the user.
+    $account_roles = array_map('strtolower', $this->getCore()->getUserRoles($account));
+
+    // Calculate...
+    $common_roles = array_intersect($roles_to_check, $account_roles);
+    $roles_not_in_account = array_diff($roles_to_check, $account_roles);
+
+    // ...and check!
+    if (!$not && count($roles_not_in_account)) {
+      throw new \Exception("Given user does not have the role(s) " . implode(', ', $roles_not_in_account));
+    }
+    elseif ($not && count($common_roles)) {
+      throw new \Exception("Given user has the role(s) " . implode(', ', $common_roles));
+    }
+  }
+
+  /**
+   * Locates and load an account using a user locator.
+   *
+   * A user locator can be:
+   *   - NULL: This means the current user.
+   *   - A username.
+   *   - A user's email .
+   *   - A uid.
+   *
+   * @param $string $locator
+   * @return \Drupal\Core\Entity\EntityInterface|mixed
+   *   the user located by the given locator.
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   */
+  protected function locateAccount($locator) {
+    if (empty($locator)) {
       $current_user = $this->getUserManager()->getCurrentUser();
       $account = $this->getCore()->loadUserByProperty('uid', $current_user->uid);
     }
     else {
-      $property = $this->getCore()->getUserPropertyByName($user);
-      $account = $this->getCore()->loadUserByProperty($property, $user);
+      $property = $this->getCore()->getUserPropertyByName($locator);
+      $account = $this->getCore()->loadUserByProperty($property, $locator);
     }
 
-    if ($account) {
-      $roles = explode(',', $role);
-      $roles = array_map('trim', $roles);
-      // Case insensitive:
-      $roles = array_map('strtolower', $roles);
-      $aroles = array_map('strtolower', $this->getCore()->getUserRoles($account));
-      foreach ($roles as $role) {
-        if (!$not && !in_array($role, $aroles)) {
-          throw new \Exception("Given user does not have the role $role");
-        }
-        else if ($not && in_array($role, $aroles)) {
-          throw new \Exception("Given user have the role $role");
-        }
-      }
-    }
-    else {
-      throw new \Exception("Given user does not exists!");
-    }
+    return $account;
+  }
+
+  /**
+   * Converts a comma-separated list of role names into an array of role names.
+   *
+   * Role names are converted into lower case.
+   *
+   * So, from a string like "MyRole, MySecondRole" this function returns:
+   *   array("myrole", "mysecondrole");
+   *
+   * @param string $roles_string
+   *   A comma-separated list of role names.
+   * @return array
+   *   An array of role names
+   */
+  protected function roleString2Array($roles_string) {
+    $roles_raw_array = explode(',', $roles_string);
+    return array_map(function ($item) {
+      return strtolower(trim($item));
+    }, $roles_raw_array);
   }
 
   /**
@@ -93,3 +143,4 @@ class UsersContext extends RawDrupalContext {
   }
 
 }
+

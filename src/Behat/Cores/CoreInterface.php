@@ -8,6 +8,24 @@ namespace Metadrop\Behat\Cores;
 interface CoreInterface {
 
   /**
+   * Gets a value from Drupal's State API.
+   *
+   * @param string $key
+   *   The key of the data to retrieve from State API.
+   */
+  public function getState($key);
+
+  /**
+   * Sets a value from Drupal's State API.
+   *
+   * @param string $key
+   *   The key of the data to store.
+   * @param mixed $value
+   *   The data to store.
+   */
+  public function setState($key, $value);
+
+  /**
    * Clear page caches.
    *
    * @param string $path
@@ -24,6 +42,16 @@ interface CoreInterface {
    *   Cache bin.
    */
   public function cacheClear($cid, $bin = 'cache');
+
+  /**
+   * Clear an entity static cache.
+   *
+   * @param string $entity_type_id
+   *   Entity type id to clear its static cache.
+   * @param array $ids
+   *   Array of ids to clear its static cache. If null, all entities are cleared.
+   */
+  public function staticEntityCacheClear($entity_type_id, array $ids = NULL);
 
   /**
    * Run elysia cron.
