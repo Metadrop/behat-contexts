@@ -81,6 +81,51 @@ class UIContext extends RawMinkContext implements SnippetAcceptingContext {
   }
 
   /**
+   * Fill in a select 2 autocomplete field.
+   *
+   * @When I fill in the select2 autocomplete :autocomplete with :text
+   */
+  public function fillInSelect2Autocomplete($locator, $text) {
+
+    $session = $this->getSession();
+    $xpath = "//*[@name=\"$locator\"]/following-sibling::*//input[contains(@class, 'select2-search__field')]";
+
+    $el = $session->getPage()->find('xpath', $xpath);
+
+    if (empty($el)) {
+      throw new ExpectationException('No such autocomplete element ' . $locator, $session);
+    }
+
+    // Set the text and trigger the autocomplete with a space keystroke.
+    $el->setValue($text);
+
+    try {
+      $el->keyDown(' ');
+      $el->keyUp(' ');
+
+      // Wait for ajax.
+      $this->getSession()->wait(1000, '(typeof(jQuery)=="undefined" || (0 === jQuery.active && 0 === jQuery(\':animated\').length))');
+      // Wait a second, just to be sure.
+      sleep(1);
+
+      // Select the autocomplete popup with the name we are looking for.
+      $popup = $session->getPage()->find('xpath', "//ul[contains(@class, 'select2-results__options')]/li[text() = '{$text}']");
+
+      if (empty($popup)) {
+        throw new ExpectationException('No such option ' . $text . ' in ' . $locator, $session);
+      }
+
+      // Clicking on the popup fills the autocomplete properly.
+      $popup->click();
+    }
+    catch (UnsupportedDriverActionException $e) {
+      // So javascript is not supported.
+      // We did set the value correctly, so Drupal will figure it out.
+    }
+
+  }
+
+  /**
    * Step to remove the multiple property of a file field.
    *
    * PhantomJS is not compatible with file field multiple and crashes.
