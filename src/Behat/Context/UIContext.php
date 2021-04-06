@@ -413,4 +413,25 @@ class UIContext extends RawMinkContext implements SnippetAcceptingContext {
     }
   }
 
+  /**
+   * Check selector is disabled or not.
+   *
+   * @Then the input with :label label should be disabled
+   */
+  public function inputIsDisabled($label) {
+    $session = $this->getSession();
+    $xpath = "//label[contains(text(),'" . $label . "')]/following-sibling::input";
+    $element = $session->getPage()->find(
+      'xpath',
+      $xpath
+    );
+    if (empty($element) || !($element instanceof NodeElement)) {
+      throw new \Exception("The input with label {$label} was not found");
+    }
+    $disabled =  $element->getAttribute('disabled');
+    if (is_null($disabled) || $disabled != "disabled") {
+      throw new \Exception("The input with label {$label} does not have disabled attribute.");
+    }
+  }
+
 }
