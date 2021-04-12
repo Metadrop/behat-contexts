@@ -37,6 +37,13 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
+  public function staticEntityCacheClear($entity_type_id, array $ids = NULL) {
+    entity_get_controller($entity_type_id)->resetCache($ids);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function viewsCacheClear($view_name) {
     $this->cacheClear($view_name . ':', 'cache_views-data');
   }
@@ -226,7 +233,7 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function deleteEntities($entity_type, $condition_key, $condition_value, $condition_operand = 'LIKE') {
+  public function deleteEntitiesWithCondition($entity_type, $condition_key, $condition_value, $condition_operand = 'LIKE') {
     throw new PendingException('Pending to implement method in Drupal 7');
   }
 
@@ -235,6 +242,67 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
    */
   public function entityDelete($entity_type, $entity_id) {
     return entity_delete($entity_type, $entity_id);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function entityDeleteMultiple($entity_type, array $entities_ids) {
+    return entity_delete_multiple($entity_type, $entities_ids);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDbLogMessages(int $scenario_start_time, array $severities = [], array $types = []) {
+    $query = db_select('watchdog', 'w')
+      ->fields('w', ['message', 'variables', 'type', 'wid'])
+      ->condition('timestamp', $scenario_start_time, '>=');
+
+    if (!empty($severities)) {
+      $query->condition('severity', $severities, 'IN');
+    }
+
+    if (!empty($types)) {
+      $query->condition('type', $types, 'IN');
+    }
+
+    return $query->execute()->fetchAll();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function loadEntityByLabel(string $entity_type, string $label) {
+    throw new PendingException('Pending to implement method in Drupal 7');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function loadEntityByProperties(string $entity_type, array $properties) {
+    throw new PendingException('Pending to implement method in Drupal 7');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function formatString($string, array $params) {
+    return format_string($string, $params);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getState($key) {
+    throw new \Exception('State API does not exists in Drupal 7. This method is supported only in Drupal 8 or greater.');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setState($key, $value) {
+    throw new \Exception('State API does not exists in Drupal 7. This method is supported only in Drupal 8 or greater.');
   }
 
 }

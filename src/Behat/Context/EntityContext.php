@@ -4,6 +4,11 @@ namespace Metadrop\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Context\SnippetAcceptingContext;
+use Drupal\Core\Entity\Entity;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Driver\BlackboxDriver;
+use Drupal\Driver\Exception\UnsupportedDriverActionException;
+use Symfony\Component\Serializer\Exception\UnsupportedException;
 
 /**
  * Class EntityContext.
@@ -23,6 +28,8 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
    * @var array|mixed
    */
   protected $customParameters = [];
+
+  protected $entities = [];
 
   /**
    * Constructor.
@@ -48,11 +55,28 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
    * @Given I go to the last entity :entity with :bundle bundle created
    * @Given I go to :subpath of the last entity :entity created
    * @Given I go to :subpath of the last entity :entity with :bundle bundle created
-   *
-   * @USECORE
    */
   public function goToTheLastEntityCreated($entity_type, $bundle = NULL, $subpath = NULL) {
-    $path = $this->getCore()->buildEntityUri($entity_type, $bundle, $subpath);
+    $last_entity = $this->getCore()->getLastEntityId($entity_type, $bundle);
+    if (empty($last_entity)) {
+      throw new \Exception("Imposible to go to path: the entity does not exists");
+    }
+
+    $entity = $this->getCore()->entityLoadSingle($entity_type, $last_entity);
+    $path = $this->getCore()->buildEntityUri($entity_type, $entity, $subpath);
+    if (!empty($path)) {
+      $this->getSession()->visit($this->locatePath($path));
+    }
+  }
+  /**
+   * Go to a specific path of an entity with a specific label.
+   *
+   * @Given I go to the :entity_type entity with label :label
+   * @Given I go to :subpath of the :entity_type entity with label :label
+   */
+  public function goToTheEntityWithLabel($entity_type, $label, $subpath = NULL) {
+    $entity = $this->getCore()->loadEntityByLabel($entity_type, $label);
+    $path = $this->getCore()->buildEntityUri($entity_type, $entity, $subpath);
     if (!empty($path)) {
       $this->getSession()->visit($this->locatePath($path));
     }
@@ -63,8 +87,6 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
    *
    * @Given last entity :entity created is deleted
    * @Given last entity :entity with :bundle bundle created is deleted
-   *
-   * @USECORE
    */
   public function deleteLastEntityCreated($entity_type, $bundle = NULL) {
     $last_entity_id = $this->getCore()->getLastEntityId($entity_type, $bundle);
@@ -119,6 +141,41 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
     }
     elseif (!$throw_error_on_empty && empty($errors)) {
       throw new \Exception('Entity values are correct, but it should not!');
+    }
+  }
+
+  /**
+   * Check entity fields loaded by label.
+   *
+   * @Then the :label :entity_type should have the following values:
+   *
+   * Example:
+   * And the 'Lorem ipsum sit amet' node should have the following values:
+   *  | field_bar   | field_foo  |
+   *  | Lorem       | ipsum      |
+   */
+  public function checkEntityByLabelTestValues($entity_type, $label, TableNode $values) {
+    $hash = $values->getHash();
+    $fields = $hash[0];
+
+    // Reset cache on load entities because this step is aim to be used many
+    // times after saving a content. If the saving process is triggered by a
+    // form, the reset of static cache would be done in a different process, so
+    // the main process would be getting the cached version of the entity.
+    $entity = $this->getCore()->loadEntityByLabel($entity_type, $label, TRUE);
+
+    // Check entity.
+    if (!$entity instanceof EntityInterface) {
+      throw new \Exception('The ' . $entity_type . ' with label ' . $label . ' was not found.');
+    }
+    // Make field tokens replacements.
+    $fields = $this->replaceTokens($fields);
+
+    // Check entity values and obtain the errors.
+    $errors = $this->checkEntityValues($entity, $fields);
+
+    if (!empty($errors)) {
+      throw new \Exception('Failed checking values: ' . implode(', ', $errors));
     }
   }
 
@@ -183,7 +240,9 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
         if (!empty($entity)) {
           $values[$key] = $this->getCore()->getEntityFieldValue($destiny_replacement, $entity, $values[$key]);
         }
-
+      }
+      elseif (strpos($value, 'relative-date:') === 0) {
+        $values[$key] = strtotime(str_replace('relative-date:', '', $value));
       }
     }
     return $values;
@@ -195,6 +254,10 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
    * @BeforeScenario @purgeEntities
    */
   public function recordTimeBeforeScenario() {
+    if ($this->getDriver() instanceof BlackboxDriver) {
+      throw new UnsupportedDriverActionException('No ability to purge entities, put @api in your scenario.', $this->getDriver());
+    }
+
     $this->timeBeforeScenario = REQUEST_TIME;
   }
 
@@ -207,7 +270,7 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
    *        parameters:
    *          'purge_entities':
    *            - user
-   *            - custom_entity
+   *            - custom_entity.
    *
    * @AfterScenario @purgeEntities
    */
@@ -219,9 +282,78 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
     $purge_entities = !isset($this->customParameters['purge_entities']) ? [] : $this->customParameters['purge_entities'];
 
     foreach ($purge_entities as $entity_type) {
-      $this->getCore()->deleteEntities($entity_type, $condition_key, $condition_value, '>=');
+      $this->getCore()->deleteEntitiesWithCondition($entity_type, $condition_key, $condition_value, '>=');
     }
 
+  }
+
+  /**
+   * Create entities.
+   *
+   * @Given :entity_type entity:
+   */
+  public function entity($entityType, TableNode $entitiesTable) {
+    foreach ($entitiesTable->getHash() as $entityHash) {
+      $fields = $this->replaceTokens($entityHash);
+      $entity = (object) $fields;
+      $this->entityCreate($entityType, $entity);
+    }
+  }
+
+  /**
+   * Create an entity.
+   *
+   * During the entity creation, is possible to hook into before
+   * entity creation and after, using @beforeEntityCreate
+   * and @afterEntityCreate tags.
+   *
+   * @param string $entity_type
+   *   Entity type.
+   * @param object $entity
+   *   Entity.
+   */
+  public function entityCreate($entity_type, $entity) {
+    $this->dispatchHooks('BeforeEntityCreateScope', $entity, $entity_type);
+    $this->parseEntityFields($entity_type, $entity);
+    $entity = \Drupal::entityTypeManager()
+      ->getStorage($entity_type)
+      ->create((array) $entity);
+
+    // Check if the field is an entity reference an allow values to be the
+    // labels of the referenced entities.
+    $reference_types = [
+      'entity_reference',
+      'file',
+    ];
+    foreach ($entity as $field_name => $field) {
+      if (in_array($field->getFieldDefinition()->getType(), $reference_types)) {
+        $values = $field->getValue();
+        foreach ($values as $key => $value) {
+          if (is_array($value)) {
+            $referenced_entity_type = $field->getFieldDefinition()->getSetting('target_type');
+            $referenced_entity = $this->getCore()->loadEntityByLabel($referenced_entity_type, $value['target_id']);
+            if ($referenced_entity instanceof EntityInterface) {
+              $entity->get($field_name)->get($key)->setValue($referenced_entity->id());
+            }
+          }
+        }
+      }
+    }
+
+    $saved = $entity->save();
+    $this->dispatchHooks('AfterEntityCreateScope', (object) (array) $entity, $entity_type);
+    $this->entities[$entity_type][] = $entity->id();
+
+    return $saved;
+  }
+
+  /**
+   * @AfterScenario
+   */
+  public function deleteGeneratedEntities() {
+    foreach ($this->entities as $entity_type => $ids) {
+      $this->getCore()->entityDeleteMultiple($entity_type, $ids);
+    }
   }
 
 

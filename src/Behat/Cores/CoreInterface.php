@@ -8,6 +8,24 @@ namespace Metadrop\Behat\Cores;
 interface CoreInterface {
 
   /**
+   * Gets a value from Drupal's State API.
+   *
+   * @param string $key
+   *   The key of the data to retrieve from State API.
+   */
+  public function getState($key);
+
+  /**
+   * Sets a value from Drupal's State API.
+   *
+   * @param string $key
+   *   The key of the data to store.
+   * @param mixed $value
+   *   The data to store.
+   */
+  public function setState($key, $value);
+
+  /**
    * Clear page caches.
    *
    * @param string $path
@@ -24,6 +42,16 @@ interface CoreInterface {
    *   Cache bin.
    */
   public function cacheClear($cid, $bin = 'cache');
+
+  /**
+   * Clear an entity static cache.
+   *
+   * @param string $entity_type_id
+   *   Entity type id to clear its static cache.
+   * @param array $ids
+   *   Array of ids to clear its static cache. If null, all entities are cleared.
+   */
+  public function staticEntityCacheClear($entity_type_id, array $ids = NULL);
 
   /**
    * Run elysia cron.
@@ -208,7 +236,7 @@ interface CoreInterface {
    * @param string $condition_operand
    *   Condition operand.
    */
-  public function deleteEntities($entity_type, $condition_key, $condition_value, $condition_operand = 'LIKE');
+  public function deleteEntitiesWithCondition($entity_type, $condition_key, $condition_value, $condition_operand = 'LIKE');
 
    /**
    * Delete entities by condition.
@@ -219,4 +247,67 @@ interface CoreInterface {
    *   Entity id.
    */
   public function entityDelete($entity_type, $entity_id);
+
+  /**
+   * Obtain warnings and notices from watchdog logs.
+   *
+   * @param int $scenario_start_time
+   *   Scenario start time.
+   * @param array $severities
+   *   Severities.
+   * @param array $types
+   *   Log types (php, access denied...).
+   */
+  public function getDbLogMessages(int $scenario_start_time, array $severities = [], array $types = []);
+
+  /**
+   * Delete a list of entities of the same entity type.
+   *
+   * @param string $entity_type
+   *   Entity type.
+   * @param array $entities_ids
+   *   Entity id list.
+   */
+  public function entityDeleteMultiple($entity_type, array $entities_ids);
+
+  /**
+   * Load an entity with a specific label.
+   *
+   * @param string $entity_type
+   *   Entity type.
+   * @param string $label
+   *   Entity label.
+   *
+   * @return mixed
+   *   Entity.
+   */
+  public function loadEntityByLabel(string $entity_type, string $label);
+
+  /**
+   * Load an entity by properties.
+   *
+   * @param string $entity_type
+   *   The entity type.
+   * @param array $properties
+   *   The array of properties to search.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface|mixed
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   */
+  public function loadEntityByProperties(string $entity_type, array $properties);
+
+  /**
+   * Make string variable replacements.
+   *
+   * @param string $string
+   *   Message  with variables placeholders.
+   * @param array $params
+   *   List of variables replacements.
+   *
+   * @return string
+   *   Message with replacements.
+   */
+  public function formatString($string, array $params);
+
 }
