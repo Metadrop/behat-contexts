@@ -141,6 +141,7 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
     $paragraph_object->is_new = TRUE;
     $paragraph_object->setHostEntity($entity_type, $entity);
     $paragraph_object->save();
+    return $paragraph_object;
   }
 
   /**
