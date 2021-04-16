@@ -38,7 +38,7 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
    * {@inheritdoc}
    */
   public function staticEntityCacheClear($entity_type_id, array $ids = NULL) {
-    throw new \Exception('Clearing static entity cache is not implemented for Drupal 7');
+    entity_get_controller($entity_type_id)->resetCache($ids);
   }
 
   /**
@@ -141,6 +141,7 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
     $paragraph_object->is_new = TRUE;
     $paragraph_object->setHostEntity($entity_type, $entity);
     $paragraph_object->save();
+    return $paragraph_object;
   }
 
   /**

@@ -45,14 +45,21 @@ class ParagraphsContext extends RawDrupalContext {
     $entity = $this->getCore()->entityLoadSingle($entity_type, $last_id);
 
     // Create multiple paragraphs.
+    $created_paragraphs = [];
     foreach ($paragraph_fields_table->getHash() as $paragraph_data) {
       $paragraph_object = (object) $paragraph_data;
+      $this->dispatchHooks('BeforeEntityCreateScope', $paragraph_object, 'paragraph');
       $paragraph_object->type = $paragraph_type;
       $this->parseEntityFields('paragraph', $paragraph_object);
       $this->expandEntityFields('paragraph', $paragraph_object);
-      $this->getCore()->attachParagraphToEntity($paragraph_type, $paragraph_field, (array) $paragraph_object, $entity, $entity_type);
+      $paragraph_created = $this->getCore()->attachParagraphToEntity($paragraph_type, $paragraph_field, (array) $paragraph_object, $entity, $entity_type);
+      $paragraph_object->id = $paragraph_created->id();
+      $created_paragraphs[] = $paragraph_object;
     }
     $this->getCore()->entitySave($entity_type, $entity);
+    foreach ($created_paragraphs as $created_paragraph) {
+      $this->dispatchHooks('AfterEntityCreateScope', $created_paragraph, 'paragraph');
+    }
   }
 
 }

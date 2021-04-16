@@ -232,6 +232,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     $paragraph = Paragraph::create($paragraph_values);
     $paragraph->save();
     $entity->get($paragraph_field)->appendItem($paragraph);
+    return $paragraph;
   }
 
   /**
