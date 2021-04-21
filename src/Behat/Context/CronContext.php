@@ -51,9 +51,9 @@ class CronContext extends RawDrupalContext {
   }
 
   /**
-   * Run ultimate cron job.
-   *
    * @Given I run the ultimate cron :name job
+   *
+   * Run ultimate cron job.
    */
   public function ultimateCronRun($cronName) {
     $this->getCore()->runUltimateCron($cronName);
