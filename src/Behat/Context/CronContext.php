@@ -41,22 +41,4 @@ class CronContext extends RawDrupalContext {
     $this->getCore()->runModuleCron('search_api_solr');
   }
 
-  /**
-   * @Given I run the cron from module :module
-   *
-   * Run module cron.
-   */
-  public function iRunCronOfModule($module) {
-    $this->getCore()->runModuleCron($module);
-  }
-
-  /**
-   * @Given I run the ultimate cron :name job
-   *
-   * Run ultimate cron job.
-   */
-  public function ultimateCronRun($cronName) {
-    $this->getCore()->runUltimateCron($cronName);
-  }
-
 }
