@@ -65,6 +65,13 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
+  public function runUltimateCron($cron_name) {
+    throw new PendingException('Pending to implement method in Drupal 7');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function loadUserByProperty($property, $value, $reset = TRUE) {
     $query = db_select('users');
     $query->fields('users', ['uid']);

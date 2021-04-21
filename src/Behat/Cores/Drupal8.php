@@ -3,6 +3,7 @@
 namespace Metadrop\Behat\Cores;
 
 use Drupal\Core\Url;
+use Drupal\ultimate_cron\Entity\CronJob;
 use NuvoleWeb\Drupal\Driver\Cores\Drupal8 as OriginalDrupal8;
 use Metadrop\Behat\Cores\Traits\UsersTrait;
 use Metadrop\Behat\Cores\Traits\CronTrait;
@@ -65,6 +66,19 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    */
   public function runElysiaCronJob($job) {
     throw new PendingException('Elysia job cron run not implemented yet!');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function runUltimateCron($cron_name) {
+    $cron_job = current(\Drupal::entityTypeManager()->getStorage('ultimate_cron_job')->loadByProperties(['id' => $job]));
+    if ($cron_job instanceof CronJob) {
+      $cron_job->run(t('Run by behat Cron Context'));
+    }
+    else {
+      throw new \InvalidArgumentException(sprintf("Could not find cron job with name: " . $job));
+    }
   }
 
   /**
