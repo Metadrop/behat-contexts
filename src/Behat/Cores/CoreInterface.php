@@ -75,7 +75,7 @@ interface CoreInterface {
   public function runModuleCron($module_name);
 
   /**
-   * Run specific cron job.
+   * Run specific cron job using ultimate_cron module.
    *
    * @param string $cron_name
    *   Cron name.
