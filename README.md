@@ -14,7 +14,7 @@ Install with [Composer](http://getcomposer.org):
 ```json
 {
     "type": "vcs",
-    "url": "https://github.com/mistermoper/drupal-behat"
+    "url": "https://github.com/metadrop/drupal-behat"
 }
 ```
 
