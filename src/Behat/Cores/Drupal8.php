@@ -72,6 +72,10 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    * {@inheritdoc}
    */
   public function runUltimateCron($cron_name) {
+    if (!\Drupal::moduleHandler()->moduleExists('ultimate_cron')) {
+      throw new \Exception("The Ultimate Cron module is not installed.");
+    }
+
     $cron_job = current(\Drupal::entityTypeManager()->getStorage('ultimate_cron_job')->loadByProperties(['id' => $job]));
     if ($cron_job instanceof CronJob) {
       $cron_job->run(t('Run by behat Cron Context'));
