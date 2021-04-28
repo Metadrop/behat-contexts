@@ -313,4 +313,18 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
     throw new \Exception('State API does not exists in Drupal 7. This method is supported only in Drupal 8 or greater.');
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function validMail($email_address) {
+    return valid_email_address($email_address);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefaultFileScheme() {
+    return file_default_scheme() . '://';
+  }
+
 }

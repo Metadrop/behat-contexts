@@ -333,7 +333,12 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
             $referenced_entity_type = $field->getFieldDefinition()->getSetting('target_type');
             $referenced_entity = $this->getCore()->loadEntityByLabel($referenced_entity_type, $value['target_id']);
             if ($referenced_entity instanceof EntityInterface) {
-              $entity->get($field_name)->get($key)->setValue($referenced_entity->id());
+              if ($key === 0 && $entity->get($field_name)->isEmpty()) {
+                $entity->get($field_name)->setValue($referenced_entity->id());
+              }
+              else {
+                $entity->get($field_name)->get($key)->setValue($referenced_entity->id());
+              }
             }
           }
         }
