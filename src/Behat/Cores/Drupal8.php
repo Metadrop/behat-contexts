@@ -409,4 +409,19 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     \Drupal::state()->set($key, $value);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function validMail($email_address) {
+    return \Drupal::service('email.validator')->isValid($name);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefaultFileScheme() {
+    return \Drupal::config('system.file')
+      ->get('default_scheme') . '://';
+  }
+
 }
