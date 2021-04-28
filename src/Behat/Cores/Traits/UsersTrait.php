@@ -21,7 +21,7 @@ trait UsersTrait {
    *   The property
    */
   public function getUserPropertyByName($name) {
-    if (valid_email_address($name)) {
+    if ($this->validMail($name)) {
       $property = 'mail';
     }
     elseif (is_numeric($name)) {
@@ -41,5 +41,31 @@ trait UsersTrait {
     Assert::notEq($user, FALSE, 'User with mail "' . $mail . '" exists.');
     return $user;
   }
+
+  /**
+   * Verify the given string is a email address.
+   *
+   * @param string $email_address
+   *   Email address.
+   *
+   * @return boolean
+   *   TRUE when the given string is a valid email address.
+   */
+  abstract protected function validMail($email_address);
+
+  /**
+   * Get user by specific property.
+   *
+   * @param string $property
+   *   User property.
+   * @param string $value
+   *   Value.
+   * @param string $reset
+   *   Don't use cache to get user.
+   *
+   * @return mixed
+   *   User loaded.
+   */
+  abstract protected function loadUserByProperty($property, $value, $reset = TRUE);
 
 }
