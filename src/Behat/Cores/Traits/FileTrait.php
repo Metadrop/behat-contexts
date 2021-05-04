@@ -20,8 +20,7 @@ trait FileTrait {
   public function createFileWithName($file_path, $directory = NULL) {
 
     if (empty($directory)) {
-      $directory = \Drupal::config('system.file')
-          ->get('default_scheme') . '://';
+      $directory = $this->getDefaultFileScheme();
     }
 
     $destination = $directory . '/' . basename($file_path);
@@ -31,12 +30,22 @@ trait FileTrait {
     }
     else {
       $data = file_get_contents($file_path);
-      $file = file_save_data($data, $destination, FileSystemInterface::EXISTS_REPLACE);
+
+      // Existing files are replaced.
+      $file = file_save_data($data, $destination, 1);
       if (!$file) {
         throw new \Exception("Error: file could not be copied to directory");
       }
     }
     return $this->entityId('file', $file);
   }
+
+  /**
+   * Get the default file scheme.
+   *
+   * @return string
+   *   Default file scheme.
+   */
+  abstract public function getDefaultFileScheme();
 
 }
