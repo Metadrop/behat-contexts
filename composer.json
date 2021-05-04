@@ -3,7 +3,7 @@
     "description": "Contexts that we use with Behat 3.x tests on Drupal sites.",
     "type": "library",
     "require": {
-        "nuvoleweb/drupal-behat": "^1.0"
+        "nuvoleweb/drupal-behat": "^1.2"
     },
     "authors": [
         {

@@ -2,6 +2,8 @@
 
 namespace Metadrop\Behat\Cores\Traits;
 
+use Drupal\Core\File\FileSystemInterface;
+
 /**
  * Trait FileTrait.
  */
@@ -28,7 +30,9 @@ trait FileTrait {
     }
     else {
       $data = file_get_contents($file_path);
+
       // Existing files are replaced.
+      $file = file_save_data($data, $destination, 1);
       if (!$file) {
         throw new \Exception("Error: file could not be copied to directory");
       }

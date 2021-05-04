@@ -37,7 +37,7 @@ trait UsersTrait {
    * {@inheritdoc}
    */
   public function loadUserByMail($mail) {
-    $user = user_load_by_mail($mail);
+    $user = $this->loadUserByProperty('mail', $mail);
     Assert::notEq($user, FALSE, 'User with mail "' . $mail . '" exists.');
     return $user;
   }
