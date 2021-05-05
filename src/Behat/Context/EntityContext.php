@@ -361,19 +361,21 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
 
     if ($bypass_entities) {
       $entities = array_filter($this->entities, function($key) use ($bypass_entities){
-        return in_array($key, $bypass_entities);
+        return !in_array($key, $bypass_entities);
       }, ARRAY_FILTER_USE_KEY);
     }
     else {
       $entities = $this->entities;
     }
 
+    // Array reversion is needed in order to guarantee that any hierarchical
+    // relationship between entities (i.e: group and subgroup) is respected
+    // by removing first the later (dependent) entities.
     foreach (array_reverse($entities) as $entity_type => $ids) {
       foreach (array_reverse($ids) as $id) {
         $this->getCore()->entityDeleteMultiple($entity_type, [$id]);
       }
     }
   }
-
 
 }
