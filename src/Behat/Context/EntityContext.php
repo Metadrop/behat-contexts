@@ -355,9 +355,23 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
   /**
    * @AfterScenario
    */
-  public function deleteGeneratedEntities() {
-    foreach ($this->entities as $entity_type => $ids) {
-      $this->getCore()->entityDeleteMultiple($entity_type, $ids);
+  public function cleanEntities() {
+
+    $bypass_entities = isset($this->customParameters['entities_clean_bypass']) ? $this->customParameters['entities_clean_bypass'] : FALSE;
+
+    if ($bypass_entities) {
+      $entities = array_filter($this->entities, function($key) use ($bypass_entities){
+        return in_array($key, $bypass_entities);
+      }, ARRAY_FILTER_USE_KEY);
+    }
+    else {
+      $entities = $this->entities;
+    }
+
+    foreach (array_reverse($entities) as $entity_type => $ids) {
+      foreach (array_reverse($ids) as $id) {
+        $this->getCore()->entityDeleteMultiple($entity_type, [$id]);
+      }
     }
   }
 
