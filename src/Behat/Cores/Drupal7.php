@@ -327,4 +327,21 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
     return file_default_scheme() . '://';
   }
 
+  /**
+   * Gets the current Honeypot time limit
+   */
+  public function getHoneypotLimit() {
+    throw new PendingException('Pending to implement method in Drupal 7');
+  }
+
+  /**
+   * Sets the Honeypot time limit
+   *
+   * @param int $time_limit
+   *   The time limit to be set.
+   */
+  public function setHoneypotLimit(int $time_limit) {
+    throw new PendingException('Pending to implement method in Drupal 7');
+  }
+
 }
