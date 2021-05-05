@@ -7,6 +7,11 @@ use NuvoleWeb\Drupal\DrupalExtension\Context\RawMinkContext;
 class FormContext extends RawMinkContext {
 
   /**
+   * The honeypot time limit
+   */
+  protected $honeypotTimeLimit;
+
+  /**
    * Gets info about required state of a form element.
    *
    * It relies on the requeried class added to he element by Drupal. This
@@ -60,6 +65,30 @@ class FormContext extends RawMinkContext {
     if ($this->isFormElementRequired($type, $label)) {
       throw new \InvalidArgumentException("Form element \"$label\" of type \"$type\" is required");
     }
+  }
+
+  /**
+   * Disable honeypot time limit value.
+   *
+   * To be used when the presence of a honeypot time limit is provoking
+   * false negatives on tests.
+   *
+   * @BeforeScenario @honeypot-disable
+   */
+  public function disableHoneypot() {
+    print('Honeypot: disabling time limit');
+    $this->honeypotTimeLimit = \Drupal::configFactory()->getEditable('honeypot.settings')->get('time_limit');
+    \Drupal::configFactory()->getEditable('honeypot.settings')->set('time_limit', 0)->save();
+  }
+
+  /**
+   * Restore honeypot time limit value.
+   *
+   * @AfterScenario @honeypot-disable
+   */
+  public function restoreHoneypot() {
+    print('Honeypot: restoring time limit');
+    \Drupal::configFactory()->getEditable('honeypot.settings')->set('time_limit', $this->honeypotTimeLimit)->save();
   }
 
 }
