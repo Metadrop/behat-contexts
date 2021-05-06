@@ -343,8 +343,11 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     $query = \Drupal::entityQuery($entity_type);
     $condition_scaped = strtoupper($condition_operand) == 'LIKE' ? '%' . $database->escapeLike($condition_value) . '%' : $condition_value;
     $query->condition($condition_key, $condition_scaped, $condition_operand);
+    $query->accessCheck(FALSE);
     $entities_ids = $query->execute();
-    $this->entityDeleteMultiple($entity_type, $entities_ids);
+    foreach(array_reverse($entities_ids) as $id) {
+      $this->entityDeleteMultiple($entity_type, [$id]);
+    }
   }
 
   /**
