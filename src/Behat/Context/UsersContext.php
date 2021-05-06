@@ -172,7 +172,7 @@ class UsersContext extends RawDrupalContext {
   /**
    * Users with any type of role.
    *
-   * @Given I am a(n) :role( user)
+   * @Given I am a(n) user with :role role
    */
   public function assertUserByRole($role) {
     if (!$this->drupalContext instanceof DrupalContext) {
