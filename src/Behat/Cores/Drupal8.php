@@ -424,4 +424,23 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
       ->get('default_scheme') . '://';
   }
 
+  /**
+   * Gets the current Honeypot time limit
+   *
+   * @return int
+   *   The time limit value
+   */
+  public function getHoneypotLimit(): int {
+    return \Drupal::configFactory()->getEditable('honeypot.settings')->get('time_limit');
+  }
+
+  /**
+   * Sets the Honeypot time limit
+   *
+   * @param int $time_limit
+   *   The time limit to be set.
+   */
+  public function setHoneypotLimit(int $time_limit) {
+    \Drupal::configFactory()->getEditable('honeypot.settings')->set('time_limit', $time_limit)->save();
+  }
 }
