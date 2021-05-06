@@ -2,7 +2,34 @@
 
 namespace Metadrop\Behat\Context;
 
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Drupal\DrupalExtension\Context\DrupalContext;
+
 class UsersContext extends RawDrupalContext {
+
+  /**
+   * @var \Drupal\DrupalExtension\Context\DrupalContext
+   */
+  protected $drupalContext;
+
+  /**
+   * Get the necessary contexts.
+   *
+   * @BeforeScenario
+   *
+   * @param BeforeScenarioScope $scope
+   *   Scope del scenario.
+   */
+  public function gatherContexts(BeforeScenarioScope $scope) {
+    $environment = $scope->getEnvironment();
+    $classesArray = $environment->getContextClasses();
+    foreach ($classesArray as $class_name) {
+      if (is_subclass_of($class_name, DrupalContext::class) || $class_name == DrupalContext::class) {
+        $this->drupalContext = $environment->getContext($class_name);
+        break;
+      }
+    }
+  }
 
   /**
    * Check that user with mail exists.
@@ -140,6 +167,23 @@ class UsersContext extends RawDrupalContext {
    */
   public function userShouldNotHaveTheRole($role, $user = NULL) {
     return $this->userRoleCheck($role, $user, TRUE);
+  }
+
+  /**
+   * Users with any type of role.
+   *
+   * @Given I am a(n) :role( user)
+   */
+  public function assertUserByRole($role) {
+    if (empty($this->drupalContext)) {
+      throw new \Exception("The context is not found in the suite environment. Please check behat.yml file");
+    }
+    if ($role == 'anonymous') {
+      $this->drupalContext->assertAnonymousUser();
+    }
+    else {
+      $this->drupalContext->assertAuthenticatedByRole($role);
+    }
   }
 
 }
