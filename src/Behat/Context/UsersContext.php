@@ -175,9 +175,10 @@ class UsersContext extends RawDrupalContext {
    * @Given I am a(n) :role( user)
    */
   public function assertUserByRole($role) {
-    if (empty($this->drupalContext)) {
+    if (!$this->drupalContext instanceof DrupalContext) {
       throw new \Exception("The context is not found in the suite environment. Please check behat.yml file");
     }
+
     if ($role == 'anonymous') {
       $this->drupalContext->assertAnonymousUser();
     }
@@ -187,4 +188,3 @@ class UsersContext extends RawDrupalContext {
   }
 
 }
-
