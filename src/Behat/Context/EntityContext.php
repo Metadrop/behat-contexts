@@ -31,6 +31,10 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
 
   protected $entities = [];
 
+  protected $users = [];
+
+  protected $nodes = [];
+
   /**
    * Constructor.
    *
@@ -280,11 +284,35 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
     // entities were created after scenario execution.
     $condition_value = $this->timeBeforeScenario;
     $purge_entities = !isset($this->customParameters['purge_entities']) ? [] : $this->customParameters['purge_entities'];
+    $given_entities = $this->getGivenEntitiesMap();
 
     foreach ($purge_entities as $entity_type) {
-      $this->getCore()->deleteEntitiesWithCondition($entity_type, $condition_key, $condition_value, '>=');
-    }
+      $entities_ids = $this->getCore()->getEntitiesWithCondition($entity_type, $condition_key, $condition_value, '>=');
+      if (!empty($given_entities[$entity_type])) {
+        $entities_ids = array_diff($entities_ids, $given_entities[$entity_type]);
+      };
 
+      foreach(array_reverse($entities_ids) as $id) {
+        $this->getCore()->entityDelete($entity_type, $id);
+      }
+    }
+  }
+
+  /**
+   * Get the entities created on Given steps.
+   *
+   * @return array
+   *   An array of ids grouped by entity type.
+   */
+  protected function getGivenEntitiesMap(): array {
+    $map = [];
+    foreach($this->entities as $item) {
+      $map[$item['entity_type']][] = $item['entity_id'];
+    };
+    $map['user'] = $this->users;
+    $map['node'] = $this->nodes;
+
+    return $map;
   }
 
   /**
@@ -357,25 +385,16 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
    */
   public function cleanEntities() {
 
-    $bypass_entities = isset($this->customParameters['entities_clean_bypass']) ? $this->customParameters['entities_clean_bypass'] : FALSE;
+    // In some cases (as Group and Group Content), some entities need to be
+    // deleted by its parent and not manually or independently.
+    // The 'entities_clean_bypass' allows to define some entities that will be
+    // skipped. It might lead to database pollution, so use it carefully.
+    $bypass_entities = isset($this->customParameters['entities_clean_bypass']) ? $this->customParameters['entities_clean_bypass'] : [];
 
-    if ($bypass_entities) {
-      $entities = array_filter($this->entities, function($key) use ($bypass_entities){
-        return !in_array($key, $bypass_entities);
-      }, ARRAY_FILTER_USE_KEY);
-    }
-    else {
-      $entities = $this->entities;
-    }
-
-    // Array reversion is needed in order to guarantee that any hierarchical
-    // relationship between entities (i.e: group and subgroup) is respected
-    // by removing first the later (dependent) entities.
-    foreach (array_reverse($entities) as $entity_type => $ids) {
-      foreach (array_reverse($ids) as $id) {
-        $this->getCore()->entityDeleteMultiple($entity_type, [$id]);
+    foreach (array_reverse($this->entities) as $entity_item) {
+      if (!in_array($entity_item['entity_type'], $bypass_entities)) {
+        $this->getCore()->entityDelete($entity_item['entity_type'], $entity_item['entity_id']);
       }
     }
   }
-
 }
