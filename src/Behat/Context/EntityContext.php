@@ -8,6 +8,8 @@ use Drupal\Core\Entity\Entity;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Driver\BlackboxDriver;
 use Drupal\Driver\Exception\UnsupportedDriverActionException;
+use Drupal\DrupalExtension\Hook\Scope\AfterNodeCreateScope;
+use Drupal\DrupalExtension\Hook\Scope\AfterUserCreateScope;
 use Symfony\Component\Serializer\Exception\UnsupportedException;
 
 /**
@@ -306,9 +308,11 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
    */
   protected function getGivenEntitiesMap(): array {
     $map = [];
+
     foreach($this->entities as $item) {
       $map[$item['entity_type']][] = $item['entity_id'];
     };
+
     $map['user'] = $this->users;
     $map['node'] = $this->nodes;
 
@@ -381,6 +385,22 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
     ];
 
     return $saved;
+  }
+
+  /**
+   * @afterNodeCreate
+   */
+  public function afterNodeCreate(AfterNodeCreateScope $scope) {
+    $node = $scope->getEntity();
+    $this->nodes[] = $node->nid;
+  }
+
+  /**
+   * @afterUserCreate
+   */
+  public function afterUserCreate(AfterUserCreateScope $scope) {
+    $user = $scope->getEntity();
+    $this->users[] = $user->uid;
   }
 
   /**
