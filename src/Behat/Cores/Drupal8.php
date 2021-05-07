@@ -338,13 +338,13 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function deleteEntitiesWithCondition($entity_type, $condition_key, $condition_value, $condition_operand = 'LIKE') {
+  public function getEntitiesWithCondition($entity_type, $condition_key, $condition_value, $condition_operand = 'LIKE') {
     $database = \Drupal::database();
     $query = \Drupal::entityQuery($entity_type);
     $condition_scaped = strtoupper($condition_operand) == 'LIKE' ? '%' . $database->escapeLike($condition_value) . '%' : $condition_value;
     $query->condition($condition_key, $condition_scaped, $condition_operand);
-    $entities_ids = $query->execute();
-    $this->entityDeleteMultiple($entity_type, $entities_ids);
+    $query->accessCheck(FALSE);
+    return $query->execute();
   }
 
   /**

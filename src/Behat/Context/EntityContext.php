@@ -8,6 +8,8 @@ use Drupal\Core\Entity\Entity;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Driver\BlackboxDriver;
 use Drupal\Driver\Exception\UnsupportedDriverActionException;
+use Drupal\DrupalExtension\Hook\Scope\AfterNodeCreateScope;
+use Drupal\DrupalExtension\Hook\Scope\AfterUserCreateScope;
 use Symfony\Component\Serializer\Exception\UnsupportedException;
 
 /**
@@ -30,6 +32,10 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
   protected $customParameters = [];
 
   protected $entities = [];
+
+  protected $users = [];
+
+  protected $nodes = [];
 
   /**
    * Constructor.
@@ -280,11 +286,37 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
     // entities were created after scenario execution.
     $condition_value = $this->timeBeforeScenario;
     $purge_entities = !isset($this->customParameters['purge_entities']) ? [] : $this->customParameters['purge_entities'];
+    $given_entities = $this->getGivenEntitiesMap();
 
     foreach ($purge_entities as $entity_type) {
-      $this->getCore()->deleteEntitiesWithCondition($entity_type, $condition_key, $condition_value, '>=');
-    }
+      $entities_ids = $this->getCore()->getEntitiesWithCondition($entity_type, $condition_key, $condition_value, '>=');
+      if (!empty($given_entities[$entity_type])) {
+        $entities_ids = array_diff($entities_ids, $given_entities[$entity_type]);
+      };
 
+      foreach(array_reverse($entities_ids) as $id) {
+        $this->getCore()->entityDelete($entity_type, $id);
+      }
+    }
+  }
+
+  /**
+   * Get the entities created on Given steps.
+   *
+   * @return array
+   *   An array of ids grouped by entity type.
+   */
+  protected function getGivenEntitiesMap(): array {
+    $map = [];
+
+    foreach($this->entities as $item) {
+      $map[$item['entity_type']][] = $item['entity_id'];
+    };
+
+    $map['user'] = $this->users;
+    $map['node'] = $this->nodes;
+
+    return $map;
   }
 
   /**
@@ -347,19 +379,50 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
 
     $saved = $entity->save();
     $this->dispatchHooks('AfterEntityCreateScope', (object) (array) $entity, $entity_type);
-    $this->entities[$entity_type][] = $entity->id();
+    $this->entities[] = [
+      'entity_type' => $entity_type,
+      'entity_id' => $entity->id(),
+    ];
 
     return $saved;
   }
 
   /**
-   * @AfterScenario
+   * @afterNodeCreate
    */
-  public function deleteGeneratedEntities() {
-    foreach ($this->entities as $entity_type => $ids) {
-      $this->getCore()->entityDeleteMultiple($entity_type, $ids);
-    }
+  public function afterNodeCreate(AfterNodeCreateScope $scope) {
+    $node = $scope->getEntity();
+    $this->nodes[] = $node->nid;
   }
 
+  /**
+   * @afterUserCreate
+   */
+  public function afterUserCreate(AfterUserCreateScope $scope) {
+    $user = $scope->getEntity();
+    $this->users[] = $user->uid;
+  }
+
+  /**
+   * @AfterScenario
+   */
+  public function cleanEntities() {
+
+    // In some cases (as Group and Group Content), some entities need to be
+    // deleted by its parent and not manually or independently.
+    // The 'entities_clean_bypass' allows to define some entities that will be
+    // skipped. It might lead to database pollution, so use it carefully.
+    $bypass_entities = isset($this->customParameters['entities_clean_bypass']) ? $this->customParameters['entities_clean_bypass'] : [];
+
+    foreach (array_reverse($this->entities) as $entity_item) {
+      if (!in_array($entity_item['entity_type'], $bypass_entities)) {
+        $this->getCore()->entityDelete($entity_item['entity_type'], $entity_item['entity_id']);
+      }
+    }
+
+    $this->entities = [];
+    $this->users = [];
+    $this->nodes = [];
+  }
 
 }
