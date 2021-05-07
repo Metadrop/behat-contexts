@@ -419,5 +419,10 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
         $this->getCore()->entityDelete($entity_item['entity_type'], $entity_item['entity_id']);
       }
     }
+
+    $this->entities = [];
+    $this->users = [];
+    $this->nodes = [];
   }
+
 }
