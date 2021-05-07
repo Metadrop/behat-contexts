@@ -413,7 +413,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    * {@inheritdoc}
    */
   public function validMail($email_address) {
-    return \Drupal::service('email.validator')->isValid($name);
+    return \Drupal::service('email.validator')->isValid($email_address);
   }
 
   /**
