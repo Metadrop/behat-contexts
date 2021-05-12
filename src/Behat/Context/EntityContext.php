@@ -281,7 +281,6 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
    * @AfterScenario @purgeEntities
    */
   public function purgeEntities() {
-    $condition_key = 'created';
     // Get the request time after scenario and delete entities if the
     // entities were created after scenario execution.
     $condition_value = $this->timeBeforeScenario;
@@ -289,6 +288,19 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
     $given_entities = $this->getGivenEntitiesMap();
 
     foreach ($purge_entities as $entity_type) {
+
+      // Not every entity type has a 'changed' property.
+      // If it occurs more frequently the behat.yml
+      // should change.
+      switch ($entity_type) {
+        case 'taxonomy_term':
+          $condition_key = 'changed';
+          break;
+
+        default:
+          $condition_key = 'created';
+      }
+
       $entities_ids = $this->getCore()->getEntitiesWithCondition($entity_type, $condition_key, $condition_value, '>=');
       if (!empty($given_entities[$entity_type])) {
         $entities_ids = array_diff($entities_ids, $given_entities[$entity_type]);
