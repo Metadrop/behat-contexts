@@ -291,7 +291,8 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
 
       // Not every entity type has a 'changed' property.
       // If it occurs more frequently the behat.yml
-      // should change.
+      // should change to allow define what property
+      // can be used to get the created time.
       switch ($entity_type) {
         case 'taxonomy_term':
           $condition_key = 'changed';
