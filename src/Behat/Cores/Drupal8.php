@@ -350,11 +350,16 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function entityDelete($entity_type, $entity_id) {
+  public function entityDelete($entity_type, $entity_id, $reset_cache = FALSE) {
     if ($entity_id instanceof EntityInterface) {
       $entity_id = $entity_id->id();
     }
     $controller = \Drupal::entityTypeManager()->getStorage($entity_type);
+
+    if ($reset_cache) {
+      $controller->resetCache([$entity_id]);
+    }
+
     $entity = $controller->load($entity_id);
     $entity->delete();
   }
@@ -362,9 +367,14 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function entityDeleteMultiple($entity_type, array $entities_ids) {
+  public function entityDeleteMultiple($entity_type, array $entities_ids, $reset_cache = FALSE) {
     $controller = \Drupal::entityTypeManager()->getStorage($entity_type);
     $entities = $controller->loadMultiple($entities_ids);
+
+    if ($reset_cache) {
+      $controller->resetCache($entities_ids);
+    }
+
     $controller->delete($entities);
   }
 

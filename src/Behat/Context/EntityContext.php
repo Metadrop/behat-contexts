@@ -308,7 +308,7 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
       };
 
       foreach(array_reverse($entities_ids) as $id) {
-        $this->getCore()->entityDelete($entity_type, $id);
+        $this->getCore()->entityDelete($entity_type, $id, TRUE);
       }
     }
   }
@@ -429,7 +429,7 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
 
     foreach (array_reverse($this->entities) as $entity_item) {
       if (!in_array($entity_item['entity_type'], $bypass_entities)) {
-        $this->getCore()->entityDelete($entity_item['entity_type'], $entity_item['entity_id']);
+        $this->getCore()->entityDelete($entity_item['entity_type'], $entity_item['entity_id'], TRUE);
       }
     }
 
