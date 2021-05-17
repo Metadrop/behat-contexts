@@ -369,6 +369,7 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
     $reference_types = [
       'entity_reference',
       'file',
+      'image',
     ];
     foreach ($entity as $field_name => $field) {
       if (in_array($field->getFieldDefinition()->getType(), $reference_types)) {
