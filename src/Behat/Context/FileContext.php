@@ -2,6 +2,8 @@
 
 namespace Metadrop\Behat\Context;
 
+use Drupal\file\FileInterface;
+
 class FileContext extends RawDrupalContext {
 
   /**
@@ -71,6 +73,20 @@ class FileContext extends RawDrupalContext {
     }
 
     $this->visitPath($destination);
+  }
+
+  /**
+   * @When I go to the view the file with name :arg1
+   */
+  public function iGoToTheViewTheFileWithName($filename)
+  {
+    $file = $this->getCore()->loadEntityByLabel('file', $filename);
+    if ($file instanceof FileInterface) {
+      $this->visitPath($this->getCore()->createFileUrl($file));
+    }
+    else {
+      throw new \Exception(sprintf('File with name %s not found.', $filename));
+    }
   }
 
 }

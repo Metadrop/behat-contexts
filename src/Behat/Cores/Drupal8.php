@@ -3,7 +3,9 @@
 namespace Metadrop\Behat\Cores;
 
 use Drupal\Core\Url;
+use Drupal\file\FileInterface;
 use Drupal\ultimate_cron\Entity\CronJob;
+use http\Exception\InvalidArgumentException;
 use NuvoleWeb\Drupal\Driver\Cores\Drupal8 as OriginalDrupal8;
 use Metadrop\Behat\Cores\Traits\UsersTrait;
 use Metadrop\Behat\Cores\Traits\CronTrait;
@@ -443,4 +445,15 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   public function setHoneypotLimit(int $time_limit) {
     \Drupal::configFactory()->getEditable('honeypot.settings')->set('time_limit', $time_limit)->save();
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createFileUrl($file, bool $relative = TRUE) {
+    if ($file instanceof FileInterface) {
+      return $file->createFileUrl($relative);
+    }
+    throw new InvalidArgumentException('%s method only accept %s objects in Drupal 8 or higher', __METHOD__, FileInterface::class);
+  }
+
 }
