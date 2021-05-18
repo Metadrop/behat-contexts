@@ -325,4 +325,17 @@ interface CoreInterface {
    */
   public function formatString($string, array $params);
 
+  /**
+   * Create a url from a file.
+   *
+   * @param mixed $file
+   *   File, in its Drupal relative data type.
+   * @param bool $relative
+   *   Determine if the url retrieved will be relative or absolute.
+   *
+   * @return string
+   *   File url.
+   */
+  public function createFileUrl($file, bool $relative = TRUE);
+
 }
