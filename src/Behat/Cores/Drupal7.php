@@ -248,14 +248,14 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function entityDelete($entity_type, $entity_id) {
+  public function entityDelete($entity_type, $entity_id, $reset_cache = FALSE) {
     return entity_delete($entity_type, $entity_id);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function entityDeleteMultiple($entity_type, array $entities_ids) {
+  public function entityDeleteMultiple($entity_type, array $entities_ids, $reset_cache = FALSE) {
     return entity_delete_multiple($entity_type, $entities_ids);
   }
 

@@ -256,8 +256,10 @@ interface CoreInterface {
    *   Entity type.
    * @param int $id
    *   Entity id.
+   * @param bool $reset_cache
+   *   Wether the entity cache should be reset before loading it
    */
-  public function entityDelete($entity_type, $entity_id);
+  public function entityDelete($entity_type, $entity_id, $reset_cache = FALSE);
 
   /**
    * Obtain warnings and notices from watchdog logs.
@@ -278,8 +280,10 @@ interface CoreInterface {
    *   Entity type.
    * @param array $entities_ids
    *   Entity id list.
+   * @param bool $reset_cache
+   *   Wether the entity caches should be reset before loading them
    */
-  public function entityDeleteMultiple($entity_type, array $entities_ids);
+  public function entityDeleteMultiple($entity_type, array $entities_ids, $reset_cache = FALSE);
 
   /**
    * Load an entity with a specific label.
