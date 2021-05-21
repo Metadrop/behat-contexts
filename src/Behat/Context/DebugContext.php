@@ -204,6 +204,7 @@ class DebugContext extends NuvoleScreenshotContext implements SnippetAcceptingCo
   public function saveReport($file, $result) {
     $this->session = $this->getSession();
 
+    $file = str_replace([' ', '"'], ['-', ''], $file);
     $this->saveInfoFile($file, $result);
     $this->saveHtmlFile($file);
     $this->savePngFile($file);
