@@ -123,7 +123,7 @@ class FormContext extends RawMinkContext {
       '//span[contains(text(), "%s")]/../../div//input[contains(@name, "[%s][%s]")]',
       $label,
       $date_part_field,
-      $field,
+      $field
     );
 
     $page = $this->getSession()->getPage();
