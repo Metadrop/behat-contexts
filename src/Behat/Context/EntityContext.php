@@ -117,6 +117,22 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
   }
 
   /**
+   * @Then the :entity_type with field :field_name and value :value translation :langcode should have the following values:
+   */
+  public function checkEntityTranslationValues($entity_type, $field_name, $value, $langcode, TableNode $values) {
+    $entity = $this->getCore()->getEntityByField($entity_type, $field_name, $value);
+
+    // Check entity.
+    if (!isset($entity)) {
+      throw new \Exception('The ' . $entity_type . ' with ' . $field_name . ':  ' . $value . ' not found.');
+    }
+    if (!$entity->hasTranslation($langcode)) {
+      throw new \Exception('Entity does not have ' . $langcode . ' translation.');
+    }
+    $this->checkGivenEntityValues($entity->getTranslation($langcode), $values);
+  }
+
+  /**
    * Check object fields.
    *
    * @Then the :object_type with field :field_name and value :value should have the following values:
@@ -127,15 +143,28 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
    *  | behat@metadrop.net  | entity-replacement:user:mail:behat@metadrop.net:uid |
    */
   public function checkEntityTestValues($entity_type, $field_name, $value, TableNode $values, $throw_error_on_empty = TRUE) {
-    $hash = $values->getHash();
-    $fields = $hash[0];
-
     $entity = $this->getCore()->getEntityByField($entity_type, $field_name, $value);
 
     // Check entity.
     if (!isset($entity)) {
       throw new \Exception('The ' . $entity_type . ' with ' . $field_name . ':  ' . $value . ' not found.');
     }
+    $this->checkGivenEntityValues($entity, $values, $throw_error_on_empty);
+  }
+
+  /**
+   * Check given entity values.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   Entity to check.
+   * @param \Behat\Gherkin\Node\TableNode $values
+   *   Values to evalate.
+   * @param bool $throw_error_on_empty
+   *   Error on empty.
+   */
+  protected function checkGivenEntityValues(EntityInterface $entity, TableNode $values, $throw_error_on_empty = TRUE) {
+    $hash = $values->getHash();
+    $fields = $hash[0];
     // Make field tokens replacements.
     $fields = $this->replaceTokens($fields);
 
