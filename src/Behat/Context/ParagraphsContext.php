@@ -36,10 +36,27 @@ class ParagraphsContext extends RawDrupalContext {
    * @Given paragraph of :paragraph_type type referenced on the :field_paragraph field of the last content:
    */
   public function createParagraph($paragraph_type, $paragraph_field, TableNode $paragraph_fields_table) {
-    $entity_type = 'node';
+    $this->entityCreateParagraph($paragraph_type, $paragraph_field, 'node', $paragraph_fields_table);
+  }
+
+  /**
+   * Create a paragraph and reference it in the given field of the last entity created.
+   *
+   * @param string $paragraph_type
+   *   Paragraph type.
+   * @param string $paragraph_field
+   *   Field to reference the paragrapshs.
+   * @param string $entity_type
+   *   Entity type.
+   * @param \Behat\Gherkin\Node\TableNode $paragraph_fields_table
+   *   Paragraph fields.
+   *
+   * @Given paragraph of :paragraph_type type referenced on the :field_paragraph field of the last :entity_type entity:
+   */
+  public function entityCreateParagraph($paragraph_type, $paragraph_field, $entity_type, TableNode $paragraph_fields_table) {
     $last_id = $this->getCore()->getLastEntityId($entity_type);
     if (empty($last_id)) {
-      throw new \Exception("Impossible to get the last content id.");
+      throw new \Exception("Impossible to get the last entity id.");
     }
 
     $entity = $this->getCore()->entityLoadSingle($entity_type, $last_id);
