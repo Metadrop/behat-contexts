@@ -316,6 +316,11 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     rsort($entity_ids);
     $entity_id = reset($entity_ids);
 
+    if (!empty($entity_id)) {
+      // Ensure fresh load.
+      \Drupal::entityTypeManager()->getStorage($entity_type)->resetCache([$entity_id]);
+    }
+
     $entity = \Drupal::entityTypeManager()->getStorage($entity_type)->load($entity_id);
     return (!empty($entity) && ($entity instanceof EntityInterface)) ? $entity : NULL;
   }
