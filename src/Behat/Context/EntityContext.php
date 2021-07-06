@@ -372,7 +372,7 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
       'image',
     ];
     foreach ($entity as $field_name => $field) {
-      if (in_array($field->getFieldDefinition()->getType(), $reference_types)) {
+      if (in_array($field->getFieldDefinition()->getType(), $reference_types) && !$field->getFieldDefinition()->isComputed()) {
         $values = $field->getValue();
         foreach ($values as $key => $value) {
           if (is_array($value)) {
