@@ -375,7 +375,7 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
       if (in_array($field->getFieldDefinition()->getType(), $reference_types) && !$field->getFieldDefinition()->isComputed()) {
         $values = $field->getValue();
         foreach ($values as $key => $value) {
-          if (is_array($value)) {
+          if (is_array($value) && !empty($value['target_id'])) {
             $referenced_entity_type = $field->getFieldDefinition()->getSetting('target_type');
             $referenced_entity = $this->getCore()->loadEntityByLabel($referenced_entity_type, $value['target_id']);
             if ($referenced_entity instanceof EntityInterface) {
