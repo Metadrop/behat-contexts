@@ -133,7 +133,7 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
     $entity = $this->getCore()->getEntityByField($entity_type, $field_name, $value);
 
     // Check entity.
-    if (!isset($entity)) {
+    if (!$entity instanceof EntityInterface) {
       throw new \Exception('The ' . $entity_type . ' with ' . $field_name . ':  ' . $value . ' not found.');
     }
     // Make field tokens replacements.
