@@ -3,7 +3,6 @@
 namespace Metadrop\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
-use Metadrop\Behat\Context\RawDrupalContext;
 
 /**
  * Context used to generate random user data.
