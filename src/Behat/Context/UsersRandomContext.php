@@ -70,6 +70,9 @@ class UsersRandomContext extends DrupalContext {
       $random_mail = $this->randomUsers[$random_mail_name];
       $this->minkContext->fillField($field, $random_mail['username']);
     }
+    else {
+      throw new \InvalidArgumentException('There does not exists a random user with that name');
+    }
   }
 
   /**
