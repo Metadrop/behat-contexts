@@ -72,7 +72,7 @@ class UsersRandomContext extends DrupalContext {
   /**
    * Step for random user password.
    *
-   * @Then I fill in :arg1 with random password :arg2
+   * @Then I fill in :field with random password :random_mail_name
    */
   public function iFillInWithRandomUserPassword($field, $random_mail_name) {
     if (isset($this->randomUsers[$random_mail_name])) {
