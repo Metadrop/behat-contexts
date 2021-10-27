@@ -3,7 +3,7 @@
 namespace Metadrop\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
-use Drupal\DrupalExtension\Context\DrupalContext;
+use Metadrop\Behat\Context\RawDrupalContext;
 
 /**
  * Context used to generate random user data.
@@ -19,7 +19,7 @@ use Drupal\DrupalExtension\Context\DrupalContext;
  * 
  * @package Metadrop\Behat\Context
  */
-class UsersRandomContext extends DrupalContext {
+class UsersRandomContext extends RawDrupalContext {
 
   /**
    * Generated random user data.
