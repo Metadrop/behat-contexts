@@ -310,9 +310,11 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    * {@inheritdoc}
    */
   public function getEntityByField($entity_type, $field_name, $value) {
-    $entities = \Drupal::entityTypeManager()->getStorage($entity_type)
+    $storage = \Drupal::entityTypeManager()->getStorage($entity_type);
+    $entities = $storage
       ->loadByProperties([$field_name => $value]);
-    return end($entities);
+    $entity = !empty($entities) ? end($entities) : NULL;
+    return $entity instanceof EntityInterface ? $storage->loadUnchanged($entity->id()) : NULL;
   }
 
   /**
