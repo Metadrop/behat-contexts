@@ -28,6 +28,7 @@ default:
               scroll_offset: -100
         - Metadrop\Behat\Context\UrlContext
         - Metadrop\Behat\Context\UsersContext
+        - Metadrop\Behat\Context\UsersRandomContext
         - Metadrop\Behat\Context\WaitingContext
 
      filters:
