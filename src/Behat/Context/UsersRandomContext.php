@@ -60,7 +60,7 @@ class UsersRandomContext extends DrupalContext {
   /**
    * Step for random user usernames.
    *
-   * @Then I fill in :arg1 with random username :arg2
+   * @Then I fill in :field with random username :random_mail_name
    */
   public function iFillInWithRandomUserName($field, $random_mail_name) {
     if (isset($this->randomUsers[$random_mail_name])) {
