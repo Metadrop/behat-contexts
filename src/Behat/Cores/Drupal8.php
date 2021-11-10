@@ -17,6 +17,7 @@ use Drupal\user\Entity\User;
 use Drupal\paragraphs\Entity\Paragraph;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Component\Render\FormattableMarkup;
+use Metadrop\Exception\EntityNotFoundException;
 
 /**
  * Class Drupal8.
