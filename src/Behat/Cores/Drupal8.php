@@ -349,7 +349,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function entityDelete($entity_type, $entity_id, $reset_cache = FALSE, $throw_exception = TRUE) {
+  public function entityDelete($entity_type, $entity_id, $reset_cache = FALSE) {
     if ($entity_id instanceof EntityInterface) {
       $entity_id = $entity_id->id();
     }
@@ -362,9 +362,6 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     $entity = $controller->load($entity_id);
     if ($entity instanceof EntityInterface) {
       $entity->delete();
-    }
-    elseif ($throw_exception) {
-      throw new EntityNotFoundException($entity_type, $entity_id);
     }
   }
 
