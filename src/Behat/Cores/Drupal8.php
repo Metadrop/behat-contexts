@@ -360,7 +360,9 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     }
 
     $entity = $controller->load($entity_id);
-    $entity->delete();
+    if ($entity instanceof EntityInterface) {
+      $entity->delete();
+    }
   }
 
   /**
