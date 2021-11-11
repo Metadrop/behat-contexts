@@ -39,7 +39,7 @@ Steps to clear caches.
   Clear specific page caches.
 
 - Given :view view data cache is flushed
-  Clear caches for a specific view. Only available for Drupal 7, pending to implement in D8. 
+  Clear caches for a specific view. Only available for Drupal 7, pending to implement in D8.
 
 ### Content authored context
 
@@ -139,7 +139,7 @@ default:
 
 **Parameters**
   - report_on_error: If _true_ error reports are generated on failed steps.
-  - error_reporting_path: Path where reports are saved. 
+  - error_reporting_path: Path where reports are saved.
   - error_reporting_url: Url where the error screenshots will be shown. As we can see in example, the url must point to the directory where we save the reports, and the directory must be accesible through website.
   - screenshots_path: Path where screenshots are saved. Report screenshots are saved in the report path, here only screenshots from _capture full page_ steps are saved.
   - page_contents_path: Path where page contents are saved. Report page contents are saved in the report path, here only page contents from _save page content_ steps are saved.
@@ -221,7 +221,7 @@ Steps to check url values
 
 ### IUContext
 
-  This context provides steps for certain UI elements.
+This context provides steps for certain UI elements.
 
 #### Steps
 
@@ -232,6 +232,48 @@ Steps to check url values
 
   See https://harvesthq.github.io/chosen/
 
+### WaitingContext
+
+This context provides waiting time after defined steps, and extra waiting steps.
+
+Waiting steps - Sometimes steps are running faster than our site, if this is the case you can delay them a few seconds. Don't abuse of this functionality, if Behat is running slow maybe there is a performance global site issue that needs to be solved first!
+
+#### Steps
+
+    - Then I wait for :seconds second(s)
+      Step wait a defined seconds before execute next step.
+
+
+#### Configure some waiting time before execute next step
+
+Set on `behat.yml` step action with wait time in seconds before execute next step.
+
+##### Configuration
+```
+default:
+  autoload:
+    ...
+  suites:
+    default:
+      ...
+      contexts:
+        - Metadrop\Behat\Context\WaitingContext:
+            parameters:
+              waiting_steps:
+                'I go to': 1
+                'I click': 1
+                'I scroll': 1
+                'I press': 2
+```
+
+##### Action
+
+Wait 1 second before the next step to `Then I press "Log in"` (`Then the url should match "/example-page"`)
+
+```
+Then I press "Log in"
+Then the url should match "/example-page"
+```
 
 #### Configuration
 

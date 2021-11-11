@@ -3,8 +3,40 @@
 namespace Metadrop\Behat\Context;
 
 use NuvoleWeb\Drupal\DrupalExtension\Context\RawMinkContext;
+use Behat\Gherkin\Node\StepNode;
+use Behat\Behat\Hook\Scope\AfterStepScope;
+use Behat\Behat\Hook\Scope\BeforeStepScope;
+use Behat\Behat\Hook\Scope\AfterScenarioScope;
 
 class WaitingContext extends RawMinkContext {
+
+  /**
+   * Waiting steps.
+   *
+   * @var array
+   */
+  protected $waitingSteps = [];
+
+  /**
+   * Previous step.
+   *
+   * @var \Behat\Gherkin\Node\StepNode
+   */
+  private $previousStep;
+
+  /**
+   * Constructor.
+   *
+   * Save class params, if any.
+   *
+   * @param array $parameters
+   *   The definition parameters.
+   */
+  public function __construct($parameters = []) {
+    if (isset($parameters['waiting_steps'])) {
+      $this->waitingSteps = $parameters['waiting_steps'];
+    }
+  }
 
   /**
    * Wait for AJAX to finish.
@@ -63,10 +95,53 @@ class WaitingContext extends RawMinkContext {
    *   Number of seconds to wait. Must be an integer value.
    */
   public function iWaitForSeconds($seconds) {
-    if (!filter_var($seconds, FILTER_VALIDATE_INT) !== false) {
+    if (!filter_var($seconds, FILTER_VALIDATE_INT) !== FALSE) {
       throw new \InvalidArgumentException("Expected a valid integer number of seconds but given value \"$seconds\" is invalid.");
     }
     sleep($seconds);
+  }
+
+  /**
+   * Implements after step.
+   *
+   * @param \Behat\Behat\Hook\Scope\AfterStepScope $scope
+   *   After step scope.
+   *
+   * @AfterStep
+   */
+  public function afterStep(AfterStepScope $scope) {
+    $this->previousStep = $scope->getStep();
+  }
+
+  /**
+   * Implements before step.
+   *
+   * @param \Behat\Behat\Hook\Scope\BeforeStepScope $scope
+   *   Before step scope.
+   *
+   * @BeforeStep
+   */
+  public function beforeStep(BeforeStepScope $scope) {
+    if ($this->previousStep instanceof StepNode) {
+      $text = $this->previousStep->getText();
+      foreach ($this->waitingSteps as $step => $seconds) {
+        if (preg_match("/$step/i", $text)) {
+          sleep($seconds);
+        }
+      }
+    }
+  }
+
+  /**
+   * Implements after scenario.
+   *
+   * @param \Behat\Behat\Hook\Scope\AfterScenarioScope $scope
+   *   After scenario scope.
+   *
+   * @AfterScenario
+   */
+  public function afterScenario(AfterScenarioScope $scope) {
+    $this->previousStep = NULL;
   }
 
 }
