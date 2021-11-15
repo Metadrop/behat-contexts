@@ -1,4 +1,4 @@
-# Behat Contexts
+# Behat Contexts for Drupal
 
 
 Contexts that we use with Behat 3.x tests on Drupal sites.
@@ -9,19 +9,7 @@ This repository is based on [Nuvole drupal extension](https://github.com/nuvolew
 
 Install with [Composer](http://getcomposer.org):
 
-1) Add these lines in "repositories" entry of your composer.json:
-
-```json
-{
-    "type": "vcs",
-    "url": "https://github.com/metadrop/drupal-behat"
-}
-```
-
-2) Require package with composer require:
-
-`composer require metadrop/behat-contexts`
-
+    composer require metadrop/behat-contexts
 
 ## Configure
 
