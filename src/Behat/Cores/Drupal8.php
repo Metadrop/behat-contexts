@@ -475,17 +475,19 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   public function getLanguagePrefix($language) {
     $language_manager = \Drupal::languageManager();
     $language_list = $language_manager->getStandardLanguageList();
-    array_walk($language_list, function (&$item1, $key) {
-      $item1 = current($item1);
-    });
-    $language_list = array_flip($language_list);
-    $langcode = $language_list[$language] ?? '';
-    if ($langcode) {
-      $prefixes = \Drupal::config('language.negotiation')->get('url.prefixes');
-      return $prefixes[$langcode] . '/';
+
+    $filter_func = function ($item) use ($language) {
+      return in_array($language, $item);
+    };
+
+    $found = array_filter($language_list, $filter_func);
+
+    if (empty($found)) {
+      throw new \InvalidArgumentException(sprintf("Language %s not found", $language));
     }
 
-    throw new \InvalidArgumentException(sprintf("Language %s not found", $language));
+    $prefixes = \Drupal::config('language.negotiation')->get('url.prefixes');
+    return $prefixes[array_key_first($found)];
   }
 
 }

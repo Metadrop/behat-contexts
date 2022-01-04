@@ -87,7 +87,7 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
     $path = $this->getCore()->buildEntityUri($entity_type, $entity, $subpath);
     if ($language) {
       $prefix = $this->getCore()->getLanguagePrefix($language);
-      $path = $prefix . $path;
+      $path = $prefix . '/' . $path;
     }
     if (!empty($path)) {
       $this->getSession()->visit($this->locatePath($path));
