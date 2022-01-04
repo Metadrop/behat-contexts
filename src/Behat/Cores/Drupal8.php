@@ -469,4 +469,23 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     throw new InvalidArgumentException('%s method only accept %s objects in Drupal 8 or higher', __METHOD__, FileInterface::class);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getLanguagePrefix($language) {
+    $language_manager = \Drupal::languageManager();
+    $language_list = $language_manager->getStandardLanguageList();
+    array_walk($language_list, function (&$item1, $key) {
+      $item1 = current($item1);
+    });
+    $language_list = array_flip($language_list);
+    $langcode = $language_list[$language] ?? '';
+    if ($langcode) {
+      $prefixes = \Drupal::config('language.negotiation')->get('url.prefixes');
+      return $prefixes[$langcode] . '/';
+    }
+
+    throw new \InvalidArgumentException(sprintf("Language %s not found", $language));
+  }
+
 }
