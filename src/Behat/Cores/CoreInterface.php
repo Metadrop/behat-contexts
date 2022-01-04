@@ -338,4 +338,15 @@ interface CoreInterface {
    */
   public function createFileUrl($file, bool $relative = TRUE);
 
+  /**
+   * Obtain the language prefix from label.
+   *
+   * @param string $language
+   *   Language.
+   *
+   * @return string
+   *   Language prefix or empty if not found.
+   */
+  public function getLanguagePrefix($language);
+
 }

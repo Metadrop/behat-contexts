@@ -351,4 +351,11 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
     throw new PendingException('Pending to implement method in Drupal 7');
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getLanguagePrefix($language) {
+    throw new PendingException('Pending to implement method in Drupal 7');
+  }
+
 }
