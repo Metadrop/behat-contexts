@@ -101,16 +101,15 @@ class SearchApiContext extends RawDrupalContext
   /**
    * Force indexing of the last entity type.
    *
-   * @Given the last :entity_type created is indexed
+   * @see search_api.behat.inc
+   * We do not user the after step method defined on SearchApiSubContext
+   * because does not work on all situations.
+   *
+   * @Given search api index pending items
    */
-  public function indexLastEntity($entity_type) {
-    $last_id = $this->getCore()->getLastEntityId($entity_type);
-    if (empty($last_id)) {
-      throw new \Exception("Impossible to get the last entity id.");
-    }
+  public function indexPendingItems() {
 
-    $entity = $this->getCore()->entityLoadSingle($entity_type, $last_id);
-    $this->forceEntityIndex($entity);
+    $this->indexPendingSearchApiItems();
   }
 
 }
