@@ -25,6 +25,9 @@ class SearchApiContext extends RawDrupalContext
    * Index nodes after they have been created.
    *
    * @afterNodeCreate
+   *
+   * @deprecated use tag @search_api instead
+   * @see https://www.drupal.org/project/search_api/issues/3263875
    */
   public function indexNodesAfterCreate(AfterNodeCreateScope $scope) {
     $node = $scope->getEntity();
@@ -41,6 +44,9 @@ class SearchApiContext extends RawDrupalContext
    * In case there are referenced entities, try to index the parent.
    *
    * @afterEntityCreate
+   *
+   * @deprecated use tag @search_api instead
+   * @see https://www.drupal.org/project/search_api/issues/3263875
    */
   public function afterEntityCreate(AfterEntityCreateScope $scope) {
     $entity = $scope->getEntity();
