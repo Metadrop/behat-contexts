@@ -98,4 +98,19 @@ class SearchApiContext extends RawDrupalContext
     $search_api_post_request_indexing->destruct();
   }
 
+  /**
+   * Force indexing of the last entity type.
+   *
+   * @Given the last :entity_type created is indexed
+   */
+  public function indexLastEntity($entity_type) {
+    $last_id = $this->getCore()->getLastEntityId($entity_type);
+    if (empty($last_id)) {
+      throw new \Exception("Impossible to get the last entity id.");
+    }
+
+    $entity = $this->getCore()->entityLoadSingle($entity_type, $last_id);
+    $this->forceEntityIndex($entity);
+  }
+
 }
