@@ -316,7 +316,7 @@ class DebugContext extends NuvoleScreenshotContext implements SnippetAcceptingCo
     $file_path = parent::createScreenshot($file_name, $message, $ext);
     $file_base_name = basename($file_path);
     if ($url = $this->getScreenshotsUrl()) {
-      print 'Screenshot url:' . $url . DIRECTORY_SEPARATOR . $file_base_name . "\n";
+      print 'Screenshot url: ' . $url . DIRECTORY_SEPARATOR . $file_base_name . "\n";
     }
   }
 
