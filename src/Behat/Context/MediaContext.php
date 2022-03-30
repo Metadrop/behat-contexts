@@ -10,9 +10,7 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
  * Steps related with media.
  */
 class MediaContext extends RawDrupalContext {
-
-  protected $medias = [];
-
+  
   /**
    * Mink context.
    *
@@ -51,17 +49,6 @@ class MediaContext extends RawDrupalContext {
   }
 
   /**
-   * Delete created medias.
-   *
-   * @AfterScenario
-   */
-  public function deleteMedias() {
-    foreach ($this->medias as $media) {
-      $this->getCore()->entityDelete('media', $media);
-    }
-  }
-
-  /**
    * Select existing media.
    *
    */
@@ -69,6 +56,9 @@ class MediaContext extends RawDrupalContext {
     if ($widget == 'media_library') {
       $this->getSession()->getPage()->find('xpath', $xpath)->click();
       $this->getSession()->getPage()->find('css', '.ui-dialog-buttonpane.ui-widget-content .media-library-select.form-submit')->click();
+    }
+    else {
+      throw new \InvalidArgumentException("Only '$widget' widget is supported");
     }
   }
 
