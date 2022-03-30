@@ -45,7 +45,6 @@ class MediaContext extends RawDrupalContext {
     $this->minkContext = $environment->getContext('Drupal\DrupalExtension\Context\MinkContext');
     $this->uiContext = $environment->getContext(UIContext::class);
     $this->waitingContext = $environment->getContext(WaitingContext::class);
-    $this->mediaContext = $environment->getContext(MediaContext::class);
   }
 
   /**
