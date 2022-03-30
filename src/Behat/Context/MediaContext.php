@@ -64,7 +64,6 @@ class MediaContext extends RawDrupalContext {
   /**
    * Select existing media.
    *
-   * @Then I select media :arg1
    */
   public function iSelectMedia($widget, $xpath) {
     if ($widget == 'media_library') {
