@@ -57,7 +57,7 @@ class MediaContext extends RawDrupalContext {
       $this->getSession()->getPage()->find('css', '.ui-dialog-buttonpane.ui-widget-content .media-library-select.form-submit')->click();
     }
     else {
-      throw new \InvalidArgumentException("Only '$widget' widget is supported");
+      throw new \InvalidArgumentException('Only "media_library" widget is supported');
     }
   }
 
