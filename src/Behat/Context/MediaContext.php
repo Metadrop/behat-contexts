@@ -100,6 +100,7 @@ class MediaContext extends RawDrupalContext {
           throw new \Exception("The image '$media_title' was not found");
         }
         break;
+
       case "document":
         $xpath = "//a[contains(@href, '$media_title')]";
         $document = $this->getSession()->getPage()->find('xpath', $xpath);
