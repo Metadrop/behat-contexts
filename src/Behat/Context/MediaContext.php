@@ -107,6 +107,7 @@ class MediaContext extends RawDrupalContext {
           throw new \Exception("The document '$media_title' was not found");
         }
         break;
+
     }
   }
 
