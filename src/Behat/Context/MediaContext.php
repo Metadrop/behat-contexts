@@ -1,16 +1,17 @@
 <?php
 
+namespace Metadrop\Behat\Context;
+
 use Metadrop\Behat\Context\RawDrupalContext;
 use Metadrop\Behat\Context\UIContext;
 use Metadrop\Behat\Context\WaitingContext;
-use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 
 /**
  * Steps related with media.
  */
 class MediaContext extends RawDrupalContext {
-  
+
   /**
    * Mink context.
    *
