@@ -54,7 +54,9 @@ class MediaContext extends RawDrupalContext {
   public function iSelectMedia($widget, $xpath) {
     if ($widget == 'media_library') {
       $this->getSession()->getPage()->find('xpath', $xpath)->click();
+      $this->waitingContext->iWaitForAjaxToFinish(30);
       $this->getSession()->getPage()->find('css', '.ui-dialog-buttonpane.ui-widget-content .media-library-select.form-submit')->click();
+      $this->waitingContext->iWaitForAjaxToFinish(30);
     }
     else {
       throw new \InvalidArgumentException('Only "media_library" widget is supported');
