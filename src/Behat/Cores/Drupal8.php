@@ -230,9 +230,18 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function entityUri($entity_type, $entity) {
-    $path = $entity->toUrl()->getInternalPath();
-    return $path;
+  public function entityUri($entity_type, $entity, $route = 'canonical') {
+    switch($route) {
+      case 'edit':
+      case 'delete':
+      case 'add':
+        $route = $route . '-form';
+        break;
+      case NULL:
+        $route = 'canonical';
+        break;
+    }
+    return $entity->toUrl($route)->getInternalPath();
   }
 
   /**

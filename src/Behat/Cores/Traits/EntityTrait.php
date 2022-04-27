@@ -12,10 +12,10 @@ trait EntityTrait {
    *
    * @param $entity_type
    *   Entity type.
-   * @param string|null $bundle
+   * @param string|null $entity
    *   Bundle (optional).
-   * @param string|null $subpath
-   *   Sub path (optional.
+   * @param string $route
+   *   Entity route (optional).
    *
    * @return string|null
    *   Path of the last entity, if exists.
@@ -23,12 +23,9 @@ trait EntityTrait {
    * @throws \Exception
    *   When the entity does not exists it throws an exception.
    */
-  public function buildEntityUri($entity_type, $entity, $subpath = NULL) {
+  public function buildEntityUri($entity_type, $entity, $route = 'canonical') {
     if (!empty($entity)) {
-      $uri = $this->entityUri($entity_type, $entity);
-      if (!empty($subpath)) {
-        $uri .= '/' . $subpath;
-      }
+      $uri = $this->entityUri($entity_type, $entity, $route);
     }
     else {
       $uri = NULL;
