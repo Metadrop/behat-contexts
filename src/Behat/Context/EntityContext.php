@@ -106,7 +106,7 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
     foreach ($properties->getIterator() as $property){
       $properties_filter[key($property)] = $property[key($property)];
     }
-    $entity = $this->getCore()->getEntityByProperties($entity_type, $properties_filter);
+    $entity = $this->getCore()->loadEntityByProperties($entity_type, $properties_filter);
     $path = $this->getCore()->buildEntityUri($entity_type, $entity, $subpath);
 
     if ($language) {
