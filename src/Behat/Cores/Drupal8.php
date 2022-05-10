@@ -306,6 +306,17 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   public function fileDelete($fid) {
     \Drupal::entityTypeManager()->getStorage('file')->load($fid)->delete();
   }
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function getEntityByProperties($entity_type, $properties) {
+    $storage = \Drupal::entityTypeManager()->getStorage($entity_type);
+    $entities = $storage
+      ->loadByProperties($properties);
+    $entity = !empty($entities) ? end($entities) : NULL;
+    return $entity instanceof EntityInterface ? $storage->loadUnchanged($entity->id()) : NULL;
+  }
 
   /**
    * {@inheritdoc}
