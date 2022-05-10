@@ -114,8 +114,8 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
       $path = $prefix . '/' . $path;
     }
     if (!empty($path)) {
-      $this->visitPath($path));
-    }else{
+      $this->visitPath($path);
+    } else{
       throw new \Exception("Error: Entity or path not found");
     }
   }
