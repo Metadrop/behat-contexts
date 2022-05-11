@@ -101,10 +101,10 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
    * @Given I go to :subpath of the :entity_type entity with properties:
    * @Given I go to the :entity_type entity in :language language with properties:
    */
-  public function goToTheEntityWithProperties($subpath, $entity_type, $language=NULL, TableNode $properties) {
+  public function goToTheEntityWithProperties($entity_type, TableNode $properties, $subpath = NULL, $language = NULL) {
     $properties_filter = [];
-    foreach ($properties->getIterator() as $property){
-      $properties_filter[key($property)] = $property[key($property)];
+    foreach ($properties->getHash()[0] as $property_name => $property_value) {
+      $properties_filter[$property_name] = $property_value;
     }
     $entity = $this->getCore()->loadEntityByProperties($entity_type, $properties_filter);
     $path = $this->getCore()->buildEntityUri($entity_type, $entity, $subpath);
@@ -115,7 +115,8 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
     }
     if (!empty($path)) {
       $this->visitPath($path);
-    } else{
+    }
+    else {
       throw new \Exception("Error: Entity or path not found");
     }
   }
