@@ -105,6 +105,7 @@ class DrupalGroupsExtendedContext extends RawDrupalContext implements SnippetAcc
     /** @var \Drupal\group\Entity\Group $group */
     $group = $this->getEntityBylabel($group_type, $group_name);
     $group->setOwnerId($user->id());
+    $group->save();
   }
 
   /**
