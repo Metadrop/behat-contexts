@@ -4,6 +4,7 @@ namespace Metadrop\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\MinkExtension\Context\MinkContext;
 
 /**
  * Context used to generate random user data.
@@ -43,7 +44,11 @@ class UsersRandomContext extends RawDrupalContext {
    */
   public function gatherContexts(BeforeScenarioScope $scope) {
     $environment = $scope->getEnvironment();
-    $this->minkContext = $environment->getContext('Drupal\DrupalExtension\Context\MinkContext');
+    foreach ($environment->getContexts() as $context) {
+      if ($context instanceof MinkContext) {
+        $this->minkContext = $context;
+      }
+    }
   }
 
   /**

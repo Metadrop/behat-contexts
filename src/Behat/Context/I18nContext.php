@@ -8,6 +8,7 @@
 namespace Metadrop\Behat\Context;
 
 use Behat\Behat\Context\Context;
+use Behat\MinkExtension\Context\MinkContext;
 use Behat\MinkExtension\Context\RawMinkContext;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Drupal\Core\Url;
@@ -34,7 +35,11 @@ class I18nContext extends RawMinkContext implements Context {
    */
   public function gatherContexts(BeforeScenarioScope $scope) {
     $environment = $scope->getEnvironment();
-    $this->minkContext = $environment->getContext('Drupal\DrupalExtension\Context\MinkContext');
+    foreach ($environment->getContexts() as $context) {
+      if ($context instanceof MinkContext) {
+        $this->minkContext = $context;
+      }
+    }
   }
 
   /**
