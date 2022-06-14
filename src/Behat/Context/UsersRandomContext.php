@@ -97,17 +97,24 @@ class UsersRandomContext extends RawDrupalContext {
    *   Random generated user identifier.
    * @param $data_name 
    *   User data to put in the form. It can be 'username', 'email' or 'password'.
-   */ 
-  protected function fillFormFieldWithRandomUserData($field, $random_user_identifier, $data_name) {
+   * @param $region
+   *   The region where the form field is present. Optional.
+   */
+  protected function fillFormFieldWithRandomUserData($field, $random_user_identifier, $data_name, $region = NULL) {
     if (isset($this->randomUsers[$random_user_identifier])) {
       $random_user_data = $this->randomUsers[$random_user_identifier];
-      $this->minkContext->fillField($field, $random_user_data[$data_name]);
+      if (!empty($region)) {
+        $this->minkContext->regionFillField($field, $random_user_data[$data_name], $region);
+      }
+      else {
+        $this->minkContext->fillField($field, $random_user_data[$data_name]);
+      }
     }
     else {
       throw new \InvalidArgumentException("There does not exists a random user with the identifier '$random_user_identifier'");
     }
-  }  
-  
+  }
+
   /**
    * Step to fill a field with a previously generated random email.
    *
@@ -118,11 +125,14 @@ class UsersRandomContext extends RawDrupalContext {
    *   must have been generated previously.
    * @param $random_user_identifier
    *   Random generated user identifier.
+   * @param $region
+   *   The region where the form field is present. Optional.
    *
    * @Then I fill in :mail_field with random email from :random_user_identifier
+   * @Then I fill in :mail_field with random email from :random_user_identifier in the :region( region)
    */
-  public function iFillInWithRandomMail($field, $random_user_identifier) {
-    $this->fillFormFieldWithRandomUserData($field, $random_user_identifier, 'email');
+  public function iFillInWithRandomMail($field, $random_user_identifier, $region = NULL) {
+    $this->fillFormFieldWithRandomUserData($field, $random_user_identifier, 'email', $region);
   }
 
   /**
@@ -134,11 +144,14 @@ class UsersRandomContext extends RawDrupalContext {
    *   Field that would be populated with the random user data username.
    * @param $random_user_identifier
    *   Random generated user identifier.
+   * @param $region
+   *   The region where the form field is present. Optional.
    *
    * @Then I fill in :field with random username from :random_user_identifier
+   * @Then I fill in :field with random username from :random_user_identifier in the :region( region)
    */
-  public function iFillInWithRandomUserName($field, $random_user_identifier) {
-    $this->fillFormFieldWithRandomUserData($field, $random_user_identifier, 'username');
+  public function iFillInWithRandomUserName($field, $random_user_identifier, $region = NULL) {
+    $this->fillFormFieldWithRandomUserData($field, $random_user_identifier, 'username', $region);
   }
 
   /**
@@ -150,10 +163,13 @@ class UsersRandomContext extends RawDrupalContext {
    *   Field that would be populated with the random user data password.
    * @param $random_user_identifier
    *   Random generated user identifier.
+   * @param $region
+   *   The region where the form field is present. Optional.
    *
    * @Then I fill in :field with random password from :random_user_identifier
+   * @Then I fill in :field with random password from :random_user_identifier in the :region( region)
    */
-  public function iFillInWithRandomUserPassword($field, $random_user_identifier) {
-    $this->fillFormFieldWithRandomUserData($field, $random_user_identifier, 'password');
+  public function iFillInWithRandomUserPassword($field, $random_user_identifier, $region = NULL) {
+    $this->fillFormFieldWithRandomUserData($field, $random_user_identifier, 'password', $region);
   }
 }
