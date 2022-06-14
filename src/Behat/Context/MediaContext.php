@@ -6,6 +6,7 @@ use Metadrop\Behat\Context\RawDrupalContext;
 use Metadrop\Behat\Context\UIContext;
 use Metadrop\Behat\Context\WaitingContext;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\MinkExtension\Context\MinkContext;
 
 /**
  * Steps related with media.
@@ -43,7 +44,11 @@ class MediaContext extends RawDrupalContext {
    */
   public function gatherContexts(BeforeScenarioScope $scope) {
     $environment = $scope->getEnvironment();
-    $this->minkContext = $environment->getContext('Drupal\DrupalExtension\Context\MinkContext');
+    foreach ($environment->getContexts() as $context) {
+      if ($context instanceof MinkContext) {
+        $this->minkContext = $context;
+      }
+    }
     $this->uiContext = $environment->getContext(UIContext::class);
     $this->waitingContext = $environment->getContext(WaitingContext::class);
   }
