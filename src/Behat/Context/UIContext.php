@@ -434,4 +434,38 @@ class UIContext extends RawMinkContext implements SnippetAcceptingContext {
     }
   }
 
+  /**
+   * Checks the position of an item on a list.
+   *
+   * @param string $item_class_selector
+   *   Item list class selector.
+   * @param string $item_label
+   *   Label to find the item on the list.
+   * @param string $list_wrapper_class_selector
+   *   Parent wrapper to find into.
+   * @param int $item_position
+   *   Item position.
+   *
+   * @Note This method is an internal function,
+   * create a more human-readable step to use on your test.
+   * Example of use on method theCardWithTitleShouldBeInPositionExample().
+   */
+  public function elementShouldBeInPosition(string $item_class_selector, string $item_label, string $list_wrapper_class_selector, int $item_position) {
+    $session = $this->getSession();
+    $locator = "//div[contains(@class, '$list_wrapper_class_selector')]/div[contains(@class, '$item_class_selector')][$item_position]//*[contains(string(), '$item_label')]";
+    $element_find = $session->getPage()->find('xpath', $locator);
+    if (NULL === $element_find) {
+      throw new \InvalidArgumentException(sprintf('Element with label "%s" could not be found or is not in the right position.', $item_label));
+    }
+  }
+
+  /**
+   * Example of implementation elementShouldBeInPosition on a custom step.
+   *
+   * Then the card with title :title should be in position :position.
+   */
+  public function theCardWithTitleShouldBeInPositionExample(string $title, string $position) {
+    $this->elementShouldBeInPosition('item-list-css-selector', $title, 'views-infinite-scroll-content-wrapper', $position);
+  }
+
 }
