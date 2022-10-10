@@ -108,6 +108,26 @@ class UsersRandomContext extends RawDrupalContext {
     }
   }  
   
+
+  /**
+   * Get data belonging to a random user.
+   *
+   * @param string $random_user_identifier
+   *   User identifier.
+   *
+   * @return array
+   *   User data.
+   *
+   * @throws \Exception
+   *   When the user with a specific identifier.
+   */
+  public function getRandomUserData(string $random_user_identifier) {
+    if (isset($this->randomUsers[$random_user_identifier])) {
+      return $this->randomUsers[$random_user_identifier];
+    }
+    throw new \Exception(sprintf('There was no random data found for user with name "%s" ', $random_user_identifier));
+  }
+
   /**
    * Step to fill a field with a previously generated random email.
    *
