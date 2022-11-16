@@ -165,8 +165,10 @@ class UIContext extends RawMinkContext implements SnippetAcceptingContext {
     $op = $offset >= 0 ? '+' : '-';
     $script = "jQuery('html,body').unbind().animate({scrollTop: jQuery('$selector').offset().top" . $op . abs($offset) . "},0)";
     $this->getSession()->executeScript($script);
-    // Added waiting for scroll.
-    usleep(1000);
+    // Added waiting for scroll. Default is half a second, but it can
+    // be overriden in UIContext.
+    $scroll_wait_seconds = $this->customParams['scroll_time'] ?? 0.5;
+    usleep($scroll_wait_seconds * pow(10, 6));
   }
 
   /**
