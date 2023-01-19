@@ -81,6 +81,7 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
    * @Given I go to the :entity_type entity with label :label
    * @Given I go to the :entity_type entity with label :label in :language language
    * @Given I go to :subpath of the :entity_type entity with label :label
+   * @Given I go to :subpath of the :entity_type entity with label :label in :language language
    */
   public function goToTheEntityWithLabel($entity_type, $label, $subpath = NULL, $language = NULL) {
     $entity = $this->getCore()->loadEntityByLabel($entity_type, $label);
