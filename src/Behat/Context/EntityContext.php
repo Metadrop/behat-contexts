@@ -489,10 +489,16 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
     }
 
     $saved = $entity->save();
-    $this->dispatchHooks('AfterEntityCreateScope', (object) (array) $entity, $entity_type);
+    $entity_values = $entity->toArray();
+    // Place a generic id key for easier access to the value, since in the most
+    // cases we only need the id in the AfterEntityCreateScope context in order
+    // to load the entity.
+    $entity_values['id'] = $entity->id();
+
+    $this->dispatchHooks('AfterEntityCreateScope', (object) $entity_values, $entity_type);
     $this->entities[] = [
       'entity_type' => $entity_type,
-      'entity_id' => $entity->id(),
+      'entity_id' => $entity_values['id'],
     ];
 
     return $saved;
