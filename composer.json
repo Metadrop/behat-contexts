@@ -3,15 +3,21 @@
     "description": "Contexts that we use with Behat 3.x tests on Drupal sites.",
     "type": "library",
     "license": "GPL-2.0+",
-    "require": {
-        "nuvoleweb/drupal-behat": "^1.2"
-    },
     "authors": [
         {
             "name": "Metadrop",
             "email": "hi@metadrop.net"
         }
     ],
+    "repositories": [
+      {
+        "type": "vcs",
+        "url": "https://github.com/Metadrop/drupal-behat.git"
+      }
+    ],
+    "require": {
+      "nuvoleweb/drupal-behat": "^1.2"
+    },
     "autoload": {
       "psr-4": {
         "Metadrop\\": "./src/"
