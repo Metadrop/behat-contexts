@@ -2,12 +2,17 @@
 
 namespace Metadrop\Behat\Cores\Traits;
 
-use Drupal\Core\File\FileSystemInterface;
-
 /**
  * Trait FileTrait.
  */
 trait FileTrait {
+
+  /**
+   * The string translation service.
+   *
+   * @var \Drupal\file\FileRepositoryInterface
+   */
+  protected $fileRepository;
 
   /**
    * Creates file in drupal.
@@ -32,7 +37,7 @@ trait FileTrait {
       $data = file_get_contents($file_path);
 
       // Existing files are replaced.
-      $file = file_save_data($data, $destination, 1);
+      $file = $this->getFileRepository()->writeData($data, $destination, 1);
       if (!$file) {
         throw new \Exception("Error: file could not be copied to directory");
       }
@@ -47,5 +52,19 @@ trait FileTrait {
    *   Default file scheme.
    */
   abstract public function getDefaultFileScheme();
+
+  /**
+   * Gets the file repository service.
+   *
+   * @return \Drupal\file\FileRepositoryInterface
+   *   The file repository service.
+   */
+  protected function getFileRepository() {
+    if (!$this->fileRepository) {
+      $this->fileRepository = \Drupal::service('file.repository');
+    }
+
+    return $this->fileRepository;
+  }
 
 }
