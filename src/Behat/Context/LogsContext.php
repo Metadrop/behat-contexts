@@ -121,6 +121,7 @@ class LogsContext extends RawDrupalContext {
 
     $grouped_logs = self::getGroupedLogs();
     $table = new Table(new ConsoleOutput());
+    $table->setHeaderTitle('Watchdog errors');
     $table->setHeaders(['Type', 'Severity', 'Message', 'Total Messages']);
 
     $levels = RfcLogLevel::getLevels();
