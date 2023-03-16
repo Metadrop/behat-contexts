@@ -155,7 +155,7 @@ class LogsContext extends RawDrupalContext {
    *   Drupal core class.
    */
   protected static function getStaticCore() {
-    if (isset(self::$core)) {
+    if (!isset(self::$core)) {
       $version = self::getDrupalVersion();
       $core = "\Metadrop\Behat\Cores\Drupal$version";
       self::$core = $core;
