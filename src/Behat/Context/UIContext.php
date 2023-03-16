@@ -421,7 +421,7 @@ class UIContext extends RawMinkContext {
    */
   public function inputIsDisabled($label) {
     $session = $this->getSession();
-    $xpath = "//label[contains(text(),'" . $label . "')]/following-sibling::input";
+    $xpath = "//input[@id=//label[contains(text(),'" . $label . "')]/@for]";
     $element = $session->getPage()->find(
       'xpath',
       $xpath
