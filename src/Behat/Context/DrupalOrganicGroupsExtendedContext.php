@@ -7,13 +7,10 @@
 
 namespace Metadrop\Behat\Context;
 
-use Behat\Behat\Context\SnippetAcceptingContext;
-#use Drupal\DrupalExtension\Context\RawDrupalContext;
-
 /**
  * Utilities for testing organic groups.
  */
-class DrupalOrganicGroupsExtendedContext extends RawDrupalContext implements SnippetAcceptingContext {
+class DrupalOrganicGroupsExtendedContext extends RawDrupalContext {
 
   /**
    * Get entity id by entity label.

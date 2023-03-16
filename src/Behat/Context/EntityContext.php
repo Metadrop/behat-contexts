@@ -3,7 +3,6 @@
 namespace Metadrop\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
-use Behat\Behat\Context\SnippetAcceptingContext;
 use Drupal\Core\Entity\Entity;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Driver\BlackboxDriver;
@@ -15,7 +14,7 @@ use Symfony\Component\Serializer\Exception\UnsupportedException;
 /**
  * Class EntityContext.
  */
-class EntityContext extends RawDrupalContext implements SnippetAcceptingContext {
+class EntityContext extends RawDrupalContext {
 
   /**
    * Time before scenario.

@@ -3,7 +3,6 @@
 namespace Metadrop\Behat\Context;
 
 use Behat\Behat\Context\Environment\InitializedContextEnvironment;
-use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
 use NuvoleWeb\Drupal\DrupalExtension\Context\RawMinkContext;
@@ -20,7 +19,7 @@ use NuvoleWeb\Drupal\DrupalExtension\Context\ScreenShotContext;
 /**
  * Adds steps for UI elements.
  */
-class UIContext extends RawMinkContext implements SnippetAcceptingContext {
+class UIContext extends RawMinkContext {
 
   /**
    * Context parameters.
