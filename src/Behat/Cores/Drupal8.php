@@ -421,6 +421,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     $query->groupBy('variables');
     $query->groupBy('type');
     $query->groupBy('severity');
+    $query->orderBy('watchdog_message_count', 'DESC');
 
     if (!empty($severities)) {
       $query->condition('severity', $severities, 'IN');
