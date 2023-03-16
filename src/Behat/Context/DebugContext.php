@@ -215,7 +215,7 @@ class DebugContext extends NuvoleScreenshotContext implements SnippetAcceptingCo
    *
    * Contains the current URL and the error exception dump.
    */
-  protected function saveInfoFile($filename = '',  $result) {
+  protected function saveInfoFile($filename,  $result) {
     $error_file =  $filename . '.txt';
     $error_filepath = $this->getReportPath() . '/' . $error_file;
 
