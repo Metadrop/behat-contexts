@@ -28,7 +28,7 @@ class LogsContext extends RawDrupalContext {
    *
    * @var string|null
    */
-  protected $baseUrl;
+  protected static $baseUrl;
 
   /**
    * Log types.
@@ -78,7 +78,7 @@ class LogsContext extends RawDrupalContext {
   public function __construct(array $parameters = []) {
 
     if (isset($parameters['base_url'])) {
-      $this->baseUrl = $parameters['base_url'];
+      self::$baseUrl = $parameters['base_url'];
     }
     if (isset($parameters['log_types'])) {
       self::$logTypes = $parameters['log_types'];
@@ -96,9 +96,12 @@ class LogsContext extends RawDrupalContext {
    *   Levels list.
    */
   protected function setLevels(array $levels_list) {
+    self::$logLevels = [];
     foreach ($levels_list as $level) {
-      if (defined('RfcLogLevel::' . $level)) {
-        self::$logLevels["$level"] = RfcLogLevel::$level;
+
+      $constant_name = '\Drupal\Core\Logger\RfcLogLevel::' . $level;
+      if (defined($constant_name)) {
+        self::$logLevels[$level] = constant($constant_name);
       }
     }
   }
@@ -122,15 +125,16 @@ class LogsContext extends RawDrupalContext {
     $grouped_logs = self::getGroupedLogs();
     $table = new Table(new ConsoleOutput());
     $table->setHeaderTitle('Watchdog errors');
-    $table->setHeaders(['Type', 'Severity', 'Message', 'Total Messages']);
+    $table->setHeaders(['Type', 'Severity', 'Message', 'Details', 'Total Messages']);
 
     $levels = RfcLogLevel::getLevels();
     foreach ($grouped_logs as $log) {
       $message = self::formatMessageWatchdog($log);
+      $event_url = property_exists($log, 'wid') ? self::getDblogEventUrl($log->wid) : '';
       $severity = property_exists($log, 'severity') && isset($levels[$log->severity]) ? $levels[$log->severity] : '';
       $type = property_exists($log, 'type') ? $log->type : '';
       $count = property_exists($log, 'watchdog_message_count') ? $log->watchdog_message_count : '';
-      $table->addRow(["[{$type}]", $severity, $message, $count]);
+      $table->addRow(["[{$type}]", $severity, $message, $event_url, $count]);
     }
 
     $table->render();
@@ -197,7 +201,7 @@ class LogsContext extends RawDrupalContext {
       $message = self::formatMessageWatchdog($log);
       print "[{$log->type}] "
           . $message
-          . " | Details: " . $this->getDblogEventUrl($log->wid) . "\n";
+          . " | Details: " . self::getDblogEventUrl($log->wid) . "\n";
     }
     print "End of watchdog logs.";
   }
@@ -230,17 +234,17 @@ class LogsContext extends RawDrupalContext {
    * @return \Drupal\Core\GeneratedUrl|string
    *   Generated url.
    */
-  protected function getDblogEventUrl(int $wid) {
+  protected static function getDblogEventUrl(int $wid) {
     $options = ['absolute' => TRUE];
-    if (!empty($this->baseUrl)) {
-      $options['base_url'] = $this->baseUrl;
+    if (!empty(self::$baseUrl)) {
+      $options['base_url'] = self::$baseUrl;
     }
 
     // It is not possible to invoke core methods because the way
     // the url generated is not compatible:
     // - In Drupal 7 it's used the relative path.
     // - In Drupal 8 it's used the routing system.
-    if ($this->getCore() instanceof Drupal7) {
+    if (self::getDrupalVersion() == 7) {
       return url('/admin/reports/event/' . $wid, $options);
     }
     else {

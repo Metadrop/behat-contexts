@@ -416,6 +416,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     $query->fields('w', ['message', 'variables', 'type', 'severity'])
       ->condition('timestamp', $start_time, '>=')
       ->addExpression('COUNT(wid)', 'watchdog_message_count');
+    $query->addExpression('MAX(wid)', 'wid');
     $query->groupBy('message');
     $query->groupBy('variables');
     $query->groupBy('type');
