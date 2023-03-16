@@ -3,7 +3,7 @@
 namespace Metadrop\Behat\Cores;
 
 /**
- * Class CoreInterface.
+ * Interface to abstract Core helper methods related with Drupal.
  */
 interface CoreInterface {
 
@@ -49,7 +49,7 @@ interface CoreInterface {
    * @param string $entity_type_id
    *   Entity type id to clear its static cache.
    * @param array $ids
-   *   Array of ids to clear its static cache. If null, all entities are cleared.
+   *   List of ids to clear its static cache. If null, all entities are cleared.
    */
   public function staticEntityCacheClear($entity_type_id, array $ids = NULL);
 
@@ -177,12 +177,14 @@ interface CoreInterface {
 
   /**
    * Get file destionation.
+   *
    * @param string $filename
    *   The name of the file to get.
    * @param string $directory
    *   A string containing the files scheme, usually "public://".
    *
    * @return string|null
+   *   File destination.
    */
   public function getFileDestination($filename, $directory);
 
@@ -204,7 +206,7 @@ interface CoreInterface {
    * @param string $value
    *   Field value.
    *
-   * @return \stdClass
+   * @return object
    *   Entity.
    */
   public function getEntityByField($entity_type, $field_name, $value);
@@ -249,15 +251,15 @@ interface CoreInterface {
    */
   public function getEntitiesWithCondition($entity_type, $condition_key, $condition_value, $condition_operand = 'LIKE');
 
-   /**
+  /**
    * Delete entities by condition.
    *
-   * @param string $type
+   * @param string $entity_type
    *   Entity type.
-   * @param int $id
+   * @param int $entity_id
    *   Entity id.
    * @param bool $reset_cache
-   *   Wether the entity cache should be reset before loading it
+   *   Wether the entity cache should be reset before loading it.
    */
   public function entityDelete($entity_type, $entity_id, $reset_cache = FALSE);
 
@@ -274,6 +276,18 @@ interface CoreInterface {
   public function getDbLogMessages(int $scenario_start_time, array $severities = [], array $types = []);
 
   /**
+   * Get watchdog log grouped and count it.
+   *
+   * @param int $start_time
+   *   Start time to get the logs.
+   * @param array $severities
+   *   Severities.
+   * @param array $types
+   *   Log types (php, access denied...).
+   */
+  public static function getDbLogGroupedMessages(int $start_time, array $severities = [], array $types = []);
+
+  /**
    * Delete a list of entities of the same entity type.
    *
    * @param string $entity_type
@@ -281,7 +295,7 @@ interface CoreInterface {
    * @param array $entities_ids
    *   Entity id list.
    * @param bool $reset_cache
-   *   Wether the entity caches should be reset before loading them
+   *   Wether the entity caches should be reset before loading them.
    */
   public function entityDeleteMultiple($entity_type, array $entities_ids, $reset_cache = FALSE);
 
@@ -307,10 +321,25 @@ interface CoreInterface {
    *   The array of properties to search.
    *
    * @return \Drupal\Core\Entity\EntityInterface|mixed
+   *   Entity found.
+   *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function loadEntityByProperties(string $entity_type, array $properties);
+
+  /**
+   * Make string variable replacements statically.
+   *
+   * @param string $string
+   *   Message  with variables placeholders.
+   * @param array $params
+   *   List of variables replacements.
+   *
+   * @return string
+   *   Message with replacements.
+   */
+  public static function formatStringStatic($string, array $params);
 
   /**
    * Make string variable replacements.
@@ -322,6 +351,8 @@ interface CoreInterface {
    *
    * @return string
    *   Message with replacements.
+   *
+   * @see self::formatStringStatic()
    */
   public function formatString($string, array $params);
 

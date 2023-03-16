@@ -2,6 +2,7 @@
 
 namespace Metadrop\Behat\Cores;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\file\FileInterface;
 use Drupal\ultimate_cron\Entity\CronJob;
@@ -13,14 +14,13 @@ use Metadrop\Behat\Cores\Traits\FileTrait;
 use Metadrop\Behat\Cores\Traits\EntityTrait;
 use Webmozart\Assert\Assert;
 use Behat\Behat\Tester\Exception\PendingException;
-use Drupal\user\Entity\User;
 use Drupal\paragraphs\Entity\Paragraph;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Component\Render\FormattableMarkup;
 use Metadrop\Exception\EntityNotFoundException;
 
 /**
- * Class Drupal8.
+ * Class helper for core Drupal 8.
  */
 class Drupal8 extends OriginalDrupal8 implements CoreInterface {
 
@@ -28,6 +28,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   use CronTrait;
   use FileTrait;
   use EntityTrait;
+  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
@@ -81,7 +82,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
 
     $cron_job = current(\Drupal::entityTypeManager()->getStorage('ultimate_cron_job')->loadByProperties(['id' => $job]));
     if ($cron_job instanceof CronJob) {
-      $cron_job->run(t('Run by behat Cron Context'));
+      $cron_job->run($this->t('Run by behat Cron Context'));
     }
     else {
       throw new \InvalidArgumentException(sprintf("Could not find cron job with name: " . $job));
@@ -106,6 +107,8 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    *   Whether or not to reset the cache before loading the entity.
    *
    * @return \Drupal\Core\Entity\EntityInterface|mixed
+   *   Entity found.
+   *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
@@ -161,6 +164,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    *   The entity type to search.
    *
    * @return \Drupal\Core\Entity\EntityInterface|null
+   *   Latest entity.
    */
   public function loadLatestEntity(string $entity_type) {
     return $this->loadLatestEntityByProperties($entity_type);
@@ -175,6 +179,8 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    *   The properties to search for.
    *
    * @return \Drupal\Core\Entity\EntityInterface|null
+   *   Latest entity.
+   *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
@@ -292,9 +298,9 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
 
     if (!empty($directory) && strpos($directory, $private) !== FALSE) {
       $path = str_replace($private, '', $directory);
-      $destination = \Drupal\Core\Url::fromRoute('system.private_file_download', ['filepath' => $path . '/' . $filename], [
-          'relative' => TRUE,
-        ])->toString();
+      $destination = Url::fromRoute('system.private_file_download', ['filepath' => $path . '/' . $filename], [
+        'relative' => TRUE,
+      ])->toString();
     }
 
     return (!empty($destination)) ? $destination : NULL;
@@ -388,7 +394,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    */
   public function getDbLogMessages(int $scenario_start_time, array $severities = [], array $types = []) {
     $query = \Drupal::database()->select('watchdog', 'w')
-      ->fields('w', ['message', 'variables', 'type', 'wid'])
+      ->fields('w', ['message', 'variables', 'type', 'severity', 'wid'])
       ->condition('timestamp', $scenario_start_time, '>=');
 
     if (!empty($severities)) {
@@ -405,9 +411,40 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function formatString($string, array $params) {
+  public static function getDbLogGroupedMessages(int $start_time, array $severities = [], array $types = []) {
+    $query = \Drupal::database()->select('watchdog', 'w');
+    $query->fields('w', ['message', 'variables', 'type', 'severity'])
+      ->condition('timestamp', $start_time, '>=')
+      ->addExpression('COUNT(wid)', 'watchdog_message_count');
+    $query->groupBy('message');
+    $query->groupBy('variables');
+    $query->groupBy('type');
+    $query->groupBy('severity');
+
+    if (!empty($severities)) {
+      $query->condition('severity', $severities, 'IN');
+    }
+
+    if (!empty($types)) {
+      $query->condition('type', $types, 'IN');
+    }
+
+    return $query->execute()->fetchAll();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function formatStringStatic($string, array $params) {
     $string = new FormattableMarkup($string, $params);
     return $string;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function formatString($string, array $params) {
+    return self::formatStringStatic($string, $params);
   }
 
   /**
@@ -440,7 +477,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   }
 
   /**
-   * Gets the current Honeypot time limit
+   * Gets the current Honeypot time limit.
    *
    * @return int
    *   The time limit value
@@ -450,7 +487,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   }
 
   /**
-   * Sets the Honeypot time limit
+   * Sets the Honeypot time limit.
    *
    * @param int $time_limit
    *   The time limit to be set.
