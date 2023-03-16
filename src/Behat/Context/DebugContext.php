@@ -9,7 +9,6 @@
 
 namespace Metadrop\Behat\Context;
 
-use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Behat\Hook\Scope\AfterStepScope;
 use Behat\Testwork\Tester\Result\TestResult;
@@ -43,7 +42,7 @@ use NuvoleWeb\Drupal\DrupalExtension\Context\ScreenShotContext as NuvoleScreensh
  *  the other files of the report.
  *
  */
-class DebugContext extends NuvoleScreenshotContext implements SnippetAcceptingContext {
+class DebugContext extends NuvoleScreenshotContext {
 
   const DEFAULT_HEIGHT = 600;
 
