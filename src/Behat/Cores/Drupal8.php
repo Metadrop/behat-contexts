@@ -411,7 +411,12 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getDbLogGroupedMessages(int $start_time, array $severities = [], array $types = []) {
+  public static function getDbLogGroupedMessages(
+    int $start_time,
+    array $severities = [],
+    array $types = [],
+    int $log_limit = 100
+  ) {
     $query = \Drupal::database()->select('watchdog', 'w');
     $query->fields('w', ['message', 'variables', 'type', 'severity'])
       ->condition('timestamp', $start_time, '>=')
@@ -422,6 +427,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     $query->groupBy('type');
     $query->groupBy('severity');
     $query->orderBy('watchdog_message_count', 'DESC');
+    $query->range(0, $log_limit);
 
     if (!empty($severities)) {
       $query->condition('severity', $severities, 'IN');

@@ -284,8 +284,10 @@ interface CoreInterface {
    *   Severities.
    * @param array $types
    *   Log types (php, access denied...).
+   * @param int $log_limit
+   *   The amount of logs to get.
    */
-  public static function getDbLogGroupedMessages(int $start_time, array $severities = [], array $types = []);
+  public static function getDbLogGroupedMessages(int $start_time, array $severities = [], array $types = [], int $log_limit = 100);
 
   /**
    * Delete a list of entities of the same entity type.

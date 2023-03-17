@@ -281,7 +281,12 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getDbLogGroupedMessages(int $start_time, array $severities = [], array $types = []) {
+  public static function getDbLogGroupedMessages(
+    int $start_time,
+    array $severities = [],
+    array $types = [],
+    int $log_limit = 100
+  ) {
     throw new PendingException('Pending to implement method in Drupal 7');
   }
 

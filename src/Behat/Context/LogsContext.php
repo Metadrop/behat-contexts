@@ -47,6 +47,13 @@ class LogsContext extends RawDrupalContext {
   ];
 
   /**
+   * Limit of log shown on the table after suite.
+   *
+   * @var int
+   */
+  protected static $logLimit = 100;
+
+  /**
    * Drupal Helper Core class.
    *
    * @var string
@@ -84,7 +91,9 @@ class LogsContext extends RawDrupalContext {
     if (isset($parameters['log_levels'])) {
       $this->setLevels($parameters['log_levels']);
     }
-
+    if (isset($parameters['log_limit'])) {
+      static::$logLimit = $parameters['log_limit'];
+    }
   }
 
   /**
@@ -124,6 +133,7 @@ class LogsContext extends RawDrupalContext {
     $table = new Table(new ConsoleOutput());
     $table->setHeaderTitle('Watchdog errors');
     $table->setHeaders([
+      'Index',
       'Type',
       'Severity',
       'Message',
@@ -132,13 +142,15 @@ class LogsContext extends RawDrupalContext {
     ]);
 
     $levels = RfcLogLevel::getLevels();
+    $i = 1;
     foreach ($grouped_logs as $log) {
       $message = static::formatMessageWatchdog($log);
       $event_url = property_exists($log, 'wid') ? static::getDblogEventUrl($log->wid) : '';
       $severity = property_exists($log, 'severity') && isset($levels[$log->severity]) ? $levels[$log->severity] : '';
       $type = property_exists($log, 'type') ? $log->type : '';
       $count = property_exists($log, 'watchdog_message_count') ? $log->watchdog_message_count : '';
-      $table->addRow(["[{$type}]", $severity, $message, $event_url, $count]);
+      $table->addRow([$i, "[{$type}]", $severity, $message, $event_url, $count]);
+      $i++;
     }
 
     $table->render();
@@ -153,7 +165,7 @@ class LogsContext extends RawDrupalContext {
   public static function getGroupedLogs() {
     $core = static::getStaticCore();
     $method = $core . "::getDbLogGroupedMessages";
-    $logs = call_user_func($method, static::$suiteStartTime, static::$logLevels, static::$logTypes);
+    $logs = call_user_func($method, static::$suiteStartTime, static::$logLevels, static::$logTypes, static::$logLimit);
     return $logs;
   }
 
