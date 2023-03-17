@@ -446,7 +446,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    * {@inheritdoc}
    */
   public function formatString($string, array $params) {
-    return self::formatStringStatic($string, $params);
+    return static::formatStringStatic($string, $params);
   }
 
   /**

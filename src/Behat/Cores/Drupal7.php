@@ -310,7 +310,7 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
    * {@inheritdoc}
    */
   public function formatString($string, array $params) {
-    return self::formatStringStatic($string, $params);
+    return static::formatStringStatic($string, $params);
   }
 
   /**

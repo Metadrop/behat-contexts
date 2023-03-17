@@ -78,10 +78,10 @@ class LogsContext extends RawDrupalContext {
   public function __construct(array $parameters = []) {
 
     if (isset($parameters['base_url'])) {
-      self::$baseUrl = $parameters['base_url'];
+      static::$baseUrl = $parameters['base_url'];
     }
     if (isset($parameters['log_types'])) {
-      self::$logTypes = $parameters['log_types'];
+      static::$logTypes = $parameters['log_types'];
     }
     if (isset($parameters['log_levels'])) {
       $this->setLevels($parameters['log_levels']);
@@ -96,12 +96,12 @@ class LogsContext extends RawDrupalContext {
    *   Levels list.
    */
   protected function setLevels(array $levels_list) {
-    self::$logLevels = [];
+    static::$logLevels = [];
     foreach ($levels_list as $level) {
 
       $constant_name = '\Drupal\Core\Logger\RfcLogLevel::' . $level;
       if (defined($constant_name)) {
-        self::$logLevels[$level] = constant($constant_name);
+        static::$logLevels[$level] = constant($constant_name);
       }
     }
   }
@@ -112,7 +112,7 @@ class LogsContext extends RawDrupalContext {
    * @BeforeSuite
    */
   public static function setLogsTimeSuite(BeforeSuiteScope $before_suite_scope) {
-    self::$suiteStartTime = time();
+    static::$suiteStartTime = time();
   }
 
   /**
@@ -122,15 +122,15 @@ class LogsContext extends RawDrupalContext {
    */
   public static function showLogsAfterSuite(AfterSuiteScope $after_suite_scope) {
 
-    $grouped_logs = self::getGroupedLogs();
+    $grouped_logs = static::getGroupedLogs();
     $table = new Table(new ConsoleOutput());
     $table->setHeaderTitle('Watchdog errors');
     $table->setHeaders(['Type', 'Severity', 'Message', 'Details', 'Total Messages']);
 
     $levels = RfcLogLevel::getLevels();
     foreach ($grouped_logs as $log) {
-      $message = self::formatMessageWatchdog($log);
-      $event_url = property_exists($log, 'wid') ? self::getDblogEventUrl($log->wid) : '';
+      $message = static::formatMessageWatchdog($log);
+      $event_url = property_exists($log, 'wid') ? static::getDblogEventUrl($log->wid) : '';
       $severity = property_exists($log, 'severity') && isset($levels[$log->severity]) ? $levels[$log->severity] : '';
       $type = property_exists($log, 'type') ? $log->type : '';
       $count = property_exists($log, 'watchdog_message_count') ? $log->watchdog_message_count : '';
@@ -147,9 +147,9 @@ class LogsContext extends RawDrupalContext {
    *   List of logs.
    */
   public static function getGroupedLogs() {
-    $core = self::getStaticCore();
+    $core = static::getStaticCore();
     $method = $core . "::getDbLogGroupedMessages";
-    $logs = call_user_func($method, self::$suiteStartTime, self::$logLevels, self::$logTypes);
+    $logs = call_user_func($method, static::$suiteStartTime, static::$logLevels, static::$logTypes);
     return $logs;
   }
 
@@ -160,12 +160,12 @@ class LogsContext extends RawDrupalContext {
    *   Drupal core class.
    */
   protected static function getStaticCore() {
-    if (!isset(self::$core)) {
-      $version = self::getDrupalVersion();
+    if (!isset(static::$core)) {
+      $version = static::getDrupalVersion();
       $core = "\Metadrop\Behat\Cores\Drupal$version";
-      self::$core = $core;
+      static::$core = $core;
     }
-    return self::$core;
+    return static::$core;
   }
 
   /**
@@ -180,9 +180,9 @@ class LogsContext extends RawDrupalContext {
     $module_is_enabled = in_array('dblog', $this->getCore()->getModuleList());
 
     if ($module_is_enabled) {
-      $log_types = $scope->getTestResult()->getResultCode() === TestResults::PASSED ? self::$logTypes : [];
+      $log_types = $scope->getTestResult()->getResultCode() === TestResults::PASSED ? static::$logTypes : [];
       // Filter by error, notice, and warning severity.
-      $logs = $this->getCore()->getDbLogMessages($this->getScenarioStartTime(), self::$logLevels, $log_types);
+      $logs = $this->getCore()->getDbLogMessages($this->getScenarioStartTime(), static::$logLevels, $log_types);
       if (!empty($logs)) {
         $this->printWatchdogLogs($logs);
       }
@@ -198,10 +198,10 @@ class LogsContext extends RawDrupalContext {
   public function printWatchdogLogs(array $logs) {
     print 'Logs from watchdog (dblog):' . PHP_EOL . PHP_EOL;
     foreach ($logs as $log) {
-      $message = self::formatMessageWatchdog($log);
+      $message = static::formatMessageWatchdog($log);
       print "[{$log->type}] "
           . $message
-          . " | Details: " . self::getDblogEventUrl($log->wid) . "\n";
+          . " | Details: " . static::getDblogEventUrl($log->wid) . "\n";
     }
     print "End of watchdog logs.";
   }
@@ -218,7 +218,7 @@ class LogsContext extends RawDrupalContext {
   public static function formatMessageWatchdog(\stdClass $log) {
     $log_variables = unserialize($log->variables);
     $log->variables = !empty($log_variables) ? $log_variables : [];
-    $core = self::getStaticCore();
+    $core = static::getStaticCore();
     $method = $core . "::formatStringStatic";
     $formatted_string = call_user_func($method, $log->message, $log->variables);
     $message = mb_strimwidth($formatted_string, 0, 200, '...');
@@ -236,15 +236,15 @@ class LogsContext extends RawDrupalContext {
    */
   protected static function getDblogEventUrl(int $wid) {
     $options = ['absolute' => TRUE];
-    if (!empty(self::$baseUrl)) {
-      $options['base_url'] = self::$baseUrl;
+    if (!empty(static::$baseUrl)) {
+      $options['base_url'] = static::$baseUrl;
     }
 
     // It is not possible to invoke core methods because the way
     // the url generated is not compatible:
     // - In Drupal 7 it's used the relative path.
     // - In Drupal 8 it's used the routing system.
-    if (self::getDrupalVersion() == 7) {
+    if (static::getDrupalVersion() == 7) {
       return url('/admin/reports/event/' . $wid, $options);
     }
     else {
@@ -267,7 +267,7 @@ class LogsContext extends RawDrupalContext {
    * @see \Drupal\Driver\DrupalDriver::getDrupalVersion
    */
   public static function getDrupalVersion() {
-    if (!isset(self::$coreVersion)) {
+    if (!isset(static::$coreVersion)) {
       // Support 6, 7 and 8.
       $version_constant_paths = [
         // Drupal 6.
@@ -301,13 +301,13 @@ class LogsContext extends RawDrupalContext {
       // Extract the major version from VERSION.
       $version_parts = explode('.', $version);
       if (is_numeric($version_parts[0])) {
-        self::$coreVersion = (integer) $version_parts[0] < 8 ? $version_parts[0] : 8;
+        static::$coreVersion = (integer) $version_parts[0] < 8 ? $version_parts[0] : 8;
       }
       else {
         throw new BootstrapException(sprintf('Unable to extract major Drupal core version from version string %s.', $version));
       }
     }
-    return self::$coreVersion;
+    return static::$coreVersion;
   }
 
 }
