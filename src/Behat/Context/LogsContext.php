@@ -2,11 +2,15 @@
 
 namespace Metadrop\Behat\Context;
 
+use Behat\Testwork\Hook\Scope\AfterSuiteScope;
+use Behat\Testwork\Hook\Scope\BeforeSuiteScope;
 use Drupal\Core\Url;
-use Drupal\Driver\Cores\Drupal7;
 use Metadrop\Behat\Cores\Traits\ScenarioTimeTrait;
 use Behat\Testwork\Tester\Result\TestResults;
 use Behat\Behat\Hook\Scope\AfterScenarioScope;
+use Drupal\Core\Logger\RfcLogLevel;
+use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 /**
  * Context used to work with logs.
@@ -22,7 +26,53 @@ class LogsContext extends RawDrupalContext {
    *
    * @var string|null
    */
-  protected $baseUrl;
+  protected static $baseUrl;
+
+  /**
+   * Log types.
+   *
+   * @var array
+   */
+  protected static $logTypes = ['php'];
+
+  /**
+   * Log levels to register.
+   *
+   * @var array
+   */
+  protected static $logLevels = [
+    'ERROR' => 3,
+    'WARNING' => 4,
+    'NOTICE' => 5,
+  ];
+
+  /**
+   * Limit of log shown on the table after suite.
+   *
+   * @var int
+   */
+  protected static $logLimit = 100;
+
+  /**
+   * Drupal Helper Core class.
+   *
+   * @var string
+   */
+  protected static $core;
+
+  /**
+   * Suite start time.
+   *
+   * @var string
+   */
+  protected static $suiteStartTime;
+
+  /**
+   * Drupal core version.
+   *
+   * @var int
+   */
+  protected static $coreVersion;
 
   /**
    * LogsContext constructor.
@@ -30,17 +80,114 @@ class LogsContext extends RawDrupalContext {
    * @param array $parameters
    *   Parameters (optional).
    */
-  public function __construct(array $parameters = [])
-  {
+  public function __construct(array $parameters = []) {
+
     if (isset($parameters['base_url'])) {
-      $this->baseUrl = $parameters['base_url'];
+      static::$baseUrl = $parameters['base_url'];
     }
+    if (isset($parameters['log_types'])) {
+      static::$logTypes = $parameters['log_types'];
+    }
+    if (isset($parameters['log_levels'])) {
+      $this->setLevels($parameters['log_levels']);
+    }
+    if (isset($parameters['log_limit'])) {
+      static::$logLimit = $parameters['log_limit'];
+    }
+  }
+
+  /**
+   * Set logs levels.
+   *
+   * @param array $levels_list
+   *   Levels list.
+   */
+  protected function setLevels(array $levels_list) {
+    static::$logLevels = [];
+    foreach ($levels_list as $level) {
+
+      $constant_name = '\Drupal\Core\Logger\RfcLogLevel::' . $level;
+      if (defined($constant_name)) {
+        static::$logLevels[$level] = constant($constant_name);
+      }
+    }
+  }
+
+  /**
+   * Set when the suite starts to retrieve the right logs.
+   *
+   * @BeforeSuite
+   */
+  public static function setLogsTimeSuite(BeforeSuiteScope $before_suite_scope) {
+    static::$suiteStartTime = time();
+  }
+
+  /**
+   * Show a table list with the logs grouped.
+   *
+   * @AfterSuite
+   */
+  public static function showLogsAfterSuite(AfterSuiteScope $after_suite_scope) {
+
+    $grouped_logs = static::getGroupedLogs();
+    $table = new Table(new ConsoleOutput());
+    $table->setHeaderTitle('Watchdog errors');
+    $table->setHeaders([
+      'Index',
+      'Type',
+      'Severity',
+      'Message',
+      'Details',
+      'Total Messages',
+    ]);
+
+    $levels = RfcLogLevel::getLevels();
+    $i = 1;
+    foreach ($grouped_logs as $log) {
+      $message = static::formatMessageWatchdog($log);
+      $event_url = property_exists($log, 'wid') ? static::getDblogEventUrl($log->wid) : '';
+      $severity = property_exists($log, 'severity') && isset($levels[$log->severity]) ? $levels[$log->severity] : '';
+      $type = property_exists($log, 'type') ? $log->type : '';
+      $count = property_exists($log, 'watchdog_message_count') ? $log->watchdog_message_count : '';
+      $table->addRow([$i, "[{$type}]", $severity, $message, $event_url, $count]);
+      $i++;
+    }
+
+    $table->render();
+  }
+
+  /**
+   * Get the logs grouped.
+   *
+   * @return array
+   *   List of logs.
+   */
+  public static function getGroupedLogs() {
+    $core = static::getStaticCore();
+    $method = $core . "::getDbLogGroupedMessages";
+    $logs = call_user_func($method, static::$suiteStartTime, static::$logLevels, static::$logTypes, static::$logLimit);
+    return $logs;
+  }
+
+  /**
+   * Returns the current Drupal core helper.
+   *
+   * @return string
+   *   Drupal core class.
+   */
+  protected static function getStaticCore() {
+    if (!isset(static::$core)) {
+      $version = static::getDrupalVersion();
+      $core = "\Metadrop\Behat\Cores\Drupal$version";
+      static::$core = $core;
+    }
+    return static::$core;
   }
 
   /**
    * Show watchdog logs messages after scenario.
    *
-   * @param AfterScenarioScope $scope
+   * @param \Behat\Behat\Hook\Scope\AfterScenarioScope $scope
    *   After Scenario scope.
    *
    * @AfterScenario @api
@@ -49,9 +196,9 @@ class LogsContext extends RawDrupalContext {
     $module_is_enabled = in_array('dblog', $this->getCore()->getModuleList());
 
     if ($module_is_enabled) {
-      $log_types = $scope->getTestResult()->getResultCode() === TestResults::PASSED ? ['php'] : [];
+      $log_types = $scope->getTestResult()->getResultCode() === TestResults::PASSED ? static::$logTypes : [];
       // Filter by error, notice, and warning severity.
-      $logs = $this->getCore()->getDbLogMessages($this->getScenarioStartTime(), [3, 4, 5], $log_types);
+      $logs = $this->getCore()->getDbLogMessages($this->getScenarioStartTime(), static::$logLevels, $log_types);
       if (!empty($logs)) {
         $this->printWatchdogLogs($logs);
       }
@@ -67,15 +214,31 @@ class LogsContext extends RawDrupalContext {
   public function printWatchdogLogs(array $logs) {
     print 'Logs from watchdog (dblog):' . PHP_EOL . PHP_EOL;
     foreach ($logs as $log) {
-      $log_variables = unserialize($log->variables);
-      $log->variables = !empty($log_variables) ? $log_variables : [];
-      $formatted_string =  $this->getCore()->formatString($log->message, $log->variables);
-      $message = mb_strimwidth($formatted_string, 0, 200, '...');
+      $message = static::formatMessageWatchdog($log);
       print "[{$log->type}] "
           . $message
-          . " | Details: " . $this->getDblogEventUrl($log->wid) . "\n";
+          . " | Details: " . static::getDblogEventUrl($log->wid) . "\n";
     }
     print "End of watchdog logs.";
+  }
+
+  /**
+   * Format message log.
+   *
+   * @param object $log
+   *   Log.
+   *
+   * @return string
+   *   Formatted log.
+   */
+  public static function formatMessageWatchdog(\stdClass $log) {
+    $log_variables = unserialize($log->variables);
+    $log->variables = !empty($log_variables) ? $log_variables : [];
+    $core = static::getStaticCore();
+    $method = $core . "::formatStringStatic";
+    $formatted_string = call_user_func($method, $log->message, $log->variables);
+    $message = mb_strimwidth($formatted_string, 0, 200, '...');
+    return $message;
   }
 
   /**
@@ -87,20 +250,23 @@ class LogsContext extends RawDrupalContext {
    * @return \Drupal\Core\GeneratedUrl|string
    *   Generated url.
    */
-  protected function getDblogEventUrl(int $wid) {
+  protected static function getDblogEventUrl(int $wid) {
     $options = ['absolute' => TRUE];
-    if (!empty($this->baseUrl)) {
-      $options['base_url'] = $this->baseUrl;
+    if (!empty(static::$baseUrl)) {
+      $options['base_url'] = static::$baseUrl;
     }
 
-    // It is not possible to invoke core methods because the way the url generated is not compatible:
+    // It is not possible to invoke core methods because the way
+    // the url generated is not compatible:
     // - In Drupal 7 it's used the relative path.
     // - In Drupal 8 it's used the routing system.
-    if ($this->getCore() instanceof Drupal7) {
+    if (static::getDrupalVersion() == 7) {
       return url('/admin/reports/event/' . $wid, $options);
     }
     else {
-      return Url::fromRoute('dblog.event', ['event_id' => $wid], $options)->toString();
+      return Url::fromRoute('dblog.event', [
+        'event_id' => $wid,
+      ], $options)->toString();
     }
 
   }

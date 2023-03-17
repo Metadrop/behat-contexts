@@ -11,7 +11,7 @@ use Metadrop\Behat\Cores\Traits\FileTrait;
 use Behat\Behat\Tester\Exception\PendingException;
 
 /**
- * Class Drupal7.
+ * Class helper for core Drupal 8.
  */
 class Drupal7 extends OriginalDrupal7 implements CoreInterface {
 
@@ -87,7 +87,7 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
    * {@inheritdoc}
    */
   public function entityId($entity_type, $entity) {
-    list($entity_id) = entity_extract_ids($entity_type, $entity);
+    [$entity_id] = entity_extract_ids($entity_type, $entity);
     return $entity_id;
   }
 
@@ -264,7 +264,7 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
    */
   public function getDbLogMessages(int $scenario_start_time, array $severities = [], array $types = []) {
     $query = db_select('watchdog', 'w')
-      ->fields('w', ['message', 'variables', 'type', 'wid'])
+      ->fields('w', ['message', 'variables', 'type', 'severity', 'wid'])
       ->condition('timestamp', $scenario_start_time, '>=');
 
     if (!empty($severities)) {
@@ -276,6 +276,18 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
     }
 
     return $query->execute()->fetchAll();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getDbLogGroupedMessages(
+    int $start_time,
+    array $severities = [],
+    array $types = [],
+    int $log_limit = 100
+  ) {
+    throw new PendingException('Pending to implement method in Drupal 7');
   }
 
   /**
@@ -295,8 +307,15 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function formatString($string, array $params) {
+  public static function formatStringStatic($string, array $params) {
     return format_string($string, $params);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function formatString($string, array $params) {
+    return static::formatStringStatic($string, $params);
   }
 
   /**
@@ -328,14 +347,14 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
   }
 
   /**
-   * Gets the current Honeypot time limit
+   * Gets the current Honeypot time limit.
    */
   public function getHoneypotLimit() {
     throw new PendingException('Pending to implement method in Drupal 7');
   }
 
   /**
-   * Sets the Honeypot time limit
+   * Sets the Honeypot time limit.
    *
    * @param int $time_limit
    *   The time limit to be set.
