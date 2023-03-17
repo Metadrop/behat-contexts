@@ -250,6 +250,8 @@ class LogsContext extends RawDrupalContext {
 
       // Close file.
       fclose($stream);
+      $output = new ConsoleOutput();
+      $output->writeln('Created dblog report on ' . $source_file);
     }
   }
 
