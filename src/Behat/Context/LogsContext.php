@@ -82,6 +82,13 @@ class LogsContext extends RawDrupalContext {
   protected static $logPath = DRUPAL_ROOT . '/../reports/behat/dblog/report_dblog.csv';
 
   /**
+   * Option to enable, disable to write the report.
+   *
+   * @var bool
+   */
+  protected static $writeReportEnabled = FALSE;
+
+  /**
    * LogsContext constructor.
    *
    * @param array $parameters
@@ -103,6 +110,9 @@ class LogsContext extends RawDrupalContext {
     }
     if (isset($parameters['log_path'])) {
       static::$logPath = $parameters['log_path'];
+    }
+    if (isset($parameters['log_write_report'])) {
+      static::$writeReportEnabled = $parameters['log_write_report'];
     }
   }
 
@@ -140,7 +150,10 @@ class LogsContext extends RawDrupalContext {
   public static function showLogsAfterSuite(AfterSuiteScope $after_suite_scope) {
     $grouped_logs = static::getGroupedLogs();
     static::writeTableLogs($grouped_logs);
-    static::writeReport($grouped_logs);
+    if (static::$writeReportEnabled) {
+      static::writeReport($grouped_logs);
+    }
+
   }
 
   /**
