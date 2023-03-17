@@ -5,8 +5,6 @@ namespace Metadrop\Behat\Context;
 use Behat\Testwork\Hook\Scope\AfterSuiteScope;
 use Behat\Testwork\Hook\Scope\BeforeSuiteScope;
 use Drupal\Core\Url;
-use Drupal\Driver\Cores\Drupal7;
-use Drupal\Driver\Exception\BootstrapException;
 use Metadrop\Behat\Cores\Traits\ScenarioTimeTrait;
 use Behat\Testwork\Tester\Result\TestResults;
 use Behat\Behat\Hook\Scope\AfterScenarioScope;
@@ -125,7 +123,13 @@ class LogsContext extends RawDrupalContext {
     $grouped_logs = static::getGroupedLogs();
     $table = new Table(new ConsoleOutput());
     $table->setHeaderTitle('Watchdog errors');
-    $table->setHeaders(['Type', 'Severity', 'Message', 'Details', 'Total Messages']);
+    $table->setHeaders([
+      'Type',
+      'Severity',
+      'Message',
+      'Details',
+      'Total Messages',
+    ]);
 
     $levels = RfcLogLevel::getLevels();
     foreach ($grouped_logs as $log) {
@@ -253,61 +257,6 @@ class LogsContext extends RawDrupalContext {
       ], $options)->toString();
     }
 
-  }
-
-  /**
-   * Determine major Drupal version.
-   *
-   * @return int
-   *   The major Drupal version.
-   *
-   * @throws \Drupal\Driver\Exception\BootstrapException
-   *   Thrown when the Drupal version could not be determined.
-   *
-   * @see \Drupal\Driver\DrupalDriver::getDrupalVersion
-   */
-  public static function getDrupalVersion() {
-    if (!isset(static::$coreVersion)) {
-      // Support 6, 7 and 8.
-      $version_constant_paths = [
-        // Drupal 6.
-        '/modules/system/system.module',
-        // Drupal 7.
-        '/includes/bootstrap.inc',
-        // Drupal 8.
-        '/autoload.php',
-        '/core/includes/bootstrap.inc',
-      ];
-
-      if (DRUPAL_ROOT === FALSE) {
-        throw new BootstrapException('`drupal_root` parameter must be defined.');
-      }
-
-      foreach ($version_constant_paths as $path) {
-        if (file_exists(DRUPAL_ROOT . $path)) {
-          require_once DRUPAL_ROOT . $path;
-        }
-      }
-      if (defined('VERSION')) {
-        $version = VERSION;
-      }
-      elseif (defined('\Drupal::VERSION')) {
-        $version = \Drupal::VERSION;
-      }
-      else {
-        throw new BootstrapException('Unable to determine Drupal core version. Supported versions are 6, 7, and 8.');
-      }
-
-      // Extract the major version from VERSION.
-      $version_parts = explode('.', $version);
-      if (is_numeric($version_parts[0])) {
-        static::$coreVersion = (integer) $version_parts[0] < 8 ? $version_parts[0] : 8;
-      }
-      else {
-        throw new BootstrapException(sprintf('Unable to extract major Drupal core version from version string %s.', $version));
-      }
-    }
-    return static::$coreVersion;
   }
 
 }
