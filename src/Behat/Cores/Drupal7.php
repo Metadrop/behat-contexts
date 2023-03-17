@@ -285,7 +285,7 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
     int $start_time,
     array $severities = [],
     array $types = [],
-    int $log_limit = 100
+    int $log_limit = -1
   ) {
     throw new PendingException('Pending to implement method in Drupal 7');
   }

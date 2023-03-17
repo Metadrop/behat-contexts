@@ -75,6 +75,13 @@ class LogsContext extends RawDrupalContext {
   protected static $coreVersion;
 
   /**
+   * Log csv path.
+   *
+   * @var string
+   */
+  protected static $logPath = DRUPAL_ROOT . '/../reports/behat/dblog/report_dblog.csv';
+
+  /**
    * LogsContext constructor.
    *
    * @param array $parameters
@@ -93,6 +100,9 @@ class LogsContext extends RawDrupalContext {
     }
     if (isset($parameters['log_limit'])) {
       static::$logLimit = $parameters['log_limit'];
+    }
+    if (isset($parameters['log_path'])) {
+      static::$logPath = $parameters['log_path'];
     }
   }
 
@@ -123,13 +133,23 @@ class LogsContext extends RawDrupalContext {
   }
 
   /**
-   * Show a table list with the logs grouped.
+   * Process logs after behat suite.
    *
    * @AfterSuite
    */
   public static function showLogsAfterSuite(AfterSuiteScope $after_suite_scope) {
-
     $grouped_logs = static::getGroupedLogs();
+    static::writeTableLogs($grouped_logs);
+    static::writeReport($grouped_logs);
+  }
+
+  /**
+   * Show a table list with the logs grouped.
+   *
+   * @param array $grouped_logs
+   *   List of logs to show.
+   */
+  public static function writeTableLogs(array $grouped_logs) {
     $table = new Table(new ConsoleOutput());
     $table->setHeaderTitle('Watchdog errors');
     $table->setHeaders([
@@ -143,7 +163,9 @@ class LogsContext extends RawDrupalContext {
 
     $levels = RfcLogLevel::getLevels();
     $i = 1;
-    foreach ($grouped_logs as $log) {
+    $limit = static::$logLimit;
+    $grouped_logs_limit = array_slice($grouped_logs, 0, $limit);
+    foreach ($grouped_logs_limit as $log) {
       $message = static::formatMessageWatchdog($log);
       $event_url = property_exists($log, 'wid') ? static::getDblogEventUrl($log->wid) : '';
       $severity = property_exists($log, 'severity') && isset($levels[$log->severity]) ? $levels[$log->severity] : '';
@@ -157,6 +179,68 @@ class LogsContext extends RawDrupalContext {
   }
 
   /**
+   * Write report into csv.
+   *
+   * @param array $grouped_logs
+   *   List of logs to write.
+   */
+  public static function writeReport(array $grouped_logs) {
+    $source_file = static::$logPath;
+    $source_dir = dirname($source_file);
+    if (!file_exists($source_dir)) {
+      mkdir($source_dir, 0777, TRUE);
+    }
+    if (is_writable($source_dir)) {
+      // Open CSV.
+      $stream = fopen($source_file, 'w+');
+
+      // Write header.
+      fputcsv($stream, [
+        'Index',
+        'Type',
+        'Severity',
+        'Message',
+        'Location',
+        'Referer',
+        'Link',
+        'Details',
+        'Total Messages',
+      ]);
+
+      $i = 1;
+      $levels = RfcLogLevel::getLevels();
+      foreach ($grouped_logs as $log) {
+        $message = static::formatMessageWatchdog($log);
+        $event_url = property_exists($log, 'wid') ? static::getDblogEventUrl($log->wid) : '';
+        $severity = property_exists($log, 'severity') && isset($levels[$log->severity]) ? $levels[$log->severity] : '';
+        $type = property_exists($log, 'type') ? $log->type : '';
+        $count = property_exists($log, 'watchdog_message_count') ? $log->watchdog_message_count : '';
+        $location = property_exists($log, 'location') ? $log->location : '';
+        $referer = property_exists($log, 'referer') ? $log->referer : '';
+        $link = property_exists($log, 'link') ? $log->link : '';
+
+        // Write into the CSV.
+        fputcsv($stream, [
+          $i,
+          $type,
+          $severity,
+          $message,
+          $location,
+          $referer,
+          $link,
+          $event_url,
+          $count,
+        ]);
+        $i++;
+
+      }
+
+      // Close file.
+      fclose($stream);
+    }
+  }
+
+  /**
    * Get the logs grouped.
    *
    * @return array
@@ -165,7 +249,7 @@ class LogsContext extends RawDrupalContext {
   public static function getGroupedLogs() {
     $core = static::getStaticCore();
     $method = $core . "::getDbLogGroupedMessages";
-    $logs = call_user_func($method, static::$suiteStartTime, static::$logLevels, static::$logTypes, static::$logLimit);
+    $logs = call_user_func($method, static::$suiteStartTime, static::$logLevels, static::$logTypes);
     return $logs;
   }
 
@@ -232,11 +316,11 @@ class LogsContext extends RawDrupalContext {
    *   Formatted log.
    */
   public static function formatMessageWatchdog(\stdClass $log) {
-    $log_variables = unserialize($log->variables);
-    $log->variables = !empty($log_variables) ? $log_variables : [];
+    $log_variables = property_exists($log, 'variables') && is_string($log->variables) && !empty($log->variables) ? unserialize($log->variables) : [];
+    $message = property_exists($log, 'message') ? $log->message : '';
     $core = static::getStaticCore();
     $method = $core . "::formatStringStatic";
-    $formatted_string = call_user_func($method, $log->message, $log->variables);
+    $formatted_string = call_user_func($method, $message, $log_variables);
     $message = mb_strimwidth($formatted_string, 0, 200, '...');
     return $message;
   }

@@ -415,19 +415,24 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     int $start_time,
     array $severities = [],
     array $types = [],
-    int $log_limit = 100
+    int $log_limit = -1
   ) {
     $query = \Drupal::database()->select('watchdog', 'w');
     $query->fields('w', ['message', 'variables', 'type', 'severity'])
       ->condition('timestamp', $start_time, '>=')
       ->addExpression('COUNT(wid)', 'watchdog_message_count');
     $query->addExpression('MAX(wid)', 'wid');
+    $query->addExpression('MAX(link)', 'link');
+    $query->addExpression('GROUP_CONCAT(DISTINCT(location))', 'location');
+    $query->addExpression('GROUP_CONCAT(DISTINCT(referer))', 'referer');
     $query->groupBy('message');
     $query->groupBy('variables');
     $query->groupBy('type');
     $query->groupBy('severity');
     $query->orderBy('watchdog_message_count', 'DESC');
-    $query->range(0, $log_limit);
+    if ($log_limit > 0) {
+      $query->range(0, $log_limit);
+    }
 
     if (!empty($severities)) {
       $query->condition('severity', $severities, 'IN');
