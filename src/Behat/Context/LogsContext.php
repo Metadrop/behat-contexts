@@ -149,9 +149,11 @@ class LogsContext extends RawDrupalContext {
    */
   public static function showLogsAfterSuite(AfterSuiteScope $after_suite_scope) {
     $grouped_logs = static::getGroupedLogs();
-    static::writeTableLogs($grouped_logs);
-    if (static::$writeReportEnabled) {
-      static::writeReport($grouped_logs);
+    if (!empty($grouped_logs)) {
+      static::writeTableLogs($grouped_logs);
+      if (static::$writeReportEnabled) {
+        static::writeReport($grouped_logs);
+      }
     }
 
   }
