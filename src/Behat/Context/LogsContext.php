@@ -33,14 +33,14 @@ class LogsContext extends RawDrupalContext {
    *
    * @var array
    */
-  protected static $logTypes = ['php'];
+  protected static $types = ['php'];
 
   /**
    * Log levels to register.
    *
    * @var array
    */
-  protected static $logLevels = [
+  protected static $levels = [
     'ERROR' => 3,
     'WARNING' => 4,
     'NOTICE' => 5,
@@ -51,7 +51,7 @@ class LogsContext extends RawDrupalContext {
    *
    * @var int
    */
-  protected static $logLimit = 100;
+  protected static $limit = 100;
 
   /**
    * Drupal Helper Core class.
@@ -79,7 +79,7 @@ class LogsContext extends RawDrupalContext {
    *
    * @var string
    */
-  protected static $logPath = DRUPAL_ROOT . '/../reports/behat/dblog/report_dblog.csv';
+  protected static $path = DRUPAL_ROOT . '/../reports/behat/dblog';
 
   /**
    * Option to enable, disable to write the report.
@@ -99,20 +99,20 @@ class LogsContext extends RawDrupalContext {
     if (isset($parameters['base_url'])) {
       static::$baseUrl = $parameters['base_url'];
     }
-    if (isset($parameters['log_types'])) {
-      static::$logTypes = $parameters['log_types'];
+    if (isset($parameters['types'])) {
+      static::$types = $parameters['types'];
     }
-    if (isset($parameters['log_levels'])) {
-      $this->setLevels($parameters['log_levels']);
+    if (isset($parameters['levels'])) {
+      $this->setLevels($parameters['levels']);
     }
-    if (isset($parameters['log_limit'])) {
-      static::$logLimit = $parameters['log_limit'];
+    if (isset($parameters['limit'])) {
+      static::$limit = $parameters['limit'];
     }
-    if (isset($parameters['log_path'])) {
-      static::$logPath = $parameters['log_path'];
+    if (isset($parameters['path'])) {
+      static::$path = $parameters['path'];
     }
-    if (isset($parameters['log_write_report'])) {
-      static::$writeReportEnabled = $parameters['log_write_report'];
+    if (isset($parameters['write_report'])) {
+      static::$writeReportEnabled = $parameters['write_report'];
     }
   }
 
@@ -123,12 +123,12 @@ class LogsContext extends RawDrupalContext {
    *   Levels list.
    */
   protected function setLevels(array $levels_list) {
-    static::$logLevels = [];
+    static::$levels = [];
     foreach ($levels_list as $level) {
 
       $constant_name = '\Drupal\Core\Logger\RfcLogLevel::' . $level;
       if (defined($constant_name)) {
-        static::$logLevels[$level] = constant($constant_name);
+        static::$levels[$level] = constant($constant_name);
       }
     }
   }
@@ -176,7 +176,7 @@ class LogsContext extends RawDrupalContext {
 
     $levels = RfcLogLevel::getLevels();
     $i = 1;
-    $limit = static::$logLimit;
+    $limit = static::$limit;
     $grouped_logs_limit = array_slice($grouped_logs, 0, $limit);
     foreach ($grouped_logs_limit as $log) {
       $message = static::formatMessageWatchdog($log);
@@ -264,7 +264,7 @@ class LogsContext extends RawDrupalContext {
   public static function getGroupedLogs() {
     $core = static::getStaticCore();
     $method = $core . "::getDbLogGroupedMessages";
-    $logs = call_user_func($method, static::$suiteStartTime, static::$logLevels, static::$logTypes);
+    $logs = call_user_func($method, static::$suiteStartTime, static::$levels, static::$types);
     return $logs;
   }
 
@@ -295,9 +295,9 @@ class LogsContext extends RawDrupalContext {
     $module_is_enabled = in_array('dblog', $this->getCore()->getModuleList());
 
     if ($module_is_enabled) {
-      $log_types = $scope->getTestResult()->getResultCode() === TestResults::PASSED ? static::$logTypes : [];
+      $log_types = $scope->getTestResult()->getResultCode() === TestResults::PASSED ? static::$types : [];
       // Filter by error, notice, and warning severity.
-      $logs = $this->getCore()->getDbLogMessages($this->getScenarioStartTime(), static::$logLevels, $log_types);
+      $logs = $this->getCore()->getDbLogMessages($this->getScenarioStartTime(), static::$levels, $log_types);
       if (!empty($logs)) {
         $this->printWatchdogLogs($logs);
       }
