@@ -204,7 +204,7 @@ class LogsContext extends RawDrupalContext {
     $source_dir = dirname(static::$path);
     $date = date_create();
     $time = date_format($date, "Y-m-d-H-i-s");
-    $source_file = $source_dir . '/report_dblog-' . $time . '.csv';
+    $source_file = $source_dir . '/dblog-report-' . $time . '.csv';
     if (!file_exists($source_dir)) {
       mkdir($source_dir, 0664, TRUE);
     }
