@@ -201,7 +201,7 @@ class LogsContext extends RawDrupalContext {
    */
   public static function writeReport(array $grouped_logs) {
     // Add date to report.
-    $source_dir = dirname(static::$path);
+    $source_dir = static::$path;
     $date = date_create();
     $time = date_format($date, "Y-m-d-H-i-s");
     $source_file = $source_dir . '/dblog-report-' . $time . '.csv';
