@@ -344,10 +344,10 @@ class EntityContext extends RawDrupalContext {
         }
       }
       elseif (strtok($value, ':') == 'relative-date' && ($relative_date = strtok(':')) !== FALSE) {
-        $timestamp =  strtotime($relative_date);
+        $timestamp = strtotime($relative_date);
         // Get the rest of the string, not only string separated by ":",
         // This way we make sure if the format is something like "Y:m:d"
-        // it won't be separated by ":".
+        // it won't be cut by ":".
         $format = strtok('');
         $values[$key] = $format === FALSE ? $timestamp : \date($format, $timestamp);
       }
