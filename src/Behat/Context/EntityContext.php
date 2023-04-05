@@ -315,33 +315,70 @@ class EntityContext extends RawDrupalContext {
   }
 
   /**
+   * Make replacement on given string when this one contains entity-replacement.
+   *
+   * [entity-replacement:user:mail:behat@metadrop.net:uid]
+   *
+   * @param string $value
+   *   String that contains a single or multiple entity-replacement tokens.
+   *
+   * @return string|bool
+   *   Replaced or untouched string or FALSE otherwise.
+   *
+   * @throws \Exception
+   */
+  protected function entityTokensReplacements($value) {
+    $entity_tokens = [];
+    $replacements = [];
+    if (strpos($value, 'entity-replacement') === 0) {
+      $entity_tokens = [$value];
+    }
+    else {
+      $matches = [];
+      preg_match_all('#\[entity-replacement:?([^]]*)\]#', $value, $matches);
+      $entity_tokens = reset($matches);
+    }
+
+    if (empty($entity_tokens)) {
+      return FALSE;
+    }
+
+    // Get entity type list.
+    $entity_types = $this->getCore()->getEntityTypes();
+
+    foreach ($entity_tokens as $entity_token) {
+      $token_pieces = explode(':', str_replace(['[', ']'], ['', ''], $entity_token));
+      array_shift($token_pieces);
+      $entity_type = $token_pieces[0];
+      $field_key = $token_pieces[1];
+      $field_value = $token_pieces[2];
+      $destiny_replacement = $token_pieces[3];
+
+      $keys_exists = isset($entity_type) && isset($field_key) && isset($field_value) && isset($destiny_replacement);
+
+      if (!$keys_exists || !in_array($entity_type, $entity_types)) {
+        throw new \Exception(sprintf('The "%s" token or its entity values are not valid!', $entity_token));
+      }
+
+      $entity = $this->getCore()->getEntityByField($entity_type, $field_key, $field_value);
+      $replacements[] = !empty($entity) ? $this->getCore()->getEntityFieldValue($destiny_replacement, $entity, $entity_token) : $entity_token;
+    }
+
+    return str_replace($entity_tokens, $replacements, $value);
+  }
+
+  /**
    * Replacement tokens.
    *
    * @param array|mixed $values
    *   Fields to replace.
    */
   protected function replaceTokens($values) {
-    // Get entity type list.
+
     $entity_types = $this->getCore()->getEntityTypes();
-    foreach ($values as $key => $value) {
-      if (strpos($value, 'entity-replacement') === 0) {
-        $token_pieces = explode(':', $value);
-        array_shift($token_pieces);
-        $entity_type = $token_pieces[0];
-        $field_key = $token_pieces[1];
-        $field_value = $token_pieces[2];
-        $destiny_replacement = $token_pieces[3];
-
-        $keys_exists = isset($entity_type) && isset($field_key) && isset($field_value) && isset($destiny_replacement);
-
-        if (!$keys_exists || !in_array($entity_type, $entity_types)) {
-          throw new \Exception('Token or entity values are not valid!');
-        }
-        $entity = $this->getCore()->getEntityByField($entity_type, $field_key, $field_value);
-
-        if (!empty($entity)) {
-          $values[$key] = $this->getCore()->getEntityFieldValue($destiny_replacement, $entity, $values[$key]);
-        }
+    foreach ($values as $key => &$value) {
+      if (($replacement = $this->entityTokensReplacements($value)) !== FALSE) {
+        $value = $replacement;
       }
       elseif (strtok($value, ':') == 'relative-date' && ($relative_date = strtok(':')) !== FALSE) {
         $timestamp = strtotime($relative_date);
@@ -349,9 +386,10 @@ class EntityContext extends RawDrupalContext {
         // This way we make sure if the format is something like "Y:m:d"
         // it won't be cut by ":".
         $format = strtok('');
-        $values[$key] = $format === FALSE ? $timestamp : \date($format, $timestamp);
+        $value = $format === FALSE ? $timestamp : \date($format, $timestamp);
       }
     }
+
     return $values;
   }
 
