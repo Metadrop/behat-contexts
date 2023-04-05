@@ -317,6 +317,13 @@ class EntityContext extends RawDrupalContext {
   /**
    * Make replacement on given string when this one contains entity-replacement.
    *
+   * [entity-replacement:{entity_type}:{field_name}:{field_value}:{destiny_replacement_field_name}]
+   *
+   * entity_type -> the entity type on which to search.
+   * field_name -> the entity field to search on.
+   * field_value -> the value of the field that the entity should have.
+   * destiny_replacement_field_name -> The name of the field on which to take the value to be used as a replacement.
+   *
    * Examples:
    *  - [entity-replacement:user:mail:behat@metadrop.net:uid]
    *    Output: 123
@@ -327,7 +334,7 @@ class EntityContext extends RawDrupalContext {
    *  - entity-replacement:user:mail:behat@metadrop.net:uid (This way can only be use for single replacement)
    *    Output: 123
    *
-   * In summary every token will be replaced, and the text between them will
+   * Every token will be replaced, and the text between them will
    * remain the same.
    *
    * @param string $value
