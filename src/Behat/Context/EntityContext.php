@@ -343,8 +343,13 @@ class EntityContext extends RawDrupalContext {
           $values[$key] = $this->getCore()->getEntityFieldValue($destiny_replacement, $entity, $values[$key]);
         }
       }
-      elseif (strpos($value, 'relative-date:') === 0) {
-        $values[$key] = strtotime(str_replace('relative-date:', '', $value));
+      elseif (strtok($value, ':') == 'relative-date' && ($relative_date = strtok(':')) !== FALSE) {
+        $timestamp =  strtotime($relative_date);
+        // Get the rest of the string, not only string separated by ":",
+        // This way we make sure if the format is something like "Y:m:d"
+        // it won't be separated by ":".
+        $format = strtok('');
+        $values[$key] = $format === FALSE ? $timestamp : \date($format, $timestamp);
       }
     }
     return $values;
