@@ -317,7 +317,18 @@ class EntityContext extends RawDrupalContext {
   /**
    * Make replacement on given string when this one contains entity-replacement.
    *
-   * [entity-replacement:user:mail:behat@metadrop.net:uid]
+   * Examples:
+   *  - [entity-replacement:user:mail:behat@metadrop.net:uid]
+   *    Output: 123
+   *  - [entity-replacement:user:mail:behat@metadrop.net:uid], [entity-replacement:user:mail:behat_2@metadrop.net:uid], [entity-replacement:user:mail:behat_3@metadrop.net:uid]
+   *    Output: 123, 124, 125
+   *  - [entity-replacement:user:mail:behat@metadrop.net:uid] - [entity-replacement:user:mail:behat_2@metadrop.net:uid] - [entity-replacement:user:mail:behat_3@metadrop.net:uid]
+   *    Output: 123 - 124 - 125
+   *  - entity-replacement:user:mail:behat@metadrop.net:uid (This way can only be use for single replacement)
+   *    Output: 123
+   *
+   * In summary every token will be replaced, and the text between them will
+   * remain the same.
    *
    * @param string $value
    *   String that contains a single or multiple entity-replacement tokens.
@@ -349,14 +360,9 @@ class EntityContext extends RawDrupalContext {
     foreach ($entity_tokens as $entity_token) {
       $token_pieces = explode(':', str_replace(['[', ']'], ['', ''], $entity_token));
       array_shift($token_pieces);
-      $entity_type = $token_pieces[0];
-      $field_key = $token_pieces[1];
-      $field_value = $token_pieces[2];
-      $destiny_replacement = $token_pieces[3];
+      list($entity_type, $field_key, $field_value, $destiny_replacement) = $token_pieces;
 
-      $keys_exists = isset($entity_type) && isset($field_key) && isset($field_value) && isset($destiny_replacement);
-
-      if (!$keys_exists || !in_array($entity_type, $entity_types)) {
+      if (!in_array($entity_type, $entity_types)) {
         throw new \Exception(sprintf('The "%s" token or its entity values are not valid!', $entity_token));
       }
 
