@@ -349,7 +349,7 @@ class EntityContext extends RawDrupalContext {
     $entity_tokens = [];
     $replacements = [];
     if (strpos($value, 'entity-replacement') === 0) {
-      $entity_tokens = [$value];
+      $entity_tokens = (array) $value;
     }
     else {
       $matches = [];
