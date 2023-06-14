@@ -66,6 +66,47 @@ This report includes:
   - A file with the current URL and the error exception dump.
   - If available, a file with current page state.
 
+### Cookie compliance context
+
+Allows checking that the sites are cookie GDPR compliant.
+This context works with any cookie banner integration : onetrust, cookies, eu cookie compliance...
+
+It checks that before accepting cookies there are not cookies
+saved in the browser, and when the cookies are accepted, the
+expected cookies appears.
+
+The context parameters are:
+
+- **cookie_agree_selector**: The CSS selector of the button to agree cookies.
+- **cookie_banner_selector**: The CSS selector of the cookie compliance banner.
+- **cookies**: Map of cookies that should be handled byt each cookie category. The key
+  is the cookie category and the value is the list of cookies that will be present after
+  accepting the cookie compliance category.
+
+
+Example configuration:
+
+```yaml
+  - CookieComplianceContext:
+      cookie_agree_selector: '.eu-cookie-compliance-banner button.agree-button'
+      cookie_banner_selector: '.eu-cookie-compliance-banner'
+      cookies:
+        mandatory:
+          - 'cookie-agreed'
+          - 'cookie-agreed-categories'
+        analytics:
+          - '_ga'
+```
+
+Steps included in this context:
+
+- **Then I accept cookies**: Accept cookie banner with default options.
+
+- **Then there should not be cookies of :type type**: Assert the cookies of a specific category are not present.
+
+- **Then the cookies of :type type have been saved**:  Assert the cookies of a specific category are present.
+
+- **When I wait cookie banner appears**:  Wait until the cookie banner is loaded.
 
 #### Steps
 
