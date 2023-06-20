@@ -313,11 +313,11 @@ class CookieComplianceContext extends RawMinkContext {
       ];
     }, $urls));
 
-    $output->writeln("\nPotential cookie source found (iframe):\n");
+    $output->writeln("\nPotential cookies source found (iframe):\n");
 
     $urlsTable->render();
 
-    $output->writeln("\nPlease check and exclude them if not applicable. set the cookies_third_party_domains_ignored variable up.\n");
+    $output->writeln("\nPlease check and exclude them if not applicable. Set the cookies_third_party_domains_ignored variable up.\n");
 
     echo $output->fetch();
   }
