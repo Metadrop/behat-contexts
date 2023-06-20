@@ -79,9 +79,13 @@ The context parameters are:
 
 - **cookie_agree_selector**: The CSS selector of the button to agree cookies.
 - **cookie_banner_selector**: The CSS selector of the cookie compliance banner.
-- **cookies**: Map of cookies that should be handled byt each cookie category. The key
+- **cookies**: Map of cookies that should be handled by each cookie category. The key
   is the cookie category and the value is the list of cookies that will be present after
   accepting the cookie compliance category.
+- **cookies_ignored**: List of cookies that must be ignored if they appear at the step 'There are
+  no cookies loaded'. Add here cookies when they can't be managed at the server side.
+- **cookies_third_party_domains_ignored**: List of domains reported that contains potential cookies loaded
+  but they can be ignored because no cookies are being loaded.
 
 
 Example configuration:
@@ -96,17 +100,26 @@ Example configuration:
           - 'cookie-agreed-categories'
         analytics:
           - '_ga'
+      # Optional configuration:
+      cookies_ignored:
+        - cookieA
+        - cookieB
+      cookies_third_party_domains_ignored:
+        - example.com
 ```
 
 Steps included in this context:
 
 - **Then I accept cookies**: Accept cookie banner with default options.
 
-- **Then there should not be cookies of :type type**: Assert the cookies of a specific category are not present.
+- **Then the cookies of :type type have not been loaded**: Assert the cookies of a specific category are not present.
 
-- **Then the cookies of :type type have been saved**:  Assert the cookies of a specific category are present.
+- **Then the cookies of :type type have been loaded**:  Assert the cookies of a specific category are present.
 
 - **When I wait cookie banner appears**:  Wait until the cookie banner is loaded.
+
+- **Then there should not be any cookies loaded**:  Check there are no cookies loaded at all. It also reports
+  potential cookie source coming from third party iframes (s.e.: youtube, doubleclick, etc).
 
 #### Steps
 
