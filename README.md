@@ -86,7 +86,8 @@ The context parameters are:
   no cookies loaded'. Add here cookies when they can't be managed at the server side.
 - **cookies_third_party_domains_ignored**: List of domains reported that contains potential cookies loaded
   but they can be ignored because no cookies are being loaded.
-
+- **cookies_third_party_domains_included**: List of domains that are not present in the default list of domains
+  checked by the context, and is needed to be checked those sites are not loading cookies by iframes.
 
 Example configuration:
 
@@ -106,6 +107,8 @@ Example configuration:
         - cookieB
       cookies_third_party_domains_ignored:
         - example.com
+      cookies_third_party_domains_included:
+        - extra-analytics-service.com
 ```
 
 Steps included in this context:
@@ -120,6 +123,8 @@ Steps included in this context:
 
 - **Then there should not be any cookies loaded**:  Check there are no cookies loaded at all. It also reports
   potential cookie source coming from third party iframes (s.e.: youtube, doubleclick, etc).
+
+  By default, only those iframes which domains belongs to the **THIRD_PARTY_COOKIE_HOSTS** CookieComplianceContext constant will be detected as iframes that will add unwanted cookies.
 
 #### Steps
 
