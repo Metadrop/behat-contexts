@@ -86,6 +86,15 @@ class CookieComplianceContext extends RawMinkContext {
   protected array $cookiesThirdPartyDomainsIgnored;
 
   /**
+   * List of third party domains that loads cookies to add.
+   *
+   * Used to complement THIRD_PARTY_COOKIE_HOSTS list.
+   *
+   * @var array
+   */
+  protected array $cookiesThirdPartyDomainsIncluded;
+
+  /**
    * Cookie compliance constructor.
    *
    * @param string $cookie_agree_selector
@@ -98,13 +107,23 @@ class CookieComplianceContext extends RawMinkContext {
    *   List of cookies to ignore.
    * @param array $cookies_third_party_domains_ignored
    *   List of third party domains that loads cookies to ignore.
+   * @param array $cookies_third_party_domains_included
+   *   List of third party domains that loads cookies to add.
    */
-  public function __construct(string $cookie_agree_selector, string $cookie_banner_selector, array $cookies, array $cookies_ignored = [], array $cookies_third_party_domains_ignored = []) {
+  public function __construct(
+    string $cookie_agree_selector,
+    string $cookie_banner_selector,
+    array $cookies,
+    array $cookies_ignored = [],
+    array $cookies_third_party_domains_ignored = [],
+    array $cookies_third_party_domains_included = []
+  ) {
     $this->cookieAgreeSelector = $cookie_agree_selector;
     $this->cookieBannerSelector = $cookie_banner_selector;
     $this->cookies = $cookies;
     $this->cookiesIgnored = $cookies_ignored;
     $this->cookiesThirdPartyDomainsIgnored = $cookies_third_party_domains_ignored;
+    $this->cookiesThirdPartyDomainsIncluded = $cookies_third_party_domains_included;
   }
 
   /**
@@ -268,12 +287,15 @@ class CookieComplianceContext extends RawMinkContext {
 
     $third_party_cookie_urls_loaded = [];
 
+    $potential_cookie_source_domains = array_unique(array_merge(static::THIRD_PARTY_COOKIE_HOSTS, $this->cookiesThirdPartyDomainsIncluded));
+    $potential_cookie_source_domains = array_diff($potential_cookie_source_domains, $this->cookiesThirdPartyDomainsIgnored);
+
     /** @var \DOMElement $iframe */
     foreach ($page_html_xpath->query('//iframe') as $iframe) {
       $iframe_src = $iframe->getAttribute('src');
       if (!empty($iframe_src)) {
         $iframe_host = parse_url($iframe_src, PHP_URL_HOST);
-        foreach (static::THIRD_PARTY_COOKIE_HOSTS as $third_party_cookie_host) {
+        foreach ($potential_cookie_source_domains as $third_party_cookie_host) {
           if (!in_array($third_party_cookie_host, $this->cookiesThirdPartyDomainsIgnored) && str_ends_with($iframe_host, $third_party_cookie_host)) {
             $third_party_cookie_urls_loaded[] = [
               'url' => $iframe_src,
