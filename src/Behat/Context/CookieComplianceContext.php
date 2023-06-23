@@ -137,6 +137,11 @@ class CookieComplianceContext extends RawMinkContext {
   public function iAcceptCookies() {
     $agree_button = $this->getSession()->getPage()->find('css', $this->cookieAgreeSelector);
     if ($agree_button instanceof NodeElement) {
+      // Some cookie banners have animations that do not let click the agree
+      // button after the animation ends. That's why we wait one second.
+      if (!$agree_button->isVisible()) {
+        sleep(1);
+      }
       $agree_button->press();
       if (!$this->getSession()->wait(10000, sprintf('document.querySelector("%s") == null', $this->cookieBannerSelector))) {
         throw new \Exception(sprintf('The cookie banner with selector "%s" is stil present after accepting cookies.', $this->cookieBannerSelector));
