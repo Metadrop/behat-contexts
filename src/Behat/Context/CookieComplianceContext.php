@@ -143,7 +143,10 @@ class CookieComplianceContext extends RawMinkContext {
         sleep(1);
       }
       $agree_button->press();
-      if (!$this->getSession()->wait(10000, sprintf('document.querySelector("%s") == null', $this->cookieBannerSelector))) {
+      if (!$this->getSession()->wait(
+        10000,
+        sprintf('document.querySelector("%s") == null || document.querySelector("%s").style.visibility == "hidden"',
+          $this->cookieBannerSelector, $this->cookieBannerSelector))) {
         throw new \Exception(sprintf('The cookie banner with selector "%s" is stil present after accepting cookies.', $this->cookieBannerSelector));
       }
     }
