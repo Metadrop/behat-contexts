@@ -72,8 +72,9 @@ class MediaContext extends RawDrupalContext {
    * Upload a media to media field.
    *
    * @Then I upload media with name :media_title to :field field using :widget widget
+   * @Then I assign the media with name :media_title to :field field
    */
-  public function iUploadMediaWithNameToField($media_title, $field, $widget) {
+  public function iUploadMediaWithNameToField($media_title, $field, $widget = 'media_library') {
     if ($widget == 'media_library') {
       $this->uiContext->iClickOnTheElementWithXpath("//input[contains(@id, 'edit-" . $field . "-open-button')]");
       $this->waitingContext->iWaitForAjaxToFinish(30);
