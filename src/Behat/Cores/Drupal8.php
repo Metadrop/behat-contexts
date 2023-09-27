@@ -187,6 +187,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   public function loadLatestEntityByProperties(string $entity_type, array $properties = []) {
     $storage = \Drupal::entityTypeManager()->getStorage($entity_type);
     $query = $storage->getQuery();
+    $query->accessCheck(FALSE);
 
     foreach ($properties as $property => $value) {
       $query->condition($property, $value);
