@@ -225,6 +225,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     $query->sort($id_key, 'DESC');
     $query->range(0, 1);
     $query->addMetaData('account', \Drupal::entityTypeManager()->getStorage('user')->load(1));
+    $query->accessCheck(FALSE);
     $results = $query->execute();
 
     if (!empty($results)) {
