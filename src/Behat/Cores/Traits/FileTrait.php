@@ -32,7 +32,7 @@ trait FileTrait {
       $data = file_get_contents($file_path);
 
       // Existing files are replaced.
-      $file = file_save_data($data, $destination, 1);
+      $file = $this->fileSaveData($data, $destination, 1);
       if (!$file) {
         throw new \Exception("Error: file could not be copied to directory");
       }
