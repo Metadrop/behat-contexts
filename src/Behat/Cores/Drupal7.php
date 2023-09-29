@@ -2,6 +2,7 @@
 
 namespace Metadrop\Behat\Cores;
 
+use Drupal\Core\File\FileSystemInterface;
 use Metadrop\Behat\Cores\Traits\EntityTrait;
 use NuvoleWeb\Drupal\Driver\Cores\Drupal7 as OriginalDrupal7;
 use Metadrop\Behat\Cores\Traits\UsersTrait;
@@ -375,6 +376,13 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
    */
   public function getLanguagePrefix($language) {
     throw new PendingException('Pending to implement method in Drupal 7');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fileSaveData(string $data, $destination = NULL, int $replace = FileSystemInterface::EXISTS_RENAME) {
+    return file_save_data($data, $destination, $replace);
   }
 
 }
