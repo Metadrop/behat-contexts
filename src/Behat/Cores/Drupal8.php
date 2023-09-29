@@ -2,6 +2,7 @@
 
 namespace Metadrop\Behat\Cores;
 
+use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\file\FileInterface;
@@ -29,6 +30,27 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   use FileTrait;
   use EntityTrait;
   use StringTranslationTrait;
+
+  /**
+   * The File Repository service.
+   *
+   * @var \Drupal\file\FileRepositoryInterface
+   */
+  protected $fileRepository;
+
+  /**
+   * Gets the file repository service.
+   *
+   * @return \Drupal\file\FileRepositoryInterface
+   *   The file repository service.
+   */
+  protected function getFileRepository() {
+    if (!$this->fileRepository) {
+      $this->fileRepository = \Drupal::service('file.repository');
+    }
+
+    return $this->fileRepository;
+  }
 
   /**
    * {@inheritdoc}
@@ -540,6 +562,13 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
 
     $prefixes = \Drupal::config('language.negotiation')->get('url.prefixes');
     return $prefixes[array_key_first($found)];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fileSaveData(string $data, $destination = NULL, int $replace = FileSystemInterface::EXISTS_RENAME) {
+    return $this->getFileRepository()->writeData($data, $destination, $replace);
   }
 
 }
