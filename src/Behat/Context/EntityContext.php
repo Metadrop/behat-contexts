@@ -16,6 +16,8 @@ use Symfony\Component\Serializer\Exception\UnsupportedException;
  */
 class EntityContext extends RawDrupalContext {
 
+  use DrupalContextDependencyTrait;
+
   /**
    * Time before scenario.
    *
@@ -85,6 +87,7 @@ class EntityContext extends RawDrupalContext {
   public function goToTheEntityWithLabel($entity_type, $label, $subpath = NULL, $language = NULL) {
     $entity = $this->getCore()->loadEntityByLabel($entity_type, $label);
     $path = $this->getCore()->buildEntityUri($entity_type, $entity, $subpath);
+    print_r([$path]);
     if ($language) {
       $prefix = $this->getCore()->getLanguagePrefix($language);
       $path = $prefix . '/' . $path;
@@ -544,6 +547,52 @@ class EntityContext extends RawDrupalContext {
     $this->entities = [];
     $this->users = [];
     $this->nodes = [];
+  }
+
+  /**
+   * Check current user is not able to perform a specific operation in the site.
+   *
+   * @Then I am able to :operation the :entity_type entity with label :entity_label
+   */
+  public function iAmAbleToDoOperationAtEntityWithLabel($operation, $entity_type, $entity_label) {
+    if (!$this->userHasAccessToEntity($operation, $entity_type, $entity_label)) {
+      throw new \InvalidArgumentException(sprintf('User is not able to "%s" the "%s" entity with label "%s"', $operation, $entity_type, $entity_label));
+    }
+  }
+
+  /**
+   * Check current user is not able to perform a specific operation in the site.
+   *
+   * @Then I am not able to :operation the :entity_type entity with label :entity_label
+   */
+  public function iAmNotAbleToDoOperationAtEntityWithLabel($operation, $entity_type, $entity_label) {
+    if ($this->userHasAccessToEntity($operation, $entity_type, $entity_label)) {
+      throw new \InvalidArgumentException(sprintf('User is able to "%s" the "%s" entity with label "%s"', $operation, $entity_type, $entity_label));
+    }
+  }
+
+  /**
+   * Check if current user has access to operation on specific entity.
+   *
+   * @param string $operation
+   *    Operation that wants to be checked. Examples: view, update, delete.
+   * @param string $entity_type
+   *    Entity type.
+   * @param string $entity_label
+   *    Entity label.
+   */
+  public function userHasAccessToEntity($operation, $entity_type, $entity_label) {
+    $current_user_raw = $this->drupalContext->getUserManager()->getCurrentUser();
+    $current_user_uid = !empty($current_user_raw) ? (int) $current_user_raw->uid : 0;
+    $current_user = $this->getCore()->loadEntityByProperties('user', [
+      'uid' => $current_user_uid
+    ]);
+    $entity = $this->getCore()->loadEntityByLabel($entity_type, $entity_label);
+    if (!$entity instanceof EntityInterface) {
+      throw new \InvalidArgumentException(sprintf('The "%s" entity with label "%s"', $entity_type, $entity_label));
+    }
+
+    return $entity->access($operation, $current_user);
   }
 
 }
