@@ -239,7 +239,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
         break;
 
       case NULL:
-        $route = 'canonical';
+        $rel = 'canonical';
         break;
 
     }
