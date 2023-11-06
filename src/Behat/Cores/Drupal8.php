@@ -237,6 +237,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
       case 'add':
         $route = $route . '-form';
         break;
+
       case NULL:
         $route = 'canonical';
         break;
