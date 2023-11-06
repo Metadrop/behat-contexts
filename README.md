@@ -266,7 +266,7 @@ Steps to check url values
      Check an url hasn't a specific value in a query parameter.
 
 
-### IUContext
+### UIContext
 
 This context provides steps for certain UI elements.
 
@@ -278,6 +278,17 @@ This context provides steps for certain UI elements.
   doesn't work with multiple selection enabled or tag style.
 
   See https://harvesthq.github.io/chosen/
+
+#### Example of how to use internal method elementShouldBeInPosition
+
+    /**
+    * Example of implementation elementShouldBeInPosition on a custom step.
+    *
+    * @Then the card on the infinite scroll view with title :title should be in position :position.
+    */
+    public function theCardWithTitleShouldBeInPositionExample(string $title, string $position) {
+      $this->elementShouldBeInPosition('item-list-css-selector', $title, 'views-infinite-scroll-content-wrapper', $position);
+    }
 
 ### WaitingContext
 
