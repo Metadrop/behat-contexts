@@ -242,6 +242,8 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
         $rel = 'canonical';
         break;
 
+       default:
+          return $entity->toUrl()->getInternalPath() . '/' . $route;
     }
     return $entity->toUrl($rel)->getInternalPath();
   }
