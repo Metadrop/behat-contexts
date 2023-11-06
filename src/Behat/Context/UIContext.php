@@ -449,7 +449,7 @@ class UIContext extends RawMinkContext {
    *
    * @Note This method is an internal function,
    * create a more human-readable step to use on your test.
-   * Example of use on method theCardWithTitleShouldBeInPositionExample().
+   * Example of use in the README, on the UIContext section.
    */
   public function elementShouldBeInPosition(string $item_class_selector, string $item_label, string $list_wrapper_class_selector, int $item_position) {
     $session = $this->getSession();
