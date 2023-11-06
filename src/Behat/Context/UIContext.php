@@ -460,13 +460,4 @@ class UIContext extends RawMinkContext {
     }
   }
 
-  /**
-   * Example of implementation elementShouldBeInPosition on a custom step.
-   *
-   * Then the card with title :title should be in position :position.
-   */
-  public function theCardWithTitleShouldBeInPositionExample(string $title, string $position) {
-    $this->elementShouldBeInPosition('item-list-css-selector', $title, 'views-infinite-scroll-content-wrapper', $position);
-  }
-
 }
