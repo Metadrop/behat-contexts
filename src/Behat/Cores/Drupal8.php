@@ -243,7 +243,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
         break;
 
     }
-    return $entity->toUrl($route)->getInternalPath();
+    return $entity->toUrl($rel)->getInternalPath();
   }
 
   /**
