@@ -237,15 +237,9 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
       case 'add':
         $rel .= '-form';
         break;
-
-      case NULL:
-        $rel = 'canonical';
-        break;
-
-       default:
-          return $entity->toUrl()->getInternalPath() . '/' . $route;
+      default:
+        return $entity->toUrl()->getInternalPath() . '/' . $route;
     }
-    return $entity->toUrl($rel)->getInternalPath();
   }
 
   /**
