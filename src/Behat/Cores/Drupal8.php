@@ -241,6 +241,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
       case NULL:
         $route = 'canonical';
         break;
+
     }
     return $entity->toUrl($route)->getInternalPath();
   }
