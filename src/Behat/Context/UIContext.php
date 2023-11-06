@@ -447,7 +447,7 @@ class UIContext extends RawMinkContext {
    * @param int $item_position
    *   Item position.
    *
-   * @Note This method is an internal function,
+   * @Note This method is an internal method,
    * create a more human-readable step to use on your test.
    * Example of use in the README, on the UIContext section.
    */
