@@ -2,6 +2,8 @@
 
 namespace Metadrop\Behat\Cores;
 
+use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\file\FileInterface;
 use Drupal\ultimate_cron\Entity\CronJob;
@@ -13,14 +15,13 @@ use Metadrop\Behat\Cores\Traits\FileTrait;
 use Metadrop\Behat\Cores\Traits\EntityTrait;
 use Webmozart\Assert\Assert;
 use Behat\Behat\Tester\Exception\PendingException;
-use Drupal\user\Entity\User;
 use Drupal\paragraphs\Entity\Paragraph;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Component\Render\FormattableMarkup;
 use Metadrop\Exception\EntityNotFoundException;
 
 /**
- * Class Drupal8.
+ * Class helper for core Drupal 8.
  */
 class Drupal8 extends OriginalDrupal8 implements CoreInterface {
 
@@ -28,6 +29,28 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   use CronTrait;
   use FileTrait;
   use EntityTrait;
+  use StringTranslationTrait;
+
+  /**
+   * The File Repository service.
+   *
+   * @var \Drupal\file\FileRepositoryInterface
+   */
+  protected $fileRepository;
+
+  /**
+   * Gets the file repository service.
+   *
+   * @return \Drupal\file\FileRepositoryInterface
+   *   The file repository service.
+   */
+  protected function getFileRepository() {
+    if (!$this->fileRepository) {
+      $this->fileRepository = \Drupal::service('file.repository');
+    }
+
+    return $this->fileRepository;
+  }
 
   /**
    * {@inheritdoc}
@@ -81,7 +104,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
 
     $cron_job = current(\Drupal::entityTypeManager()->getStorage('ultimate_cron_job')->loadByProperties(['id' => $job]));
     if ($cron_job instanceof CronJob) {
-      $cron_job->run(t('Run by behat Cron Context'));
+      $cron_job->run($this->t('Run by behat Cron Context'));
     }
     else {
       throw new \InvalidArgumentException(sprintf("Could not find cron job with name: " . $job));
@@ -106,6 +129,8 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    *   Whether or not to reset the cache before loading the entity.
    *
    * @return \Drupal\Core\Entity\EntityInterface|mixed
+   *   Entity found.
+   *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
@@ -161,6 +186,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    *   The entity type to search.
    *
    * @return \Drupal\Core\Entity\EntityInterface|null
+   *   Latest entity.
    */
   public function loadLatestEntity(string $entity_type) {
     return $this->loadLatestEntityByProperties($entity_type);
@@ -175,12 +201,15 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    *   The properties to search for.
    *
    * @return \Drupal\Core\Entity\EntityInterface|null
+   *   Latest entity.
+   *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function loadLatestEntityByProperties(string $entity_type, array $properties = []) {
     $storage = \Drupal::entityTypeManager()->getStorage($entity_type);
     $query = $storage->getQuery();
+    $query->accessCheck(FALSE);
 
     foreach ($properties as $property => $value) {
       $query->condition($property, $value);
@@ -219,6 +248,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     $query->sort($id_key, 'DESC');
     $query->range(0, 1);
     $query->addMetaData('account', \Drupal::entityTypeManager()->getStorage('user')->load(1));
+    $query->accessCheck(FALSE);
     $results = $query->execute();
 
     if (!empty($results)) {
@@ -292,9 +322,9 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
 
     if (!empty($directory) && strpos($directory, $private) !== FALSE) {
       $path = str_replace($private, '', $directory);
-      $destination = \Drupal\Core\Url::fromRoute('system.private_file_download', ['filepath' => $path . '/' . $filename], [
-          'relative' => TRUE,
-        ])->toString();
+      $destination = Url::fromRoute('system.private_file_download', ['filepath' => $path . '/' . $filename], [
+        'relative' => TRUE,
+      ])->toString();
     }
 
     return (!empty($destination)) ? $destination : NULL;
@@ -388,7 +418,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
    */
   public function getDbLogMessages(int $scenario_start_time, array $severities = [], array $types = []) {
     $query = \Drupal::database()->select('watchdog', 'w')
-      ->fields('w', ['message', 'variables', 'type', 'wid'])
+      ->fields('w', ['message', 'variables', 'type', 'severity', 'wid'])
       ->condition('timestamp', $scenario_start_time, '>=');
 
     if (!empty($severities)) {
@@ -405,9 +435,53 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function formatString($string, array $params) {
+  public static function getDbLogGroupedMessages(
+    int $start_time,
+    array $severities = [],
+    array $types = [],
+    int $log_limit = -1
+  ) {
+    $query = \Drupal::database()->select('watchdog', 'w');
+    $query->fields('w', ['message', 'variables', 'type', 'severity'])
+      ->condition('timestamp', $start_time, '>=')
+      ->addExpression('COUNT(wid)', 'watchdog_message_count');
+    $query->addExpression('MAX(wid)', 'wid');
+    $query->addExpression('MAX(link)', 'link');
+    $query->addExpression('GROUP_CONCAT(DISTINCT(location))', 'location');
+    $query->addExpression('GROUP_CONCAT(DISTINCT(referer))', 'referer');
+    $query->groupBy('message');
+    $query->groupBy('variables');
+    $query->groupBy('type');
+    $query->groupBy('severity');
+    $query->orderBy('watchdog_message_count', 'DESC');
+    if ($log_limit > 0) {
+      $query->range(0, $log_limit);
+    }
+
+    if (!empty($severities)) {
+      $query->condition('severity', $severities, 'IN');
+    }
+
+    if (!empty($types)) {
+      $query->condition('type', $types, 'IN');
+    }
+
+    return $query->execute()->fetchAll();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function formatStringStatic($string, array $params) {
     $string = new FormattableMarkup($string, $params);
     return $string;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function formatString($string, array $params) {
+    return static::formatStringStatic($string, $params);
   }
 
   /**
@@ -440,7 +514,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   }
 
   /**
-   * Gets the current Honeypot time limit
+   * Gets the current Honeypot time limit.
    *
    * @return int
    *   The time limit value
@@ -450,7 +524,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   }
 
   /**
-   * Sets the Honeypot time limit
+   * Sets the Honeypot time limit.
    *
    * @param int $time_limit
    *   The time limit to be set.
@@ -488,6 +562,13 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
 
     $prefixes = \Drupal::config('language.negotiation')->get('url.prefixes');
     return $prefixes[array_key_first($found)];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function fileSaveData(string $data, $destination = NULL, int $replace = FileSystemInterface::EXISTS_RENAME) {
+    return $this->getFileRepository()->writeData($data, $destination, $replace);
   }
 
 }

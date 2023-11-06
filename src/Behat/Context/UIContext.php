@@ -3,7 +3,6 @@
 namespace Metadrop\Behat\Context;
 
 use Behat\Behat\Context\Environment\InitializedContextEnvironment;
-use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
 use NuvoleWeb\Drupal\DrupalExtension\Context\RawMinkContext;
@@ -20,7 +19,7 @@ use NuvoleWeb\Drupal\DrupalExtension\Context\ScreenShotContext;
 /**
  * Adds steps for UI elements.
  */
-class UIContext extends RawMinkContext implements SnippetAcceptingContext {
+class UIContext extends RawMinkContext {
 
   /**
    * Context parameters.
@@ -165,8 +164,10 @@ class UIContext extends RawMinkContext implements SnippetAcceptingContext {
     $op = $offset >= 0 ? '+' : '-';
     $script = "jQuery('html,body').unbind().animate({scrollTop: jQuery('$selector').offset().top" . $op . abs($offset) . "},0)";
     $this->getSession()->executeScript($script);
-    // Added waiting for scroll.
-    usleep(1000);
+    // Added waiting for scroll. Default is half a second, but it can
+    // be overriden in UIContext.
+    $scroll_wait_seconds = $this->customParams['scroll_time'] ?? 0.5;
+    usleep($scroll_wait_seconds * pow(10, 6));
   }
 
   /**
@@ -420,7 +421,7 @@ class UIContext extends RawMinkContext implements SnippetAcceptingContext {
    */
   public function inputIsDisabled($label) {
     $session = $this->getSession();
-    $xpath = "//label[contains(text(),'" . $label . "')]/following-sibling::input";
+    $xpath = "//input[@id=//label[contains(text(),'" . $label . "')]/@for]";
     $element = $session->getPage()->find(
       'xpath',
       $xpath

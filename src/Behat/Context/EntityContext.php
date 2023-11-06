@@ -3,7 +3,6 @@
 namespace Metadrop\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
-use Behat\Behat\Context\SnippetAcceptingContext;
 use Drupal\Core\Entity\Entity;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Driver\BlackboxDriver;
@@ -15,7 +14,9 @@ use Symfony\Component\Serializer\Exception\UnsupportedException;
 /**
  * Class EntityContext.
  */
-class EntityContext extends RawDrupalContext implements SnippetAcceptingContext {
+class EntityContext extends RawDrupalContext {
+
+  use DrupalContextDependencyTrait;
 
   /**
    * Time before scenario.
@@ -81,16 +82,45 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
    * @Given I go to the :entity_type entity with label :label
    * @Given I go to the :entity_type entity with label :label in :language language
    * @Given I go to :subpath of the :entity_type entity with label :label
+   * @Given I go to :subpath of the :entity_type entity with label :label in :language language
    */
   public function goToTheEntityWithLabel($entity_type, $label, $subpath = NULL, $language = NULL) {
     $entity = $this->getCore()->loadEntityByLabel($entity_type, $label);
     $path = $this->getCore()->buildEntityUri($entity_type, $entity, $subpath);
+    print_r([$path]);
     if ($language) {
       $prefix = $this->getCore()->getLanguagePrefix($language);
       $path = $prefix . '/' . $path;
     }
     if (!empty($path)) {
       $this->getSession()->visit($this->locatePath($path));
+    }
+  }
+
+  /**
+   * Go to a specific path of an entity with an specific properties.
+   *
+   * @Given I go to the :entity_type entity with properties:
+   * @Given I go to :subpath of the :entity_type entity with properties:
+   * @Given I go to the :entity_type entity in :language language with properties:
+   */
+  public function goToTheEntityWithProperties($entity_type, TableNode $properties, $subpath = NULL, $language = NULL) {
+    $properties_filter = [];
+    foreach ($properties->getHash()[0] as $property_name => $property_value) {
+      $properties_filter[$property_name] = $property_value;
+    }
+    $entity = $this->getCore()->loadEntityByProperties($entity_type, $properties_filter);
+    $path = $this->getCore()->buildEntityUri($entity_type, $entity, $subpath);
+
+    if ($language) {
+      $prefix = $this->getCore()->getLanguagePrefix($language);
+      $path = $prefix . '/' . $path;
+    }
+    if (!empty($path)) {
+      $this->visitPath($path);
+    }
+    else {
+      throw new \Exception("Error: Entity or path not found");
     }
   }
 
@@ -316,8 +346,13 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
           $values[$key] = $this->getCore()->getEntityFieldValue($destiny_replacement, $entity, $values[$key]);
         }
       }
-      elseif (strpos($value, 'relative-date:') === 0) {
-        $values[$key] = strtotime(str_replace('relative-date:', '', $value));
+      elseif (strtok($value, ':') == 'relative-date' && ($relative_date = strtok(':')) !== FALSE) {
+        $timestamp = strtotime($relative_date);
+        // Get the rest of the string, not only string separated by ":",
+        // This way we make sure if the format is something like "Y:m:d"
+        // it won't be cut by ":".
+        $format = strtok('');
+        $values[$key] = $format === FALSE ? $timestamp : \date($format, $timestamp);
       }
     }
     return $values;
@@ -461,10 +496,16 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
     }
 
     $saved = $entity->save();
-    $this->dispatchHooks('AfterEntityCreateScope', (object) (array) $entity, $entity_type);
+    $entity_values = $entity->toArray();
+    // Place a generic id key for easier access to the value, since in the most
+    // cases we only need the id in the AfterEntityCreateScope context in order
+    // to load the entity.
+    $entity_values['id'] = $entity->id();
+
+    $this->dispatchHooks('AfterEntityCreateScope', (object) $entity_values, $entity_type);
     $this->entities[] = [
       'entity_type' => $entity_type,
-      'entity_id' => $entity->id(),
+      'entity_id' => $entity_values['id'],
     ];
 
     return $saved;
@@ -506,6 +547,52 @@ class EntityContext extends RawDrupalContext implements SnippetAcceptingContext 
     $this->entities = [];
     $this->users = [];
     $this->nodes = [];
+  }
+
+  /**
+   * Check current user is not able to perform a specific operation in the site.
+   *
+   * @Then I am able to :operation the :entity_type entity with label :entity_label
+   */
+  public function iAmAbleToDoOperationAtEntityWithLabel($operation, $entity_type, $entity_label) {
+    if (!$this->userHasAccessToEntity($operation, $entity_type, $entity_label)) {
+      throw new \InvalidArgumentException(sprintf('User is not able to "%s" the "%s" entity with label "%s"', $operation, $entity_type, $entity_label));
+    }
+  }
+
+  /**
+   * Check current user is not able to perform a specific operation in the site.
+   *
+   * @Then I am not able to :operation the :entity_type entity with label :entity_label
+   */
+  public function iAmNotAbleToDoOperationAtEntityWithLabel($operation, $entity_type, $entity_label) {
+    if ($this->userHasAccessToEntity($operation, $entity_type, $entity_label)) {
+      throw new \InvalidArgumentException(sprintf('User is able to "%s" the "%s" entity with label "%s"', $operation, $entity_type, $entity_label));
+    }
+  }
+
+  /**
+   * Check if current user has access to operation on specific entity.
+   *
+   * @param string $operation
+   *    Operation that wants to be checked. Examples: view, update, delete.
+   * @param string $entity_type
+   *    Entity type.
+   * @param string $entity_label
+   *    Entity label.
+   */
+  public function userHasAccessToEntity($operation, $entity_type, $entity_label) {
+    $current_user_raw = $this->drupalContext->getUserManager()->getCurrentUser();
+    $current_user_uid = !empty($current_user_raw) ? (int) $current_user_raw->uid : 0;
+    $current_user = $this->getCore()->loadEntityByProperties('user', [
+      'uid' => $current_user_uid
+    ]);
+    $entity = $this->getCore()->loadEntityByLabel($entity_type, $entity_label);
+    if (!$entity instanceof EntityInterface) {
+      throw new \InvalidArgumentException(sprintf('The "%s" entity with label "%s"', $entity_type, $entity_label));
+    }
+
+    return $entity->access($operation, $current_user);
   }
 
 }

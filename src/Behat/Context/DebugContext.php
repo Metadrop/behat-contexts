@@ -9,7 +9,6 @@
 
 namespace Metadrop\Behat\Context;
 
-use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Behat\Hook\Scope\AfterStepScope;
 use Behat\Testwork\Tester\Result\TestResult;
@@ -43,7 +42,7 @@ use NuvoleWeb\Drupal\DrupalExtension\Context\ScreenShotContext as NuvoleScreensh
  *  the other files of the report.
  *
  */
-class DebugContext extends NuvoleScreenshotContext implements SnippetAcceptingContext {
+class DebugContext extends NuvoleScreenshotContext {
 
   const DEFAULT_HEIGHT = 600;
 
@@ -215,7 +214,7 @@ class DebugContext extends NuvoleScreenshotContext implements SnippetAcceptingCo
    *
    * Contains the current URL and the error exception dump.
    */
-  protected function saveInfoFile($filename = '',  $result) {
+  protected function saveInfoFile($filename,  $result) {
     $error_file =  $filename . '.txt';
     $error_filepath = $this->getReportPath() . '/' . $error_file;
 
@@ -316,7 +315,7 @@ class DebugContext extends NuvoleScreenshotContext implements SnippetAcceptingCo
     $file_path = parent::createScreenshot($file_name, $message, $ext);
     $file_base_name = basename($file_path);
     if ($url = $this->getScreenshotsUrl()) {
-      print 'Screenshot url:' . $url . DIRECTORY_SEPARATOR . $file_base_name . "\n";
+      print 'Screenshot url: ' . $url . DIRECTORY_SEPARATOR . $file_base_name . "\n";
     }
   }
 
