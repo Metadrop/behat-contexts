@@ -238,8 +238,9 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
         $rel = sprintf('%s-form', $route) ;
         break;
       default:
-        return $entity->toUrl()->getInternalPath() . '/' . $route;
+        $rel = $route;
     }
+    return $entity->linkHasTemplate($rel) ? $entity->toUrl($rel)->getInternalPath() :  $entity->toUrl()->getInternalPath() . '/' . $route;
   }
 
   /**
