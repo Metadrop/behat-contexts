@@ -13,8 +13,9 @@ class UrlContext extends RawMinkContext {
    */
   public function urlShouldHaveParamWithValue($param, $value, $have = TRUE) {
     $url = $this->getSession()->getCurrentUrl();
+    $url_query = parse_url($url, PHP_URL_QUERY) ?? '';
     $queries = [];
-    parse_str(parse_url($url, PHP_URL_QUERY), $queries);
+    parse_str($url_query, $queries);
     if (!(isset($queries[$param]) && $queries[$param] == $value) && $have) {
       throw new \Exception("The param " . $param . " with value " . $value . " is not in the url");
     }
