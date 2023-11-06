@@ -235,7 +235,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
       case 'edit':
       case 'delete':
       case 'add':
-        $rel .= '-form';
+        $rel = sprintf('%s-form', $route) ;
         break;
       default:
         return $entity->toUrl()->getInternalPath() . '/' . $route;
