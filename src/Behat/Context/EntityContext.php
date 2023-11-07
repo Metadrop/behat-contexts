@@ -87,7 +87,7 @@ class EntityContext extends RawDrupalContext {
   public function goToTheEntityWithLabel($entity_type, $label, $subpath = NULL, $language = NULL) {
     $entity = $this->getCore()->loadEntityByLabel($entity_type, $label);
     $path = $this->getCore()->buildEntityUri($entity_type, $entity, $subpath);
-    print_r([$path]);
+
     if ($language) {
       $prefix = $this->getCore()->getLanguagePrefix($language);
       $path = $prefix . '/' . $path;
