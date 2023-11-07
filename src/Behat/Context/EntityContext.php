@@ -367,6 +367,10 @@ class EntityContext extends RawDrupalContext {
     foreach ($entity_tokens as $entity_token) {
       $token_pieces = explode(':', str_replace(['[', ']'], ['', ''], $entity_token));
       array_shift($token_pieces);
+      if (count($token_pieces) < 4) {
+        throw new \Exception(sprintf('Missing arguments to find the entity token with name: %s', $entity_token));
+      }
+
       list($entity_type, $field_key, $field_value, $destiny_replacement) = $token_pieces;
 
       if (!in_array($entity_type, $entity_types)) {
