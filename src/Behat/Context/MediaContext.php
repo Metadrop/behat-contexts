@@ -78,7 +78,7 @@ class MediaContext extends RawDrupalContext {
     if ($widget == 'media_library') {
       $this->uiContext->iClickOnTheElementWithXpath("//input[contains(@id, 'edit-" . $field . "-open-button')]");
       $this->waitingContext->iWaitForAjaxToFinish(30);
-      $xpath = "//*[@id='drupal-modal']//label[text()='Select " . $media_title . "']/following-sibling::input";
+      $xpath = "//div[contains(@class, 'views-field-media-library-select-form')]//div[contains(@class, 'form-type--checkbox')]/label[contains(text(),'". $media_title ."')]/following-sibling::input";
       $this->iSelectMedia($widget, $xpath);
     }
   }
