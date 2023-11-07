@@ -240,7 +240,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
       default:
         $rel = $route;
     }
-    return $entity->linkHasTemplate($rel) ? $entity->toUrl($rel)->getInternalPath() :  $entity->toUrl()->getInternalPath() . '/' . $route;
+    return $entity->hasLinkTemplate($rel) ? $entity->toUrl($rel)->getInternalPath() :  $entity->toUrl()->getInternalPath() . '/' . $route;
   }
 
   /**
