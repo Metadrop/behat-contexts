@@ -9,12 +9,6 @@
             "email": "hi@metadrop.net"
         }
     ],
-    "repositories": [
-      {
-        "type": "vcs",
-        "url": "https://github.com/Metadrop/drupal-behat.git"
-      }
-    ],
     "require": {
       "nuvoleweb/drupal-behat": "^1.2",
       "symfony/console": "^4 || ^5 || ^6"
