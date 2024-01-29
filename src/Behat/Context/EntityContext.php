@@ -70,10 +70,7 @@ class EntityContext extends RawDrupalContext {
     }
 
     $entity = $this->getCore()->entityLoadSingle($entity_type, $last_entity);
-    $path = $this->getCore()->buildEntityUri($entity_type, $entity, $subpath);
-    if (!empty($path)) {
-      $this->getSession()->visit($this->locatePath($path));
-    }
+    $this->visitEntityPath($entity_type, $entity, $subpath);
   }
 
   /**
@@ -86,15 +83,7 @@ class EntityContext extends RawDrupalContext {
    */
   public function goToTheEntityWithLabel($entity_type, $label, $subpath = NULL, $language = NULL) {
     $entity = $this->getCore()->loadEntityByLabel($entity_type, $label);
-    $path = $this->getCore()->buildEntityUri($entity_type, $entity, $subpath);
-
-    if ($language) {
-      $prefix = $this->getCore()->getLanguagePrefix($language);
-      $path = $prefix . '/' . $path;
-    }
-    if (!empty($path)) {
-      $this->getSession()->visit($this->locatePath($path));
-    }
+    $this->visitEntityPath($entity_type, $entity, $subpath, $language);
   }
 
   /**
@@ -110,13 +99,28 @@ class EntityContext extends RawDrupalContext {
       $properties_filter[$property_name] = $property_value;
     }
     $entity = $this->getCore()->loadEntityByProperties($entity_type, $properties_filter);
-    $path = $this->getCore()->buildEntityUri($entity_type, $entity, $subpath);
+    $this->visitEntityPath($entity_type, $entity, $subpath, $language);
+  }
 
-    if ($language) {
-      $prefix = $this->getCore()->getLanguagePrefix($language);
-      $path = $prefix . '/' . $path;
-    }
-    if (!empty($path)) {
+  /**
+   * Visit a path of a specific entity.
+   *
+   * @param string $entity_type
+   *   Entity type.
+   * @param mixed $entity
+   *   Entity.
+   * @param string|NULL $subpath
+   *   Subpath.
+   * @param $language
+   *   Language.
+   */
+  protected function visitEntityPath(string $entity_type, $entity, string $subpath = NULL, $language = NULL) {
+    $path_found = $this->getCore()->buildEntityUri($entity_type, $entity, $subpath);
+    if (!empty($path_found)) {
+      $path = $this->getCore()->buildPath(
+        '/' . $path_found,
+        $language,
+      );
       $this->visitPath($path);
     }
     else {

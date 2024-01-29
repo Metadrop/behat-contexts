@@ -385,4 +385,15 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
     return file_save_data($data, $destination, $replace);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function buildPath(string $path, string $langcode = NULL) {
+    if (!empty($langcode)) {
+      $prefix = $this->getLanguagePrefix($langcode);
+      return $prefix . '/' . $path;
+    }
+    return $path;
+  }
+
 }

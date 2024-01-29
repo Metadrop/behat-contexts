@@ -579,4 +579,22 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     return $this->getFileRepository()->writeData($data, $destination, $replace);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function buildPath(string $path, string $langcode = NULL) {
+    $url_parameters = [];
+    if (!empty($langcode)) {
+      $language_manager = \Drupal::languageManager();
+      $language = $language_manager->getLanguage($langcode);
+      if (!$language instanceof LanguageInterface) {
+        throw new \InvalidArgumentException(sprintf("Language %s not found", $langcode));
+      }
+      $url_parameters['language'] = $language;
+    }
+
+    $url = Url::fromUserInput($path, $url_parameters);
+    return $url->toString();
+  }
+
 }
