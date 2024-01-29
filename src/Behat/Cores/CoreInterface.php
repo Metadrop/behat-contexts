@@ -382,4 +382,22 @@ interface CoreInterface {
    */
   public function getLanguagePrefix($language);
 
+  /**
+   * Builds URL string given an internal path and a langcode.
+   *
+   * It is needed to build a URL without knowing the specific
+   * language detection the site has. Typically language detection
+   * is done by language prefix, but in some cases other specific
+   * logics are used.
+   *
+   * @param string $path
+   *   Drupal internal path.
+   * @param string|NULL $langcode
+   *   Langcode, if needed.
+   *
+   * @return string
+   *   Relative path accesible by browser.
+   */
+  public function buildPath(string $path, string $langcode = NULL);
+
 }
