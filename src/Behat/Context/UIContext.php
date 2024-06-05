@@ -33,6 +33,14 @@ class UIContext extends RawMinkContext {
    */
   protected $waitingContext;
 
+    
+  /**
+   * The iframe to switch to.
+   *
+   * @var string
+   */
+  protected $iframe;
+
   /**
    * Constructor.
    *
