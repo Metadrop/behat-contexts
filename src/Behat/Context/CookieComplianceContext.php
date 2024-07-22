@@ -356,9 +356,20 @@ class CookieComplianceContext extends RawMinkContext {
    * Check cookie exists.
    *
    * @Given the cookie with name :cookie_name exists
+   */
+  public function cookieExists($cookie_name) {
+    $cookie_value = $this->getSession()->getDriver()->getCookie($cookie_name);
+    if (empty($cookie_value)) {
+      throw new \Exception(sprintf("Cookie with name %s does not have value.", $cookie_name));
+    }
+  }
+
+  /**
+   * Check cookie exists with value.
+   *
    * @Given the cookie with name :cookie_name exists with value :value
    */
-  public function cookieExists($cookie_name, $value = NULL) {
+  public function cookieExistsWithValue($cookie_name, $value) {
     $cookie_value = $this->getSession()->getDriver()->getCookie($cookie_name);
     if (empty($cookie_value)) {
       throw new \Exception(sprintf("Cookie with name %s does not have value.", $cookie_name));
