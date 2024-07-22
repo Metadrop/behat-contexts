@@ -350,6 +350,7 @@ class CookieComplianceContext extends RawMinkContext {
     $output->writeln("\nPlease check and exclude them if not applicable. Set the cookies_third_party_domains_ignored variable up.\n");
 
     echo $output->fetch();
+  }
 
   /**
    * Check cookie exists.
@@ -362,7 +363,7 @@ class CookieComplianceContext extends RawMinkContext {
     if (empty($cookie_value)) {
       throw new \Exception(sprintf("Cookie with name %s does not have value.", $cookie_name));
     }
-    if (!empty($value) && $value <> $cookie_value) {
+    if (!empty($value) && $value != $cookie_value) {
       throw new \Exception(sprintf("Cookie with name %s does not have the expected value %s, it has %s.", $cookie_name, $value, $cookie_value));
     }
   }
