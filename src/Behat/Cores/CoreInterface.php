@@ -400,4 +400,11 @@ interface CoreInterface {
    */
   public function buildPath(string $path, string $langcode = NULL);
 
+  /**
+   * Gets the request time.
+   *
+   * @return int
+   */
+  public function getRequestTime();
+
 }

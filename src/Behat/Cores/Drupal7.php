@@ -396,4 +396,11 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
     return $path;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getRequestTime() {
+    return REQUEST_TIME;
+  }
+
 }

@@ -598,4 +598,11 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
     return $url->toString();
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getRequestTime() {
+    return \Drupal::time()->getRequestTime();
+  }
+
 }

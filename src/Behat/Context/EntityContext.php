@@ -427,7 +427,7 @@ class EntityContext extends RawDrupalContext {
       throw new UnsupportedDriverActionException('No ability to purge entities, put @api in your scenario.', $this->getDriver());
     }
 
-    $this->timeBeforeScenario = REQUEST_TIME;
+    $this->timeBeforeScenario = $this->getCore()->getRequestTime();
   }
 
   /**
