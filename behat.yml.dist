@@ -30,7 +30,12 @@ default:
         - Metadrop\Behat\Context\UsersContext
         - Metadrop\Behat\Context\UsersRandomContext
         - Metadrop\Behat\Context\WaitingContext
-
+        - Metadrop\Behat\Context\VideoRecordingContext:
+            parameters:
+              show_test_info_screen: true
+              show_test_info_screen_time: 2000
+              show_green_screen: false
+              show_green_screen_time: 0
      filters:
         tags: "~@exclude"
   extensions:
