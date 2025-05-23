@@ -354,7 +354,14 @@ Add `VideoRecordingContext` to your suite in `behat.yml`:
 ```yaml
 - Metadrop\Behat\Context\VideoRecordingContext:
     parameters:
-      show_test_info_screen: true
-      show_test_info_screen_time: 2000
-      show_green_screen: false
-      show_green_screen_time: 0
+        - Metadrop\Behat\Context\VideoRecordingContext:
+            parameters:
+              enabled: true
+              show_test_info_screen: true
+              show_test_info_screen_time: 2000
+              show_green_screen: false
+              show_green_screen_time: 1000
+              show_step_info_bubble: true
+              show_step_info_bubble_time: 2000
+              show_error_info_bubble: true
+              show_error_info_bubble_time: 2000

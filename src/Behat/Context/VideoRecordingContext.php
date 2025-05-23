@@ -8,9 +8,12 @@
 
 namespace Metadrop\Behat\Context;
 
+use Behat\Behat\Hook\Scope\AfterStepScope;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Behat\Hook\Scope\BeforeStepScope;
 use NuvoleWeb\Drupal\DrupalExtension\Context\RawMinkContext;
-
+use Behat\Hook\AfterStep;
+use Behat\Hook\BeforeStep;
 
 /**
  * Context to show test info before tests to record it.
@@ -46,10 +49,15 @@ class VideoRecordingContext extends RawMinkContext {
   public function __construct($parameters = []) {
     // Default values.
     $defaults = [
+      'enabled' => FALSE,
       'show_test_info_screen' => TRUE,
       'show_test_info_screen_time' => 2000,
       'show_green_screen' => FALSE,
       'show_green_screen_time' => 3000,
+      'show_step_info_bubble' => TRUE,
+      'show_step_info_bubble_time' => 2000,
+      'show_error_info_bubble' => TRUE,
+      'show_error_info_bubble_time' => 2000,
     ];
 
     // Collect received parameters.
@@ -72,6 +80,10 @@ class VideoRecordingContext extends RawMinkContext {
    *    Scenary scope.
    */
   public function showScenarioDataBeforeTest(BeforeScenarioScope $scope) {
+    if (!$this->customParameters['enabled']) {
+      return;
+    }
+
     // Show green screen.
     if ($this->customParameters['show_green_screen']) {
       // Build green split page
@@ -121,5 +133,65 @@ class VideoRecordingContext extends RawMinkContext {
         . json_encode($html) . ";");
       $this->getSession()->wait($this->customParameters['show_test_info_screen_time']);
     }
+  }
+
+  /**
+   * Show step info after each step
+   *
+   * @AfterStep
+   */
+  public function showRedWindowIfError(AfterStepScope $scope) {
+    if (!$this->isJavascriptAvailable() || !$this->customParameters['show_error_info_bubble'] || !$this->customParameters['enabled']) {
+      return;
+    }
+
+    if (!$scope->getTestResult()->isPassed()) {
+      // Get the step text.
+      $step = $scope->getStep()->getText();
+      if ($scope->getStep()->hasArguments()) {
+        $arguments = $scope->getStep()->getArguments();
+        foreach ($arguments as $argument) {
+          $step .= '<br/>' . str_replace("\n",'<br/>', $argument->getTableAsString());
+        }
+      }
+      $step = 'Test Failed: ' . str_replace(' ', '&nbsp;', $step);
+      $div_html = '<div id="behat-step" style="position: fixed; top: 100px; left: 100px;  background-color: rgba(255,0,0,1); color: white; padding: 15px; z-index: 999999; border-radius: 3px; font-family: monospace; font-size: 16px; text-align: center;">' . $step . '</div>';
+      $this->getSession()->executeScript("document.body.insertAdjacentHTML('afterbegin', '" . $div_html . "');");
+      $this->getSession()->wait($this->customParameters['show_error_info_bubble_time']);
+      $this->getSession()->executeScript("document.getElementById('behat-step').remove();");
+    }
+  }
+
+  /**
+   * Show step info before each step
+   *
+   * @BeforeStep
+   */
+  public function showStepInfo(BeforeStepScope $scope) {
+    if (!$this->isJavascriptAvailable() || !$this->customParameters['show_step_info_bubble'] || !$this->customParameters['enabled']) {
+      return;
+    }
+    $step = $scope->getStep()->getText();
+    if ($scope->getStep()->hasArguments()) {
+      $arguments = $scope->getStep()->getArguments();
+      foreach ($arguments as $argument) {
+        $step .= '<br/>' . str_replace("\n",'<br/>', $argument->getTableAsString());
+      }
+    }
+    $step = str_replace(' ', '&nbsp;', $step);
+    $div_html = '<div id="behat-step" style="position: fixed; bottom: 20px; left: 10px; background-color: rgba(0,100,0,1); color: white; padding: 5px; z-index: 999999; border-radius: 3px; font-family: monospace; font-size: 12px;">' . $step . '</div>';
+    $this->getSession()->executeScript("document.body.insertAdjacentHTML('afterbegin', '" . $div_html . "');");
+    $this->getSession()->wait($this->customParameters['show_step_info_time']);
+    $this->getSession()->executeScript("document.getElementById('behat-step').remove();");
+  }
+
+  /**
+   * Check if javascript is available.
+   */
+  protected function isJavascriptAvailable() {
+    $driver = $this->getSession()->getDriver();
+    return $driver instanceof \Behat\Mink\Driver\Selenium2Driver
+      || $driver instanceof \Behat\Mink\Driver\ChromeDriver
+      || $driver instanceof \Behat\Mink\Driver\PantherDriver;
   }
 }
