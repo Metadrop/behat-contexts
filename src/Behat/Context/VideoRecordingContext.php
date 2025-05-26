@@ -22,10 +22,10 @@ use Behat\Hook\BeforeStep;
  * It can be configured to record videos for all scenarios or only for failed ones.
  *
  * Context params:
- *   'show_test_info_screen': If true, shows an screen with tests info and steps.
- *   'show_test_info_screen_time': How many ms must the info screen be shown.
+ *   'show_test_info_screen': If true, shows a screen with tests info and steps.
+ *   'show_test_info_screen_time': How many ms the info screen should be shown.
  *   'show_green_screen': If true, shows a green screen before the test.
- *   'show_green_screen_time': How many ms must the green screen be shown.
+ *   'show_green_screen_time': How many ms the green screen should be shown.
  *
  * @package Metadrop\Behat\Context
  */
@@ -77,7 +77,7 @@ class VideoRecordingContext extends RawMinkContext {
    * @BeforeScenario @javascript
    *
    * @param BeforeScenarioScope $scope
-   *    Scenary scope.
+   *    Scenario scope.
    */
   public function showScenarioDataBeforeTest(BeforeScenarioScope $scope) {
     if (!$this->customParameters['enabled']) {
@@ -136,55 +136,71 @@ class VideoRecordingContext extends RawMinkContext {
   }
 
   /**
-   * Show step info after each step
+   * Shows step information after each step if there is an error.
    *
    * @AfterStep
    */
   public function showRedWindowIfError(AfterStepScope $scope) {
-    if (!$this->isJavascriptAvailable() || !$this->customParameters['show_error_info_bubble'] || !$this->customParameters['enabled']) {
+    if (
+      !$this->isJavascriptAvailable() ||
+      !$this->customParameters['show_error_info_bubble'] ||
+      !$this->customParameters['enabled']
+    ) {
       return;
     }
 
     if (!$scope->getTestResult()->isPassed()) {
-      // Get the step text.
-      $step = $scope->getStep()->getText();
-      if ($scope->getStep()->hasArguments()) {
-        $arguments = $scope->getStep()->getArguments();
-        foreach ($arguments as $argument) {
-          $step .= '<br/>' . str_replace("\n",'<br/>', $argument->getTableAsString());
-        }
-      }
-      $step = 'Test Failed: ' . str_replace(' ', '&nbsp;', $step);
-      $div_html = '<div id="behat-step" style="position: fixed; top: 100px; left: 100px;  background-color: rgba(255,0,0,1); color: white; padding: 15px; z-index: 999999; border-radius: 3px; font-family: monospace; font-size: 16px; text-align: center;">' . $step . '</div>';
-      $this->getSession()->executeScript("document.body.insertAdjacentHTML('afterbegin', '" . $div_html . "');");
-      $this->getSession()->wait($this->customParameters['show_error_info_bubble_time']);
-      $this->getSession()->executeScript("document.getElementById('behat-step').remove();");
+      $stepHtml = $this->buildStepHtml($scope->getStep(), true);
+      $style = "position: fixed; bottom: 20px; left: 10px; background-color: rgba(255,0,0,1); color: white; padding: 15px; z-index: 999999; border-radius: 3px; font-family: monospace; font-size: 16px;";
+      $this->showStepBubble($stepHtml, $style, $this->customParameters['show_error_info_bubble_time']);
     }
   }
 
   /**
-   * Show step info before each step
+   * Shows step information before each step.
    *
    * @BeforeStep
    */
   public function showStepInfo(BeforeStepScope $scope) {
-    if (!$this->isJavascriptAvailable() || !$this->customParameters['show_step_info_bubble'] || !$this->customParameters['enabled']) {
+    if (
+      !$this->isJavascriptAvailable() ||
+      !$this->customParameters['show_step_info_bubble'] ||
+      !$this->customParameters['enabled']
+    ) {
       return;
     }
-    $step = $scope->getStep()->getText();
-    if ($scope->getStep()->hasArguments()) {
-      $arguments = $scope->getStep()->getArguments();
-      foreach ($arguments as $argument) {
-        $step .= '<br/>' . str_replace("\n",'<br/>', $argument->getTableAsString());
-      }
-    }
-    $step = str_replace(' ', '&nbsp;', $step);
-    $div_html = '<div id="behat-step" style="position: fixed; bottom: 20px; left: 10px; background-color: rgba(0,100,0,1); color: white; padding: 5px; z-index: 999999; border-radius: 3px; font-family: monospace; font-size: 12px;">' . $step . '</div>';
-    $this->getSession()->executeScript("document.body.insertAdjacentHTML('afterbegin', '" . $div_html . "');");
-    $this->getSession()->wait($this->customParameters['show_step_info_time']);
-    $this->getSession()->executeScript("document.getElementById('behat-step').remove();");
+    $stepHtml = $this->buildStepHtml($scope->getStep());
+    $style = "position: fixed; bottom: 20px; left: 10px; background-color: rgba(0,100,0,1); color: white; padding: 5px; z-index: 999999; border-radius: 3px; font-family: monospace; font-size: 12px;";
+    $this->showStepBubble($stepHtml, $style, $this->customParameters['show_step_info_bubble_time']);
   }
 
+  /**
+   * Builds the HTML for the step, optionally as error.
+   */
+  private function buildStepHtml($step, $isError = false) {
+    $text = $step->getText();
+    if ($step->hasArguments()) {
+      foreach ($step->getArguments() as $argument) {
+        $text .= '<br/>' . str_replace("\n", '<br/>', $argument->getTableAsString());
+      }
+    }
+    $text = str_replace(' ', '&nbsp;', $text);
+    if ($isError) {
+      $text = 'Test Failed: ' . $text;
+    }
+    return $text;
+  }
+
+  /**
+   * Shows the step info bubble.
+   */
+  private function showStepBubble($html, $style, $waitTime) {
+    $divHtml = '<div id="behat-step" style="' . $style . '">' . $html . '</div>';
+    $this->getSession()->executeScript("document.body.insertAdjacentHTML('afterbegin', '" . $divHtml . "');");
+    $this->getSession()->wait($waitTime);
+    $this->getSession()->executeScript("document.getElementById('behat-step').remove();");
+  }
+  
   /**
    * Check if javascript is available.
    */
@@ -195,3 +211,4 @@ class VideoRecordingContext extends RawMinkContext {
       || $driver instanceof \Behat\Mink\Driver\PantherDriver;
   }
 }
+
