@@ -142,9 +142,9 @@ class VideoRecordingContext extends RawMinkContext {
    */
   public function showRedWindowIfError(AfterStepScope $scope) {
     if (
-      !$this->isJavascriptAvailable() ||
-      !$this->customParameters['show_error_info_bubble'] ||
-      !$this->customParameters['enabled']
+      $this->customParameters['enabled']
+      && $this->isJavascriptAvailable()
+      && $this->customParameters['show_error_info_bubble']
     ) {
       return;
     }
