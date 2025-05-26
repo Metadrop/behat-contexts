@@ -336,3 +336,32 @@ Then the url should match "/example-page"
 #### Configuration
 
 No configuration needed.
+
+### Video Recording Context
+
+This context helps with video recording of Behat scenarios by displaying scenario metadata in the browser before each test. It is useful for identifying tests in video recordings.
+
+#### Functionality
+
+- Optionally displays a green screen for a configurable duration before each scenario, to help segment videos.
+- Optionally displays an info screen with the feature description, scenario name, background steps, and scenario steps, for a configurable duration.
+- All options are configurable via context parameters.
+
+#### Configuration
+
+Add `VideoRecordingContext` to your suite in `behat.yml`:
+
+```yaml
+- Metadrop\Behat\Context\VideoRecordingContext:
+    parameters:
+        - Metadrop\Behat\Context\VideoRecordingContext:
+            parameters:
+              enabled: true
+              show_test_info_screen: true
+              show_test_info_screen_time: 2000
+              show_green_screen: false
+              show_green_screen_time: 1000
+              show_step_info_bubble: true
+              show_step_info_bubble_time: 2000
+              show_error_info_bubble: true
+              show_error_info_bubble_time: 2000
