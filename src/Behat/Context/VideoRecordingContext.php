@@ -163,9 +163,9 @@ class VideoRecordingContext extends RawMinkContext {
    */
   public function showStepInfo(BeforeStepScope $scope) {
     if (
-      !$this->isJavascriptAvailable() ||
-      !$this->customParameters['show_step_info_bubble'] ||
-      !$this->customParameters['enabled']
+      $this->customParameters['enabled'] &&
+      $this->isJavascriptAvailable() &&
+      $this->customParameters['show_step_info_bubble']
     ) {
       return;
     }
