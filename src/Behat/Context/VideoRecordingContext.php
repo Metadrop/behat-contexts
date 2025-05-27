@@ -80,7 +80,7 @@ class VideoRecordingContext extends RawMinkContext {
    *    Scenario scope.
    */
   public function showScenarioDataBeforeTest(BeforeScenarioScope $scope) {
-    if (!$this->customParameters['enabled']) {
+    if (!$this->customParameters['enabled'] || !$this->isJavascriptAvailable()) {
       return;
     }
 
@@ -145,11 +145,8 @@ class VideoRecordingContext extends RawMinkContext {
       $this->customParameters['enabled']
       && $this->isJavascriptAvailable()
       && $this->customParameters['show_error_info_bubble']
+      && !$scope->getTestResult()->isPassed()
     ) {
-      return;
-    }
-
-    if (!$scope->getTestResult()->isPassed()) {
       $stepHtml = $this->buildStepHtml($scope->getStep(), true);
       $style = "position: fixed; bottom: 20px; left: 10px; background-color: rgba(255,0,0,1); color: white; padding: 15px; z-index: 999999; border-radius: 3px; font-family: monospace; font-size: 16px;";
       $this->showStepBubble($stepHtml, $style, $this->customParameters['show_error_info_bubble_time']);
@@ -167,11 +164,11 @@ class VideoRecordingContext extends RawMinkContext {
       $this->isJavascriptAvailable() &&
       $this->customParameters['show_step_info_bubble']
     ) {
-      return;
+      $stepHtml = $this->buildStepHtml($scope->getStep());
+      $style = "position: fixed; bottom: 20px; left: 10px; background-color: rgba(0,100,0,1); color: white; padding: 5px; z-index: 999999; border-radius: 3px; font-family: monospace; font-size: 12px;";
+      $this->showStepBubble($stepHtml, $style, $this->customParameters['show_step_info_bubble_time']);
     }
-    $stepHtml = $this->buildStepHtml($scope->getStep());
-    $style = "position: fixed; bottom: 20px; left: 10px; background-color: rgba(0,100,0,1); color: white; padding: 5px; z-index: 999999; border-radius: 3px; font-family: monospace; font-size: 12px;";
-    $this->showStepBubble($stepHtml, $style, $this->customParameters['show_step_info_bubble_time']);
+
   }
 
   /**
@@ -200,7 +197,7 @@ class VideoRecordingContext extends RawMinkContext {
     $this->getSession()->wait($waitTime);
     $this->getSession()->executeScript("document.getElementById('behat-step').remove();");
   }
-  
+
   /**
    * Check if javascript is available.
    */
