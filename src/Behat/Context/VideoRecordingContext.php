@@ -178,7 +178,14 @@ class VideoRecordingContext extends RawMinkContext {
     $text = $step->getText();
     if ($step->hasArguments()) {
       foreach ($step->getArguments() as $argument) {
-        $text .= '<br/>' . str_replace("\n", '<br/>', $argument->getTableAsString());
+        if ($argument instanceof \Behat\Gherkin\Node\PyStringNode) {
+          $text .= '<br/>' . str_replace("\n", '<br/>', htmlspecialchars($argument->getRaw()));
+        } else if ($argument instanceof \Behat\Gherkin\Node\TableNode) {
+          $text .= '<br/>' . str_replace("\n", '<br/>', $argument->getTableAsString());
+        } else {
+          // Handle other argument types if necessary.
+          $text .= '<br/>' . htmlspecialchars((string) $argument);
+        }
       }
     }
     $text = str_replace(' ', '&nbsp;', $text);
