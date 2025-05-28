@@ -51,13 +51,13 @@ class VideoRecordingContext extends RawMinkContext {
     $defaults = [
       'enabled' => FALSE,
       'show_test_info_screen' => TRUE,
-      'show_test_info_screen_time' => 2000,
+      'show_test_info_screen_time' => 1000,
       'show_green_screen' => FALSE,
-      'show_green_screen_time' => 3000,
+      'show_green_screen_time' => 1000,
       'show_step_info_bubble' => TRUE,
-      'show_step_info_bubble_time' => 2000,
+      'show_step_info_bubble_time' => 1000,
       'show_error_info_bubble' => TRUE,
-      'show_error_info_bubble_time' => 2000,
+      'show_error_info_bubble_time' => 5000,
     ];
 
     // Collect received parameters.
