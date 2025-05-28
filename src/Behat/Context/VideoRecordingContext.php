@@ -188,7 +188,13 @@ class VideoRecordingContext extends RawMinkContext {
         }
       }
     }
-    $text = str_replace(' ', '&nbsp;', $text);
+    // Escape some HTML entities.
+    $text = str_replace(
+      [' ', '(', ')', '/', '@', "'", '"'],
+      ['&nbsp;', '&#40;', '&#41;', '&#47;', '&#64;', '&#39;', '&quot;'],
+      $text
+    );
+
     if ($isError) {
       $text = 'Test Failed: ' . $text;
     }
@@ -215,4 +221,3 @@ class VideoRecordingContext extends RawMinkContext {
       || $driver instanceof \Behat\Mink\Driver\PantherDriver;
   }
 }
-
