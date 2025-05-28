@@ -178,17 +178,16 @@ class VideoRecordingContext extends RawMinkContext {
     $text = $step->getText();
     if ($step->hasArguments()) {
       foreach ($step->getArguments() as $argument) {
-        if ($argument instanceof \Behat\Gherkin\Node\PyStringNode) {
-          $text .= '<br/>' . str_replace("\n", '<br/>', htmlspecialchars($argument->getRaw()));
-        } else if ($argument instanceof \Behat\Gherkin\Node\TableNode) {
-          $text .= '<br/>' . str_replace("\n", '<br/>', $argument->getTableAsString());
-        } else {
-          // Handle other argument types if necessary.
-          $text .= '<br/>' . htmlspecialchars((string) $argument);
-        }
+        $text .= '<br/>' . str_replace("\n", '<br/>', $argument->getTableAsString());
       }
     }
-    $text = str_replace(' ', '&nbsp;', $text);
+    // Escape some HTML entities.
+    $text = str_replace(
+      [' ', '(', ')', '/', '@', "'", '"'],
+      ['&nbsp;', '&#40;', '&#41;', '&#47;', '&#64;', '&#39;', '&quot;'],
+      $text
+    );
+
     if ($isError) {
       $text = 'Test Failed: ' . $text;
     }
@@ -215,4 +214,3 @@ class VideoRecordingContext extends RawMinkContext {
       || $driver instanceof \Behat\Mink\Driver\PantherDriver;
   }
 }
-
