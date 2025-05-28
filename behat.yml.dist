@@ -38,9 +38,9 @@ default:
               show_green_screen: false
               show_green_screen_time: 1000
               show_step_info_bubble: true
-              show_step_info_bubble_time: 2000
+              show_step_info_bubble_time: 1000
               show_error_info_bubble: true
-              show_error_info_bubble_time: 2000
+              show_error_info_bubble_time: 5000
      filters:
         tags: "~@exclude"
   extensions:
