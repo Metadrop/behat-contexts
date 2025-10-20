@@ -58,6 +58,13 @@ class CookieComplianceContext extends RawMinkContext {
   protected string $cookieAgreeSelector;
 
   /**
+   * Selector that rejects all cookie categories.
+   *
+   * @var string
+   */
+  protected string $cookieRejectSelector;
+
+  /**
    * Cookie banner selector.
    *
    * @var string
@@ -99,6 +106,8 @@ class CookieComplianceContext extends RawMinkContext {
    *
    * @param string $cookie_agree_selector
    *   Selector that accepts default cookie categories.
+   * @param string $cookie_reject_selector
+   *   Selector that rejects all cookie categories.
    * @param string $cookie_banner_selector
    *   Cookie banner selector.
    * @param array $cookies
@@ -112,6 +121,7 @@ class CookieComplianceContext extends RawMinkContext {
    */
   public function __construct(
     string $cookie_agree_selector,
+    string $cookie_reject_selector,
     string $cookie_banner_selector,
     array $cookies,
     array $cookies_ignored = [],
@@ -119,6 +129,7 @@ class CookieComplianceContext extends RawMinkContext {
     array $cookies_third_party_domains_included = []
   ) {
     $this->cookieAgreeSelector = $cookie_agree_selector;
+    $this->cookieRejectSelector = $cookie_reject_selector;
     $this->cookieBannerSelector = $cookie_banner_selector;
     $this->cookies = $cookies;
     $this->cookiesIgnored = $cookies_ignored;
