@@ -144,11 +144,29 @@ class CookieComplianceContext extends RawMinkContext {
    * that are accepted by default.
    *
    * @Then I accept cookies
+   * @BeforeScenario @cookies-accepted
    */
   public function iAcceptCookies() {
-    $agree_button = $this->getSession()->getPage()->find('css', $this->cookieAgreeSelector);
-    if ($agree_button instanceof NodeElement) {
-      // Some cookie banners have animations that do not let click the agree
+    $this->handleCookieBanner(
+      $this->cookieAgreeSelector,
+      $this->cookieBannerSelector,
+      'accept'
+    );
+  }
+
+  /**
+   * Reject cookie compliance by clicking the "reject" button.
+   *
+   * @Then I reject cookies
+   * @BeforeScenario @cookies-rejected
+   */
+  public function iRejectCookies() {
+    $this->handleCookieBanner(
+      $this->cookieRejectSelector,
+      $this->cookieBannerSelector,
+      'reject'
+    );
+  }
 
   /**
    * Helper to accept or reject the cookies.
