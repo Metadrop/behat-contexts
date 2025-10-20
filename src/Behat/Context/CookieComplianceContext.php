@@ -149,20 +149,36 @@ class CookieComplianceContext extends RawMinkContext {
     $agree_button = $this->getSession()->getPage()->find('css', $this->cookieAgreeSelector);
     if ($agree_button instanceof NodeElement) {
       // Some cookie banners have animations that do not let click the agree
+
+  /**
+   * Helper to accept or reject the cookies.
+   *
+   * @param string $buttonSelector
+   *   Button selector (accept/reject).
+   * @param string $bannerSelector
+   *   Banner container selector.
+   * @param string $actionName
+   *   Action name (accept/reject).
+   */
+  private function handleCookieBanner(string $buttonSelector, string $bannerSelector, string $actionName): void {
+    $this->visitPath('/');
+    $button = $this->getSession()->getPage()->find('css', $buttonSelector);
+    if ($button instanceof NodeElement) {
+      // Some cookie banners have animations that do not let click any
       // button after the animation ends. That's why we wait one second.
-      if (!$agree_button->isVisible()) {
+      if (!$button->isVisible()) {
         sleep(1);
       }
-      $agree_button->press();
+      $button->press();
       if (!$this->getSession()->wait(
         10000,
         sprintf('document.querySelector("%s") == null || document.querySelector("%s").style.visibility == "hidden"',
-          $this->cookieBannerSelector, $this->cookieBannerSelector))) {
-        throw new \Exception(sprintf('The cookie banner with selector "%s" is stil present after accepting cookies.', $this->cookieBannerSelector));
+          $bannerSelector, $bannerSelector))) {
+        throw new \Exception(sprintf('The cookie banner with selector "%s" is still present.', $bannerSelector));
       }
     }
     else {
-      throw new \Exception('The agree button do not appears.');
+      throw new \Exception('The ' . $actionName . ' button do not appears.');
     }
   }
 
