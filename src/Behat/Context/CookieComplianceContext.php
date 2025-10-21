@@ -138,19 +138,30 @@ class CookieComplianceContext extends RawMinkContext {
   }
 
   /**
-   * Accept cookie compliance.
-   *
-   * It accepts it by accepting all the categories
-   * that are accepted by default.
+   * Accept cookie compliance manually in the current page.
    *
    * @Then I accept cookies
-   * @BeforeScenario @cookies-accepted
    */
   public function iAcceptCookies() {
     $this->handleCookieBanner(
-      $this->cookieAgreeSelector,
-      $this->cookieBannerSelector,
-      'accept'
+        $this->cookieAgreeSelector,
+        $this->cookieBannerSelector,
+        'accept'
+    );
+  }
+
+  /**
+   * Accept cookies automatically.
+   *
+   * @BeforeScenario @cookies-accepted
+   */
+  public function acceptCookiesBeforeScenario() {
+    // Visit the homepage to accept cookies before the scenario begins.
+    $this->visitPath('/');
+    $this->handleCookieBanner(
+        $this->cookieAgreeSelector,
+        $this->cookieBannerSelector,
+        'accept'
     );
   }
 
@@ -158,13 +169,27 @@ class CookieComplianceContext extends RawMinkContext {
    * Reject cookie compliance by clicking the "reject" button.
    *
    * @Then I reject cookies
-   * @BeforeScenario @cookies-rejected
    */
   public function iRejectCookies() {
     $this->handleCookieBanner(
       $this->cookieRejectSelector,
       $this->cookieBannerSelector,
       'reject'
+    );
+  }
+
+  /**
+   * Reject cookies automatically.
+   *
+   * @BeforeScenario @cookies-rejected
+   */
+  public function rejectCookiesBeforeScenario() {
+    // Visit the homepage to reject cookies before the scenario begins.
+    $this->visitPath('/');
+    $this->handleCookieBanner(
+        $this->cookieRejectSelector,
+        $this->cookieBannerSelector,
+        'reject'
     );
   }
 
@@ -179,7 +204,6 @@ class CookieComplianceContext extends RawMinkContext {
    *   Action name (accept/reject).
    */
   private function handleCookieBanner(string $buttonSelector, string $bannerSelector, string $actionName): void {
-    $this->visitPath('/');
     $button = $this->getSession()->getPage()->find('css', $buttonSelector);
     if ($button instanceof NodeElement) {
       // Some cookie banners have animations that do not let click any
@@ -190,12 +214,15 @@ class CookieComplianceContext extends RawMinkContext {
       $button->press();
       if (!$this->getSession()->wait(
         10000,
-        sprintf('document.querySelector("%s") == null || document.querySelector("%s").style.visibility == "hidden"',
-          $bannerSelector, $bannerSelector))) {
+        sprintf(
+          'document.querySelector("%s") === null || getComputedStyle(document.querySelector("%s")).visibility === "hidden"',
+          $bannerSelector,
+          $bannerSelector
+        )
+      )) {
         throw new \Exception(sprintf('The cookie banner with selector "%s" is still present.', $bannerSelector));
       }
-    }
-    else {
+    } else {
       throw new \Exception('The ' . $actionName . ' button do not appears.');
     }
   }
