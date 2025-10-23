@@ -45,10 +45,10 @@ class OneTrustCookieManager implements CookieManagerInterface {
   public function __construct(
     string $cookie_agree_selector,
     string $cookie_reject_selector,
-    string $cookie_banner_selector
+    string $cookie_banner_selector,
   ) {
     $this->cookieAgreeSelector = empty($cookie_agree_selector) ? '#onetrust-accept-btn-handler' : $cookie_agree_selector;
-    $this->cookieRejectSelector = empty($cookie_reject_selector) ? '#onetrust-reject-all-handler' : $cookie_reject_selector;;
+    $this->cookieRejectSelector = empty($cookie_reject_selector) ? '#onetrust-reject-all-handler' : $cookie_reject_selector;
     $this->cookieBannerSelector = empty($cookie_banner_selector) ? '#onetrust-banner-sdk' : $cookie_banner_selector;
   }
 
@@ -90,6 +90,8 @@ class OneTrustCookieManager implements CookieManagerInterface {
   /**
    * Execute a OneTrust API method.
    *
+   * @param Behat\Mink\Session $session
+   *   The current session.
    * @param string $method
    *   The OneTrust method name to execute.
    */
