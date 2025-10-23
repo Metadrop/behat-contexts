@@ -122,6 +122,9 @@ class CookieComplianceContext extends RawMinkContext {
       case 'onetrust':
         $this->cookieManager = new OneTrustCookieManager($cookie_agree_selector, $cookie_reject_selector, $cookie_banner_selector);
         break;
+
+      default:
+        $this->cookieManager = new DefaultCookieManager($cookie_agree_selector, $cookie_reject_selector, $cookie_banner_selector);
     }
     $this->cookies = $cookies;
     $this->cookiesIgnored = $cookies_ignored;
