@@ -5,6 +5,7 @@ namespace Metadrop\Behat\Context;
 use Behat\MinkExtension\Context\RawMinkContext;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Driver\Selenium2Driver;
+use Metadrop\Behat\Context\CookieManagerInterface;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\BufferedOutput;
 
@@ -51,25 +52,11 @@ class CookieComplianceContext extends RawMinkContext {
   ];
 
   /**
-   * Selector that accepts default cookie categories.
+   * The cookie manager.
    *
-   * @var string
+   * @var Metadrop\Behat\Context\CookieManagerInterface
    */
-  protected string $cookieAgreeSelector;
-
-  /**
-   * Selector that rejects all cookie categories.
-   *
-   * @var string
-   */
-  protected string $cookieRejectSelector;
-
-  /**
-   * Cookie banner selector.
-   *
-   * @var string
-   */
-  protected string $cookieBannerSelector;
+  protected CookieManagerInterface $cookieManager;
 
   /**
    * List of cookies classified with category.
@@ -104,6 +91,8 @@ class CookieComplianceContext extends RawMinkContext {
   /**
    * Cookie compliance constructor.
    *
+   * @param string $cookie_manager_type
+   *   The cookie manager.
    * @param string $cookie_agree_selector
    *   Selector that accepts default cookie categories.
    * @param string $cookie_reject_selector
@@ -120,17 +109,20 @@ class CookieComplianceContext extends RawMinkContext {
    *   List of third party domains that loads cookies to add.
    */
   public function __construct(
-    string $cookie_agree_selector,
-    string $cookie_reject_selector,
-    string $cookie_banner_selector,
-    array $cookies,
+    string $cookie_manager_type = '',
+    string $cookie_agree_selector = '',
+    string $cookie_reject_selector = '',
+    string $cookie_banner_selector = '',
+    array $cookies = [],
     array $cookies_ignored = [],
     array $cookies_third_party_domains_ignored = [],
-    array $cookies_third_party_domains_included = []
+    array $cookies_third_party_domains_included = [],
   ) {
-    $this->cookieAgreeSelector = $cookie_agree_selector;
-    $this->cookieRejectSelector = $cookie_reject_selector;
-    $this->cookieBannerSelector = $cookie_banner_selector;
+    switch ($cookie_manager_type) {
+      case 'onetrust':
+        $this->cookieManager = new OneTrustCookieManager($cookie_agree_selector, $cookie_reject_selector, $cookie_banner_selector);
+        break;
+    }
     $this->cookies = $cookies;
     $this->cookiesIgnored = $cookies_ignored;
     $this->cookiesThirdPartyDomainsIgnored = $cookies_third_party_domains_ignored;
@@ -138,14 +130,14 @@ class CookieComplianceContext extends RawMinkContext {
   }
 
   /**
-   * Accept cookie compliance manually in the current page.
+   * Accept cookie compliance by clicking the button.
    *
    * @Then I accept cookies
    */
   public function iAcceptCookies() {
     $this->handleCookieBanner(
-        $this->cookieAgreeSelector,
-        $this->cookieBannerSelector,
+        $this->cookieManager->getAcceptButtonSelector(),
+        $this->cookieManager->getCookieBannerSelector(),
         'accept'
     );
   }
@@ -156,24 +148,19 @@ class CookieComplianceContext extends RawMinkContext {
    * @BeforeScenario @cookies-accepted
    */
   public function acceptCookiesBeforeScenario() {
-    // Visit the homepage to accept cookies before the scenario begins.
     $this->visitPath('/');
-    $this->handleCookieBanner(
-        $this->cookieAgreeSelector,
-        $this->cookieBannerSelector,
-        'accept'
-    );
+    $this->cookieManager->acceptCookies($this->getSession());
   }
 
   /**
-   * Reject cookie compliance by clicking the "reject" button.
+   * Reject cookie compliance by clicking the button.
    *
    * @Then I reject cookies
    */
   public function iRejectCookies() {
     $this->handleCookieBanner(
-      $this->cookieRejectSelector,
-      $this->cookieBannerSelector,
+      $this->cookieManager->getRejectButtonSelector(),
+      $this->cookieManager->getCookieBannerSelector(),
       'reject'
     );
   }
@@ -184,13 +171,8 @@ class CookieComplianceContext extends RawMinkContext {
    * @BeforeScenario @cookies-rejected
    */
   public function rejectCookiesBeforeScenario() {
-    // Visit the homepage to reject cookies before the scenario begins.
     $this->visitPath('/');
-    $this->handleCookieBanner(
-        $this->cookieRejectSelector,
-        $this->cookieBannerSelector,
-        'reject'
-    );
+    $this->cookieManager->rejectCookies($this->getSession());
   }
 
   /**
@@ -222,7 +204,8 @@ class CookieComplianceContext extends RawMinkContext {
       )) {
         throw new \Exception(sprintf('The cookie banner with selector "%s" is still present.', $bannerSelector));
       }
-    } else {
+    }
+    else {
       throw new \Exception('The ' . $actionName . ' button do not appears.');
     }
   }
@@ -263,8 +246,8 @@ class CookieComplianceContext extends RawMinkContext {
    * @When I wait cookie banner appears
    */
   public function iWaitCookieBannerAppears() {
-    if (!$this->getSession()->wait(10000, sprintf('document.querySelector("%s") != null', $this->cookieBannerSelector))) {
-      throw new \Exception(sprintf('The cookie banner with selector "%s" does not appear.', $this->cookieBannerSelector));
+    if (!$this->getSession()->wait(10000, sprintf('document.querySelector("%s") != null', $this->cookieManager->getCookieBannerSelector()))) {
+      throw new \Exception(sprintf('The cookie banner with selector "%s" does not appear.', $this->cookieManager->getCookieBannerSelector()));
     }
   }
 
