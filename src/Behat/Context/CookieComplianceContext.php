@@ -193,26 +193,31 @@ class CookieComplianceContext extends RawMinkContext {
    */
   private function handleCookieBanner(string $buttonSelector, string $bannerSelector, string $actionName): void {
     $button = $this->getSession()->getPage()->find('css', $buttonSelector);
-    if ($button instanceof NodeElement) {
-      // Some cookie banners have animations that do not let click any
-      // button after the animation ends. That's why we wait one second.
-      if (!$button->isVisible()) {
-        sleep(1);
-      }
-      $button->press();
-      if (!$this->getSession()->wait(
-        10000,
-        sprintf(
-          'document.querySelector("%s") === null || getComputedStyle(document.querySelector("%s")).visibility === "hidden"',
-          $bannerSelector,
-          $bannerSelector
-        )
-      )) {
-        throw new \Exception(sprintf('The cookie banner with selector "%s" is still present.', $bannerSelector));
-      }
+
+    if (!$button) {
+      throw new \Exception(sprintf(
+        'The %s button with selector "%s" was not found.',
+        $actionName,
+        $buttonSelector
+      ));
     }
-    else {
-      throw new \Exception('The ' . $actionName . ' button do not appears.');
+    if (!$button->isVisible()) {
+      // Some cookie banners have animations. Wait for animation.
+      // to complete before interacting with the button.
+      sleep(1);
+    }
+
+    $button->press();
+
+    if (!$this->getSession()->wait(
+      10000,
+      sprintf(
+        '!document.querySelector("%s") || getComputedStyle(document.querySelector("%s")).visibility === "hidden"',
+        $bannerSelector,
+        $bannerSelector
+      )
+    )) {
+      throw new \Exception(sprintf('The cookie banner with selector "%s" is still present.', $bannerSelector));
     }
   }
 
