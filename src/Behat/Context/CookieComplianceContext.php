@@ -3,7 +3,6 @@
 namespace Metadrop\Behat\Context;
 
 use Behat\MinkExtension\Context\RawMinkContext;
-use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Driver\Selenium2Driver;
 use Metadrop\Behat\Context\CookieManagerInterface;
 use Symfony\Component\Console\Helper\Table;
