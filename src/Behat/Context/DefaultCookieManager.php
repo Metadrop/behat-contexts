@@ -14,7 +14,7 @@ class DefaultCookieManager implements CookieManagerInterface {
    *
    * @var string
    */
-  protected string $cookieAgreeSelector;
+  protected string $cookieAcceptSelector;
 
   /**
    * Selector that rejects all cookie categories.
@@ -44,26 +44,34 @@ class DefaultCookieManager implements CookieManagerInterface {
    *   If any of the selectors is empty.
    */
   public function __construct(
-    string $cookie_agree_selector = '',
-    string $cookie_reject_selector = '',
-    string $cookie_banner_selector = '',
+    string $cookie_agree_selector,
+    string $cookie_reject_selector,
+    string $cookie_banner_selector,
   ) {
-    $this->cookieAgreeSelector = !empty($cookie_agree_selector) ? $cookie_agree_selector : throw new \InvalidArgumentException('Cookie agree selector cannot be empty.');
-    $this->cookieRejectSelector = !empty($cookie_reject_selector) ? $cookie_reject_selector : throw new \InvalidArgumentException('Cookie reject selector cannot be empty.');
-    $this->cookieBannerSelector = !empty($cookie_banner_selector) ? $cookie_banner_selector : throw new \InvalidArgumentException('Cookie banner selector cannot be empty.');
+    $this->cookieAcceptSelector = $cookie_agree_selector;
+    $this->cookieRejectSelector = $cookie_reject_selector;
+    $this->cookieBannerSelector = $cookie_banner_selector;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getAcceptButtonSelector(): string {
-    return $this->cookieAgreeSelector;
+    if (empty($this->cookieAcceptSelector)) {
+      throw new \InvalidArgumentException('The Cookie accept selector (cookie_agree_selector) cannot be empty.');
+    }
+
+    return $this->cookieAcceptSelector;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getRejectButtonSelector(): string {
+    if (empty($this->cookieRejectSelector)) {
+      throw new \InvalidArgumentException('The Cookie reject selector (cookie_reject_selector) cannot be empty.');
+    }
+
     return $this->cookieRejectSelector;
   }
 
@@ -71,6 +79,10 @@ class DefaultCookieManager implements CookieManagerInterface {
    * {@inheritdoc}
    */
   public function getCookieBannerSelector(): string {
+    if (empty($this->cookieBannerSelector)) {
+      throw new \InvalidArgumentException('The Cookie banner selector (cookie_banner_selector) cannot be empty');
+    }
+
     return $this->cookieBannerSelector;
   }
 
