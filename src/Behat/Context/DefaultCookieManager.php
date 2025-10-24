@@ -89,15 +89,15 @@ class DefaultCookieManager implements CookieManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function acceptCookies($session) {
-    throw new \Exception('Please, add or use a valid Cookie Manager type (cookie_manager_type) if you need accept the cookies');
+  public function acceptCookies($session): void {
+    throw new \Exception('Please, add or use a valid Cookie Manager type (cookie_manager_type) if you need to accept cookies');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function rejectCookies($session) {
-    throw new \Exception('Please, add or use a valid Cookie Manager type (cookie_manager_type) if you need reject the cookies.');
+  public function rejectCookies($session): void {
+    throw new \Exception('Please, add or use a valid Cookie Manager type (cookie_manager_type) if you need to reject cookies');
   }
 
 }

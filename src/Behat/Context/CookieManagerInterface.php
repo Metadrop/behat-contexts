@@ -39,7 +39,7 @@ interface CookieManagerInterface {
    * Do the required actions in the browser so the cookie
    * manager considers cookies has been accepted.
    */
-  public function acceptCookies($session);
+  public function acceptCookies($session): void;
 
   /**
    * Reject cookies programatically.
@@ -47,6 +47,6 @@ interface CookieManagerInterface {
    * Do the required actions in the browser so the cookie
    * manager considers cookies has been rejected.
    */
-  public function rejectCookies($session);
+  public function rejectCookies($session): void;
 
 }

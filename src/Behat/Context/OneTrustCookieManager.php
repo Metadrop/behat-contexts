@@ -16,7 +16,7 @@ class OneTrustCookieManager implements CookieManagerInterface {
    *
    * @var string
    */
-  protected string $cookieAgreeSelector;
+  protected string $cookieAcceptSelector;
 
   /**
    * Selector that rejects all cookie categories.
@@ -47,7 +47,7 @@ class OneTrustCookieManager implements CookieManagerInterface {
     string $cookie_reject_selector,
     string $cookie_banner_selector,
   ) {
-    $this->cookieAgreeSelector = empty($cookie_agree_selector) ? '#onetrust-accept-btn-handler' : $cookie_agree_selector;
+    $this->cookieAcceptSelector = empty($cookie_agree_selector) ? '#onetrust-accept-btn-handler' : $cookie_agree_selector;
     $this->cookieRejectSelector = empty($cookie_reject_selector) ? '#onetrust-reject-all-handler' : $cookie_reject_selector;
     $this->cookieBannerSelector = empty($cookie_banner_selector) ? '#onetrust-banner-sdk' : $cookie_banner_selector;
   }
@@ -56,7 +56,7 @@ class OneTrustCookieManager implements CookieManagerInterface {
    * {@inheritdoc}
    */
   public function getAcceptButtonSelector(): string {
-    return $this->cookieAgreeSelector;
+    return $this->cookieAcceptSelector;
   }
 
   /**
@@ -76,14 +76,14 @@ class OneTrustCookieManager implements CookieManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function acceptCookies($session) {
+  public function acceptCookies($session): void {
     $this->executeOneTrustMethod($session, 'AllowAll');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function rejectCookies($session) {
+  public function rejectCookies($session): void {
     $this->executeOneTrustMethod($session, 'RejectAll');
   }
 
