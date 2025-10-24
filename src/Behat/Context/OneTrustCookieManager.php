@@ -12,14 +12,14 @@ use Behat\Mink\Session;
 class OneTrustCookieManager implements CookieManagerInterface {
 
   /**
-   * Selector that accepts default cookie categories.
+   * Selector to locate the button to accept the default cookie categories.
    *
    * @var string
    */
   protected string $cookieAcceptSelector;
 
   /**
-   * Selector that rejects all cookie categories.
+   * Selector to locate the button to reject all cookie categories.
    *
    * @var string
    */
@@ -36,9 +36,9 @@ class OneTrustCookieManager implements CookieManagerInterface {
    * OneTrust cookie manager constructor.
    *
    * @param string $cookie_agree_selector
-   *   Selector that accepts default cookie categories.
+   *   Selector to locate the button to accept the default cookie categories.
    * @param string $cookie_reject_selector
-   *   Selector that rejects all cookie categories.
+   *   Selector to locate the button to reject all cookie categories.
    * @param string $cookie_banner_selector
    *   Cookie banner selector.
    */
