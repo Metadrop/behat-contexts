@@ -54,6 +54,9 @@ class CookieComplianceContext extends RawMinkContext {
   /**
    * The cookie manager.
    *
+   * A cookie manager class that knows how to handle the
+   * cookie manager used in the page (OneTrust, Klaro, etc).
+   *
    * @var Metadrop\Behat\Context\CookieManagerInterface
    */
   protected CookieManagerInterface $cookieManager;
@@ -92,11 +95,11 @@ class CookieComplianceContext extends RawMinkContext {
    * Cookie compliance constructor.
    *
    * @param string $cookie_manager_type
-   *   The cookie manager.
+   *   The cookie manager type.
    * @param string $cookie_agree_selector
-   *   Selector that accepts default cookie categories.
+   *   Selector to locate the button to accept the default cookie categories.
    * @param string $cookie_reject_selector
-   *   Selector that rejects all cookie categories.
+   *   Selector to locate the button to reject all cookie categories.
    * @param string $cookie_banner_selector
    *   Cookie banner selector.
    * @param array $cookies
@@ -133,7 +136,7 @@ class CookieComplianceContext extends RawMinkContext {
   }
 
   /**
-   * Accept cookie compliance by clicking the button.
+   * Accept cookies by clicking the accept button in cookie popup or banner.
    *
    * @Then I accept cookies
    */
@@ -156,7 +159,7 @@ class CookieComplianceContext extends RawMinkContext {
   }
 
   /**
-   * Reject cookie compliance by clicking the button.
+   * Reject cookies by clicking the reject button in cookie popup or banner.
    *
    * @Then I reject cookies
    */
