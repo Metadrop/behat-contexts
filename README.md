@@ -67,7 +67,7 @@ expected cookies appears.
 
 The context parameters are:
 
-- **cookie_manager_type**: Types of cookie managers predefined. It also allows you to overwrite the parameters if you consider it necessary. Cookie managers implemented:
+- **cookie_manager_type**: Types of cookie managers predefined. It also allows you to overwrite the other parameters if you consider it necessary. *Cookie managers implemented*:
     - onetrust
     - eu_cookie_compliance
 - **cookie_agree_selector**: The CSS selector of the button to accept the default cookies.
@@ -83,11 +83,13 @@ The context parameters are:
 - **cookies_third_party_domains_included**: List of domains that are not present in the default list of domains
   checked by the context, and is needed to be checked those sites are not loading cookies by iframes.
 
-Example configuration *with Cookie Manager type*:
+Example configuration *without* Cookie Manager type:
 
 ```yaml
   - CookieComplianceContext:
-      cookie_manager_type: onetrust
+      cookie_agree_selector: 'button.agree-button-example'
+      cookie_reject_selector: 'button.reject-button-example'
+      cookie_banner_selector: '.cookie-compliance-banner-example'
       cookies:
         mandatory:
           - 'cookie-mandatory'
@@ -104,27 +106,13 @@ Example configuration *with Cookie Manager type*:
         - extra-analytics-service.com
 ```
 
-Example configuration without Cookie Manager type:
+Example configuration *with Cookie Manager type*:
 
 ```yaml
   - CookieComplianceContext:
-      cookie_agree_selector: 'button.agree-button-example'
-      cookie_reject_selector: 'button.reject-button-example'
-      cookie_banner_selector: '.cookie-compliance-banner-example'
-      cookies:
-        mandatory:
-          - 'cookie-agreed'
-          - 'cookie-agreed-categories'
-        analytics:
-          - '_ga'
-      # Optional configuration:
-      cookies_ignored:
-        - cookieA
-        - cookieB
-      cookies_third_party_domains_ignored:
-        - example.com
-      cookies_third_party_domains_included:
-        - extra-analytics-service.com
+      cookie_manager_type: onetrust
+      ...
+      ...
 ```
 
 #### Steps
