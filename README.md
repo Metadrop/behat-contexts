@@ -56,16 +56,6 @@ Helpers to execute cron.
  - Given I run the cron of Search API Solr
    Run search api solr cron. Only for D7.
 
-
-### DebugContext
-
-Simple context to help debugging tests with some steps. Additionally, it hooks in the after step event to add a step that generates an error report on failed steps.
-
-This report includes:
-  - A file with the HTML page content.
-  - A file with the current URL and the error exception dump.
-  - If available, a file with current page state.
-
 ### Cookie compliance context
 
 Allows checking that the sites are cookie GDPR compliant.
@@ -77,7 +67,11 @@ expected cookies appears.
 
 The context parameters are:
 
-- **cookie_agree_selector**: The CSS selector of the button to agree cookies.
+- **cookie_manager_type**: Types of cookie managers predefined. It also allows you to overwrite the parameters if you consider it necessary. Cookie managers implemented:
+    - onetrust
+    - eu_cookie_compliance
+- **cookie_agree_selector**: The CSS selector of the button to accept the default cookies.
+- **cookie_reject_selector**: The CSS selector of the button to reject all cookie categories.
 - **cookie_banner_selector**: The CSS selector of the cookie compliance banner.
 - **cookies**: Map of cookies that should be handled by each cookie category. The key
   is the cookie category and the value is the list of cookies that will be present after
@@ -89,12 +83,34 @@ The context parameters are:
 - **cookies_third_party_domains_included**: List of domains that are not present in the default list of domains
   checked by the context, and is needed to be checked those sites are not loading cookies by iframes.
 
-Example configuration:
+Example configuration *with Cookie Manager type*:
 
 ```yaml
   - CookieComplianceContext:
-      cookie_agree_selector: '.eu-cookie-compliance-banner button.agree-button'
-      cookie_banner_selector: '.eu-cookie-compliance-banner'
+      cookie_manager_type: onetrust
+      cookies:
+        mandatory:
+          - 'cookie-mandatory'
+          - 'cookie-mandatory-categories'
+        analytics:
+          - '_ga'
+      # Optional configuration:
+      cookies_ignored:
+        - cookieA
+        - cookieB
+      cookies_third_party_domains_ignored:
+        - example.com
+      cookies_third_party_domains_included:
+        - extra-analytics-service.com
+```
+
+Example configuration without Cookie Manager type:
+
+```yaml
+  - CookieComplianceContext:
+      cookie_agree_selector: 'button.agree-button-example'
+      cookie_reject_selector: 'button.reject-button-example'
+      cookie_banner_selector: '.cookie-compliance-banner-example'
       cookies:
         mandatory:
           - 'cookie-agreed'
@@ -111,9 +127,11 @@ Example configuration:
         - extra-analytics-service.com
 ```
 
-Steps included in this context:
+#### Steps
 
-- **Then I accept cookies**: Accept cookie banner with default options.
+- **Then I accept cookies**: Accept cookies by clicking the accept button in cookie popup or banner.
+
+- **Then I reject cookies**: Reject cookies by clicking the reject button in cookie popup or banner.
 
 - **Then the cookies of :type type have not been loaded**: Assert the cookies of a specific category are not present.
 
@@ -124,7 +142,27 @@ Steps included in this context:
 - **Then there should not be any cookies loaded**:  Check there are no cookies loaded at all. It also reports
   potential cookie source coming from third party iframes (s.e.: youtube, doubleclick, etc).
 
+- **Given the cookie with name :cookie_name exists**:  Check if the cookie exists.
+
+- **Given the cookie with name :cookie_name exists with value :value**: Check that the cookie exists with the specific value.
+
   By default, only those iframes which domains belongs to the **THIRD_PARTY_COOKIE_HOSTS** CookieComplianceContext constant will be detected as iframes that will add unwanted cookies.
+
+#### Tags
+
+- **@cookies-accepted**: Accept cookies automatically adding the tag to the test.
+
+- **@cookies-rejected**: Reject cookies automatically adding the tag to the test.
+
+
+### DebugContext
+
+Simple context to help debugging tests with some steps. Additionally, it hooks in the after step event to add a step that generates an error report on failed steps.
+
+This report includes:
+  - A file with the HTML page content.
+  - A file with the current URL and the error exception dump.
+  - If available, a file with current page state.
 
 #### Steps
 
