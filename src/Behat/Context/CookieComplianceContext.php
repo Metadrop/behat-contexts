@@ -3,8 +3,8 @@
 namespace Metadrop\Behat\Context;
 
 use Behat\MinkExtension\Context\RawMinkContext;
-use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Driver\Selenium2Driver;
+use Metadrop\Behat\Context\CookieManagerInterface;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\BufferedOutput;
 
@@ -51,18 +51,14 @@ class CookieComplianceContext extends RawMinkContext {
   ];
 
   /**
-   * Selector that accepts default cookie categories.
+   * The cookie manager.
    *
-   * @var string
-   */
-  protected string $cookieAgreeSelector;
-
-  /**
-   * Cookie banner selector.
+   * A cookie manager class that knows how to handle the
+   * cookie manager used in the page (OneTrust, Klaro, etc).
    *
-   * @var string
+   * @var Metadrop\Behat\Context\CookieManagerInterface
    */
-  protected string $cookieBannerSelector;
+  protected CookieManagerInterface $cookieManager;
 
   /**
    * List of cookies classified with category.
@@ -97,8 +93,12 @@ class CookieComplianceContext extends RawMinkContext {
   /**
    * Cookie compliance constructor.
    *
+   * @param string $cookie_manager_type
+   *   The cookie manager type.
    * @param string $cookie_agree_selector
-   *   Selector that accepts default cookie categories.
+   *   Selector to locate the button to accept the default cookie categories.
+   * @param string $cookie_reject_selector
+   *   Selector to locate the button to reject all cookie categories.
    * @param string $cookie_banner_selector
    *   Cookie banner selector.
    * @param array $cookies
@@ -111,15 +111,27 @@ class CookieComplianceContext extends RawMinkContext {
    *   List of third party domains that loads cookies to add.
    */
   public function __construct(
-    string $cookie_agree_selector,
-    string $cookie_banner_selector,
-    array $cookies,
+    string $cookie_manager_type = '',
+    string $cookie_agree_selector = '',
+    string $cookie_reject_selector = '',
+    string $cookie_banner_selector = '',
+    array $cookies = [],
     array $cookies_ignored = [],
     array $cookies_third_party_domains_ignored = [],
-    array $cookies_third_party_domains_included = []
+    array $cookies_third_party_domains_included = [],
   ) {
-    $this->cookieAgreeSelector = $cookie_agree_selector;
-    $this->cookieBannerSelector = $cookie_banner_selector;
+    switch ($cookie_manager_type) {
+      case 'onetrust':
+        $this->cookieManager = new OneTrustCookieManager($cookie_agree_selector, $cookie_reject_selector, $cookie_banner_selector);
+        break;
+
+      case 'eu_cookie_compliance':
+        $this->cookieManager = new EUCookieComplianceCookieManager($cookie_agree_selector, $cookie_banner_selector);
+        break;
+
+      default:
+        $this->cookieManager = new DefaultCookieManager($cookie_agree_selector, $cookie_reject_selector, $cookie_banner_selector);
+    }
     $this->cookies = $cookies;
     $this->cookiesIgnored = $cookies_ignored;
     $this->cookiesThirdPartyDomainsIgnored = $cookies_third_party_domains_ignored;
@@ -127,31 +139,88 @@ class CookieComplianceContext extends RawMinkContext {
   }
 
   /**
-   * Accept cookie compliance.
-   *
-   * It accepts it by accepting all the categories
-   * that are accepted by default.
+   * Accept cookies by clicking the accept button in cookie popup or banner.
    *
    * @Then I accept cookies
    */
   public function iAcceptCookies() {
-    $agree_button = $this->getSession()->getPage()->find('css', $this->cookieAgreeSelector);
-    if ($agree_button instanceof NodeElement) {
-      // Some cookie banners have animations that do not let click the agree
-      // button after the animation ends. That's why we wait one second.
-      if (!$agree_button->isVisible()) {
-        sleep(1);
-      }
-      $agree_button->press();
-      if (!$this->getSession()->wait(
-        10000,
-        sprintf('document.querySelector("%s") == null || document.querySelector("%s").style.visibility == "hidden"',
-          $this->cookieBannerSelector, $this->cookieBannerSelector))) {
-        throw new \Exception(sprintf('The cookie banner with selector "%s" is stil present after accepting cookies.', $this->cookieBannerSelector));
-      }
+    $this->handleCookieBanner(
+        $this->cookieManager->getAcceptButtonSelector(),
+        $this->cookieManager->getCookieBannerSelector(),
+        'accept'
+    );
+  }
+
+  /**
+   * Accept cookies automatically.
+   *
+   * @BeforeScenario @cookies-accepted
+   */
+  public function acceptCookiesBeforeScenario() {
+    $this->visitPath('/');
+    $this->cookieManager->acceptCookies($this->getSession());
+  }
+
+  /**
+   * Reject cookies by clicking the reject button in cookie popup or banner.
+   *
+   * @Then I reject cookies
+   */
+  public function iRejectCookies() {
+    $this->handleCookieBanner(
+      $this->cookieManager->getRejectButtonSelector(),
+      $this->cookieManager->getCookieBannerSelector(),
+      'reject'
+    );
+  }
+
+  /**
+   * Reject cookies automatically.
+   *
+   * @BeforeScenario @cookies-rejected
+   */
+  public function rejectCookiesBeforeScenario() {
+    $this->visitPath('/');
+    $this->cookieManager->rejectCookies($this->getSession());
+  }
+
+  /**
+   * Helper to accept or reject the cookies.
+   *
+   * @param string $buttonSelector
+   *   Button selector (accept/reject).
+   * @param string $bannerSelector
+   *   Banner container selector.
+   * @param string $actionName
+   *   Action name (accept/reject).
+   */
+  private function handleCookieBanner(string $buttonSelector, string $bannerSelector, string $actionName): void {
+    $button = $this->getSession()->getPage()->find('css', $buttonSelector);
+
+    if (!$button) {
+      throw new \Exception(sprintf(
+        'The %s button with selector "%s" was not found.',
+        $actionName,
+        $buttonSelector
+      ));
     }
-    else {
-      throw new \Exception('The agree button do not appears.');
+    if (!$button->isVisible()) {
+      // Some cookie banners have animations. Wait for animation.
+      // to complete before interacting with the button.
+      sleep(1);
+    }
+
+    $button->press();
+
+    if (!$this->getSession()->wait(
+      10000,
+      sprintf(
+        '!document.querySelector("%s") || getComputedStyle(document.querySelector("%s")).visibility === "hidden"',
+        $bannerSelector,
+        $bannerSelector
+      )
+    )) {
+      throw new \Exception(sprintf('The cookie banner with selector "%s" is still present.', $bannerSelector));
     }
   }
 
@@ -191,8 +260,8 @@ class CookieComplianceContext extends RawMinkContext {
    * @When I wait cookie banner appears
    */
   public function iWaitCookieBannerAppears() {
-    if (!$this->getSession()->wait(10000, sprintf('document.querySelector("%s") != null', $this->cookieBannerSelector))) {
-      throw new \Exception(sprintf('The cookie banner with selector "%s" does not appear.', $this->cookieBannerSelector));
+    if (!$this->getSession()->wait(10000, sprintf('document.querySelector("%s") != null', $this->cookieManager->getCookieBannerSelector()))) {
+      throw new \Exception(sprintf('The cookie banner with selector "%s" does not appear.', $this->cookieManager->getCookieBannerSelector()));
     }
   }
 
