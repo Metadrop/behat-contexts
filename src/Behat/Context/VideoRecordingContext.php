@@ -14,6 +14,7 @@ use Behat\Behat\Hook\Scope\BeforeStepScope;
 use NuvoleWeb\Drupal\DrupalExtension\Context\RawMinkContext;
 use Behat\Hook\AfterStep;
 use Behat\Hook\BeforeStep;
+use Behat\Hook\BeforeScenario
 
 /**
  * Context to show test info before tests to record it.
@@ -79,11 +80,10 @@ class VideoRecordingContext extends RawMinkContext {
   /**
    * Show tests name and green screen.
    *
-   * @BeforeScenario @javascript
-   *
    * @param BeforeScenarioScope $scope
    *    Scenario scope.
    */
+  #[BeforeScenario('@javascript')]
   public function showScenarioDataBeforeTest(BeforeScenarioScope $scope) {
     if (!$this->customParameters['enabled'] || !$this->isJavascriptAvailable()) {
       return;
@@ -157,9 +157,8 @@ class VideoRecordingContext extends RawMinkContext {
 
   /**
    * Shows step information after each step if there is an error.
-   *
-   * @AfterStep
    */
+  #[AfterStep]
   public function showRedWindowIfError(AfterStepScope $scope) {
     if (
       $this->customParameters['enabled']
@@ -175,9 +174,8 @@ class VideoRecordingContext extends RawMinkContext {
 
   /**
    * Shows step information before each step.
-   *
-   * @BeforeStep
    */
+  #[BeforeStep]
   public function showStepInfo(BeforeStepScope $scope) {
     if (
       $this->customParameters['enabled'] &&

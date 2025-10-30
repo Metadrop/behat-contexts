@@ -10,6 +10,7 @@ namespace Metadrop\Behat\Context;
 
 use Webmozart\Assert\Assert;
 use Drupal\group\Entity\Group;
+use Behat\Step\Given;
 
 /**
  * Utilities for testing Groups.
@@ -96,9 +97,8 @@ class DrupalGroupsExtendedContext extends RawDrupalContext {
    * @param $username string
    * @param $group_type string
    * @param $group_name string
-   *
-   * @Given the user :user_name is the owner of the group type :group_type with name :group_name
    */
+  #[Given('the user :user_name is the owner of the group type :group_type with name :group_name')]
   public function groupSetOwnerByUserName($user_name, $group_type, $group_name) {
     $user = user_load_by_name($user_name);
     /** @var \Drupal\group\Entity\Group $group */
@@ -116,9 +116,8 @@ class DrupalGroupsExtendedContext extends RawDrupalContext {
    *   Group type.
    * @param string $group_name
    *   Group name.
-   *
-   * @Given user :user is subscribed to the group of type :group_type with name :name
    */
+  #[Given('user :user is subscribed to the group of type :group_type with name :name')]
   public function userIsSubscribedToGroup($username, $group_type, $group_name) {
     $gid = $this->getEntityIdBylabel($group_type, $group_name);
     if (empty($gid)) {
@@ -140,9 +139,8 @@ class DrupalGroupsExtendedContext extends RawDrupalContext {
    *   Group type.
    * @param string $group_name
    *   Group name.
-   *
-   * @Given content :title with bundle :bundle is subscribed to the group of type :group_type with name :name
    */
+  #[Given('content :title with bundle :bundle is subscribed to the group of type :group_type with name :name')]
   public function contentIsSubscribedToGroup($title, $bundle, $group_type, $group_name) {
     $gid = $this->getEntityIdBylabel($group_type, $group_name);
     if (empty($gid)) {
@@ -176,9 +174,8 @@ class DrupalGroupsExtendedContext extends RawDrupalContext {
    *   Group type.
    * @param string $group_name
    *   Group name.
-   *
-   * @Given user :user is subscribed to the group of type :group_type with name :name as a(n) :role role(s)
    */
+  #[Given('user :user is subscribed to the group of type :group_type with name :name as a(n) :role role(s)')]
   public function userIsSubscribedToGroupWithRoles($username, $group_type, $group_name, $roles) {
     $gid = $this->getEntityIdBylabel($group_type, $group_name);
     if (empty($gid)) {

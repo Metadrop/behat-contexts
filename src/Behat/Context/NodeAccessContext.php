@@ -2,6 +2,8 @@
 
 namespace Metadrop\Behat\Context;
 
+use Behat\Step\Given;
+
 class NodeAccessContext extends RawDrupalContext {
 
   /**
@@ -9,10 +11,9 @@ class NodeAccessContext extends RawDrupalContext {
    *
    * @param string $bundle
    *   Entity bundle.
-   *
-   * @Given the access of last node created is refreshed
-   * @Given the access of last node created with :bundle bundle is refreshed
    */
+  #[Given('the access of last node created is refreshed')]
+  #[Given('the access of last node created with :bundle bundle is refreshed')]
   public function refreshLastNodeAccess($bundle = NULL) {
     $lastNodeId = $this->getCore()->getLastEntityId('node', $bundle);
     if (empty($lastNodeId)) {

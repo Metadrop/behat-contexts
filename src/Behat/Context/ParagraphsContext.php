@@ -3,6 +3,7 @@
 namespace Metadrop\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
+use Behat\Step\Given;
 
 class ParagraphsContext extends RawDrupalContext {
 
@@ -32,9 +33,8 @@ class ParagraphsContext extends RawDrupalContext {
    *   Field to reference the paragrapshs.
    * @param \Behat\Gherkin\Node\TableNode $paragraph_fields_table
    *   Paragraph fields.
-   *
-   * @Given paragraph of :paragraph_type type referenced on the :field_paragraph field of the last content:
    */
+  #[Given('paragraph of :paragraph_type type referenced on the :field_paragraph field of the last content:')]
   public function createParagraph($paragraph_type, $paragraph_field, TableNode $paragraph_fields_table) {
     $this->entityCreateParagraph($paragraph_type, $paragraph_field, 'node', $paragraph_fields_table);
   }
@@ -50,9 +50,8 @@ class ParagraphsContext extends RawDrupalContext {
    *   Entity type.
    * @param \Behat\Gherkin\Node\TableNode $paragraph_fields_table
    *   Paragraph fields.
-   *
-   * @Given paragraph of :paragraph_type type referenced on the :field_paragraph field of the last :entity_type entity:
    */
+  #[Given('paragraph of :paragraph_type type referenced on the :field_paragraph field of the last :entity_type entity:')]
   public function entityCreateParagraph($paragraph_type, $paragraph_field, $entity_type, TableNode $paragraph_fields_table) {
     $last_id = $this->getCore()->getLastEntityId($entity_type);
     if (empty($last_id)) {

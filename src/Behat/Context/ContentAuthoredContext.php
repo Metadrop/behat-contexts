@@ -3,6 +3,7 @@
 namespace Metadrop\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
+use Behat\Step\Given;
 
 class ContentAuthoredContext extends RawDrupalContext {
 
@@ -11,10 +12,9 @@ class ContentAuthoredContext extends RawDrupalContext {
    * | title    | status | created           |
    * | My title | 1      | 2014-10-17 8:00am |
    * | ...      | ...    | ...               |
-   *
-   * @Given :type content authored by current user:
-   * @Given own :type content:
    */
+  #[Given(':type content authored by current user:')]
+  #[Given('own :type content:')]
   public function createNodeAuthoredCurrentUser($type, TableNode $nodesTable) {
     foreach ($nodesTable->getHash() as $nodeHash) {
       $node = (object) $nodeHash;

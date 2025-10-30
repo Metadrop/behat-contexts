@@ -4,10 +4,13 @@ namespace Metadrop\Behat\Context;
 
 use Behat\Testwork\Hook\Scope\AfterSuiteScope;
 use Behat\Testwork\Hook\Scope\BeforeSuiteScope;
+use Behat\Hook\AfterScenario;
 use Drupal\Core\Url;
 use Metadrop\Behat\Cores\Traits\ScenarioTimeTrait;
 use Behat\Testwork\Tester\Result\TestResults;
 use Behat\Behat\Hook\Scope\AfterScenarioScope;
+use Behat\Hook\AfterSuite;
+use Behat\Hook\BeforeSuite;
 use Drupal\Core\Logger\RfcLogLevel;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -135,18 +138,16 @@ class LogsContext extends RawDrupalContext {
 
   /**
    * Set when the suite starts to retrieve the right logs.
-   *
-   * @BeforeSuite
    */
+  #[\Behat\Hook\BeforeSuite]
   public static function setLogsTimeSuite(BeforeSuiteScope $before_suite_scope) {
     static::$suiteStartTime = time();
   }
 
   /**
    * Process logs after behat suite.
-   *
-   * @AfterSuite
    */
+  #[\Behat\Hook\AfterSuite]
   public static function showLogsAfterSuite(AfterSuiteScope $after_suite_scope) {
     $grouped_logs = static::getGroupedLogs();
     if (!empty($grouped_logs)) {
@@ -293,9 +294,8 @@ class LogsContext extends RawDrupalContext {
    *
    * @param \Behat\Behat\Hook\Scope\AfterScenarioScope $scope
    *   After Scenario scope.
-   *
-   * @AfterScenario @api
    */
+  #[AfterScenario]
   public function showDbLog(AfterScenarioScope $scope) {
     $module_is_enabled = in_array('dblog', $this->getCore()->getModuleList());
 

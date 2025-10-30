@@ -2,6 +2,8 @@
 
 namespace Metadrop\Behat\Context;
 
+use Behat\Step\Given;
+
 class CacheContext extends RawDrupalContext {
 
   /**
@@ -10,9 +12,8 @@ class CacheContext extends RawDrupalContext {
    * @param string $path
    *  Page name without first "/"
    *  Use "*" as wildcard. Example: articles/*
-   *
-   * @Given :path page cache is flushed
    */
+  #[Given(':path page cache is flushed')]
   public function pageCacheIsFlushed($path = NULL) {
     global $base_url;
 
@@ -28,9 +29,8 @@ class CacheContext extends RawDrupalContext {
    *
    * @param string $view_name
    *  Views name
-   *
-   * @Given :view view data cache is flushed
    */
+  #[Given(':view view data cache is flushed')]
   public function viewDataCacheIsFlushed($view_name) {
     $this->getCore()->viewsCacheClear($view_name);
   }

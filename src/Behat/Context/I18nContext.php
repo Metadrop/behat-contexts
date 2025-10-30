@@ -11,6 +11,10 @@ use Behat\Behat\Context\Context;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\MinkExtension\Context\RawMinkContext;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Hook\BeforeScenario;
+use Behat\Step\Given;
+use Behat\Step\Then;
+use Behat\Step\When;
 use Drupal\Core\Url;
 
 /**
@@ -28,11 +32,11 @@ class I18nContext extends RawMinkContext implements Context {
   /**
    * Get the necessary contexts.
    *
-   * @BeforeScenario
    *
    * @param BeforeScenarioScope $scope
    *   Scope del scenario.
    */
+  #[BeforeScenario]
   public function gatherContexts(BeforeScenarioScope $scope) {
     $environment = $scope->getEnvironment();
     foreach ($environment->getContexts() as $context) {
@@ -46,11 +50,10 @@ class I18nContext extends RawMinkContext implements Context {
    * Fills in form field with specified label translated
    * Example: When I fill in "username" translated with: "bwayne"
    * Example: And I fill in "bwayne" translated for "username"
-   *
-   * @When /^(?:|I )fill in "(?P<field>(?:[^"]|\\")*)" translated field with "(?P<value>(?:[^"]|\\")*)"$/
-   * @When /^(?:|I )fill in "(?P<field>(?:[^"]|\\")*)" translated field with:$/
-   * @When /^(?:|I )fill in "(?P<value>(?:[^"]|\\")*)" for "(?P<field>(?:[^"]|\\")*)" translated field$/
    */
+  #[When('/^(?:|I )fill in "(?P<field>(?:[^"]|\\\\")*)" translated field with "(?P<value>(?:[^"]|\\\\")*)"$/')]
+  #[When('/^(?:|I )fill in "(?P<field>(?:[^"]|\\\\")*)" translated field with:$/')]
+  #[When('/^(?:|I )fill in "(?P<value>(?:[^"]|\\\\")*)" for "(?P<field>(?:[^"]|\\\\")*)" translated field$/')]
   public function fillFieldTranslated($field, $value)
   {
     $field = $this->getTranslatedText($field);
@@ -59,25 +62,20 @@ class I18nContext extends RawMinkContext implements Context {
 
   /**
    * Presses button with specified translated title.
-   *
-   * @When I press the :button translated button
    */
+  #[When('I press the :button translated button')]
   public function pressTranslatedButton($button) {
     $button = $this->getTranslatedText($button);
     $this->minkContext->pressButton($button);
   }
 
-  /**
-   * @Given I press :button translated button in the :region( region)
-   */
+  #[Given('I press :button translated button in the :region( region)')]
   public function assertRegionPressButton ($button, $region) {
     $button = $this->getTranslatedText($button);
     $this->minkContext->assertRegionPressButton($button, $region);
   }
 
-  /**
-   * @Then I (should )see the translated text :text
-   */
+  #[Then('I (should )see the translated text :text')]
   public function assertTranslatedTextVisible($text) {
     $translated_text = $this->getTranslatedText($text);
     $this->minkContext->assertTextVisible($translated_text);
@@ -89,9 +87,8 @@ class I18nContext extends RawMinkContext implements Context {
    *
    * Example: Then I should be on "/" translated page
    * Example: And I should be on "/bats" translated page
-   *
-   * @Then /^(?:|I )should be on "(?P<path>[^"]+)" translated page$/
    */
+  #[Then('/^(?:|I )should be on "(?P<path>[^"]+)" translated page$/')]
   public function assertTranslatedPageAddress($path)
   {
     $langcode = $this->getCurrentPageLanguage();

@@ -10,6 +10,8 @@ use Drupal\Driver\Exception\UnsupportedDriverActionException;
 use Drupal\DrupalExtension\Hook\Scope\AfterNodeCreateScope;
 use Drupal\DrupalExtension\Hook\Scope\AfterUserCreateScope;
 use Symfony\Component\Serializer\Exception\UnsupportedException;
+use Drupal\DrupalExtension\Hook\Call\AfterNodeCreate;
+use Drupal\DrupalExtension\Hook\Call\AfterUserCreate;
 
 /**
  * Class EntityContext.
@@ -57,12 +59,11 @@ class EntityContext extends RawDrupalContext {
 
   /**
    * Go to last entity created.
-   *
-   * @Given I go to the last entity :entity created
-   * @Given I go to the last entity :entity with :bundle bundle created
-   * @Given I go to :subpath of the last entity :entity created
-   * @Given I go to :subpath of the last entity :entity with :bundle bundle created
    */
+  #[\Behat\Step\Given('I go to the last entity :entity created')]
+  #[\Behat\Step\Given('I go to the last entity :entity with :bundle bundle created')]
+  #[\Behat\Step\Given('I go to :subpath of the last entity :entity created')]
+  #[\Behat\Step\Given('I go to :subpath of the last entity :entity with :bundle bundle created')]
   public function goToTheLastEntityCreated($entity_type, $bundle = NULL, $subpath = NULL) {
     $last_entity = $this->getCore()->getLastEntityId($entity_type, $bundle);
     if (empty($last_entity)) {
@@ -75,12 +76,11 @@ class EntityContext extends RawDrupalContext {
 
   /**
    * Go to a specific path of an entity with a specific label.
-   *
-   * @Given I go to the :entity_type entity with label :label
-   * @Given I go to the :entity_type entity with label :label in :language language
-   * @Given I go to :subpath of the :entity_type entity with label :label
-   * @Given I go to :subpath of the :entity_type entity with label :label in :language language
    */
+  #[\Behat\Step\Given('I go to the :entity_type entity with label :label')]
+  #[\Behat\Step\Given('I go to the :entity_type entity with label :label in :language language')]
+  #[\Behat\Step\Given('I go to :subpath of the :entity_type entity with label :label')]
+  #[\Behat\Step\Given('I go to :subpath of the :entity_type entity with label :label in :language language')]
   public function goToTheEntityWithLabel($entity_type, $label, $subpath = NULL, $language = NULL) {
     $entity = $this->getCore()->loadEntityByLabel($entity_type, $label);
     $this->visitEntityPath($entity_type, $entity, $subpath, $language);
@@ -88,11 +88,10 @@ class EntityContext extends RawDrupalContext {
 
   /**
    * Go to a specific path of an entity with an specific properties.
-   *
-   * @Given I go to the :entity_type entity with properties:
-   * @Given I go to :subpath of the :entity_type entity with properties:
-   * @Given I go to the :entity_type entity in :language language with properties:
    */
+  #[\Behat\Step\Given('I go to the :entity_type entity with properties:')]
+  #[\Behat\Step\Given('I go to :subpath of the :entity_type entity with properties:')]
+  #[\Behat\Step\Given('I go to the :entity_type entity in :language language with properties:')]
   public function goToTheEntityWithProperties($entity_type, TableNode $properties, $subpath = NULL, $language = NULL) {
     $properties_filter = [];
     foreach ($properties->getHash()[0] as $property_name => $property_value) {
@@ -130,10 +129,9 @@ class EntityContext extends RawDrupalContext {
 
   /**
    * Delete the last entity created.
-   *
-   * @Given last entity :entity created is deleted
-   * @Given last entity :entity with :bundle bundle created is deleted
    */
+  #[\Behat\Step\Given('last entity :entity created is deleted')]
+  #[\Behat\Step\Given('last entity :entity with :bundle bundle created is deleted')]
   public function deleteLastEntityCreated($entity_type, $bundle = NULL) {
     $last_entity_id = $this->getCore()->getLastEntityId($entity_type, $bundle);
 
@@ -149,16 +147,13 @@ class EntityContext extends RawDrupalContext {
 
   /**
    * Check entity fields.
-   *
-   * @Then the :entity_type with field :field_name and value :value should not have the following values:
    */
+  #[\Behat\Step\Then('the :entity_type with field :field_name and value :value should not have the following values:')]
   public function checkDonotHaveValues($entity_type, $field_name, $value, TableNode $values) {
     $this->checkEntityTestValues($entity_type, $field_name, $value, $values, FALSE);
   }
 
-  /**
-   * @Then the :entity_type with field :field_name and value :value translation :langcode should have the following values:
-   */
+  #[\Behat\Step\Then('the :entity_type with field :field_name and value :value translation :langcode should have the following values:')]
   public function checkEntityTranslationValues($entity_type, $field_name, $value, $langcode, TableNode $values, $check_correct = TRUE) {
     $entity = $this->getCore()->getEntityByField($entity_type, $field_name, $value);
 
@@ -172,23 +167,17 @@ class EntityContext extends RawDrupalContext {
     $this->checkGivenEntityValues($entity->getTranslation($langcode), $values, $check_correct);
   }
 
-  /**
-   * @Then the :entity_type with field :field_name and value :value translation :langcode should not have the following values:
-   */
+  #[\Behat\Step\Then('the :entity_type with field :field_name and value :value translation :langcode should not have the following values:')]
   public function checkEntityTranslationNotValues($entity_type, $field_name, $value, $langcode, TableNode $values) {
     $this->checkEntityTranslationValues($entity_type, $field_name, $value, $langcode, $values, FALSE);
   }
 
-  /**
-   * @Then the :entity_type with field :field_name and value :value should not have :langcode translation
-   */
+  #[\Behat\Step\Then('the :entity_type with field :field_name and value :value should not have :langcode translation')]
   public function checkEntityTranslationNotExists($entity_type, $field_name, $value, $langcode) {
     $this->checkEntityTranslationExists($entity_type, $field_name, $value, $langcode, FALSE);
   }
 
-  /**
-   * @Then the :entity_type with field :field_name and value :value should have :langcode translation
-   */
+  #[\Behat\Step\Then('the :entity_type with field :field_name and value :value should have :langcode translation')]
   public function checkEntityTranslationExists($entity_type, $field_name, $value, $langcode, $check_exists = TRUE) {
     $entity = $this->getCore()->getEntityByField($entity_type, $field_name, $value);
 
@@ -209,13 +198,12 @@ class EntityContext extends RawDrupalContext {
   /**
    * Check object fields.
    *
-   * @Then the :object_type with field :field_name and value :value should have the following values:
-   *
    * Example:
    * And the 'user' with field 'mail' and value 'behat@metadrop.net' should have the following values:
    *  | mail                | uid                                                 |
    *  | behat@metadrop.net  | entity-replacement:user:mail:behat@metadrop.net:uid |
    */
+  #[\Behat\Step\Then('the :object_type with field :field_name and value :value should have the following values:')]
   public function checkEntityTestValues($entity_type, $field_name, $value, TableNode $values, $throw_error_on_empty = TRUE) {
     $entity = $this->getCore()->getEntityByField($entity_type, $field_name, $value);
 
@@ -256,13 +244,12 @@ class EntityContext extends RawDrupalContext {
   /**
    * Check entity fields loaded by label.
    *
-   * @Then the :label :entity_type should have the following values:
-   *
    * Example:
    * And the 'Lorem ipsum sit amet' node should have the following values:
    *  | field_bar   | field_foo  |
    *  | Lorem       | ipsum      |
    */
+  #[\Behat\Step\Then('the :label :entity_type should have the following values:')]
   public function checkEntityByLabelTestValues($entity_type, $label, TableNode $values) {
     $hash = $values->getHash();
     $fields = $hash[0];
@@ -419,9 +406,8 @@ class EntityContext extends RawDrupalContext {
 
   /**
    * Record time before scenario purge entities.
-   *
-   * @BeforeScenario @purgeEntities
    */
+  #[\Behat\Hook\BeforeScenario('@purgeEntities')]
   public function recordTimeBeforeScenario() {
     if ($this->getDriver() instanceof BlackboxDriver) {
       throw new UnsupportedDriverActionException('No ability to purge entities, put @api in your scenario.', $this->getDriver());
@@ -440,9 +426,8 @@ class EntityContext extends RawDrupalContext {
    *          'purge_entities':
    *            - user
    *            - custom_entity.
-   *
-   * @AfterScenario @purgeEntities
    */
+  #[\Behat\Hook\AfterScenario('@purgeEntities')]
   public function purgeEntities() {
     // Get the request time after scenario and delete entities if the
     // entities were created after scenario execution.
@@ -497,9 +482,8 @@ class EntityContext extends RawDrupalContext {
 
   /**
    * Create entities.
-   *
-   * @Given :entity_type entity:
    */
+  #[\Behat\Step\Given(':entity_type entity:')]
   public function entity($entityType, TableNode $entitiesTable) {
     foreach ($entitiesTable->getHash() as $entityHash) {
       $fields = $this->replaceTokens($entityHash);
@@ -574,6 +558,7 @@ class EntityContext extends RawDrupalContext {
    * @afterNodeCreate
    */
   public function afterNodeCreate(AfterNodeCreateScope $scope) {
+
     $node = $scope->getEntity();
     $this->nodes[] = $node->nid;
   }
@@ -586,9 +571,7 @@ class EntityContext extends RawDrupalContext {
     $this->users[] = $user->uid;
   }
 
-  /**
-   * @AfterScenario
-   */
+  #[\Behat\Hook\AfterScenario]
   public function cleanEntities() {
 
     // In some cases (as Group and Group Content), some entities need to be
@@ -610,9 +593,8 @@ class EntityContext extends RawDrupalContext {
 
   /**
    * Check current user is not able to perform a specific operation in the site.
-   *
-   * @Then I am able to :operation the :entity_type entity with label :entity_label
    */
+  #[\Behat\Step\Then('I am able to :operation the :entity_type entity with label :entity_label')]
   public function iAmAbleToDoOperationAtEntityWithLabel($operation, $entity_type, $entity_label) {
     if (!$this->userHasAccessToEntity($operation, $entity_type, $entity_label)) {
       throw new \InvalidArgumentException(sprintf('User is not able to "%s" the "%s" entity with label "%s"', $operation, $entity_type, $entity_label));
@@ -621,9 +603,8 @@ class EntityContext extends RawDrupalContext {
 
   /**
    * Check current user is not able to perform a specific operation in the site.
-   *
-   * @Then I am not able to :operation the :entity_type entity with label :entity_label
    */
+  #[\Behat\Step\Then('I am not able to :operation the :entity_type entity with label :entity_label')]
   public function iAmNotAbleToDoOperationAtEntityWithLabel($operation, $entity_type, $entity_label) {
     if ($this->userHasAccessToEntity($operation, $entity_type, $entity_label)) {
       throw new \InvalidArgumentException(sprintf('User is able to "%s" the "%s" entity with label "%s"', $operation, $entity_type, $entity_label));

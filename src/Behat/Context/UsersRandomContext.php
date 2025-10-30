@@ -5,19 +5,23 @@ namespace Metadrop\Behat\Context;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\MinkExtension\Context\MinkContext;
+use Behat\Hook\BeforeScenario;
+use Behat\Step\Given;
+use Behat\Step\Then;
+
 
 /**
  * Context used to generate random user data.
  *
  * This context doesn't create any user, it creates random user data that
  * can be used during tests.
- * 
- * For example, if you need to fill a form with name, email and password you  
- * can use this context. Typically, this is used to interact with remote APIs 
- * through a form. You could use fixed values, but if the API requires 
+ *
+ * For example, if you need to fill a form with name, email and password you
+ * can use this context. Typically, this is used to interact with remote APIs
+ * through a form. You could use fixed values, but if the API requires
  * different values on each test run (because there's no way to clean previous
  * data created after submissions) this context can save your day.
- * 
+ *
  * @package Metadrop\Behat\Context
  */
 class UsersRandomContext extends RawDrupalContext {
@@ -37,11 +41,11 @@ class UsersRandomContext extends RawDrupalContext {
   /**
    * Get the necessary contexts.
    *
-   * @BeforeScenario
    *
    * @param BeforeScenarioScope $scope
    *   Scope del scenario.
    */
+  #[BeforeScenario]
   public function gatherContexts(BeforeScenarioScope $scope) {
     $environment = $scope->getEnvironment();
     foreach ($environment->getContexts() as $context) {
@@ -68,9 +72,8 @@ class UsersRandomContext extends RawDrupalContext {
    * @param \Behat\Gherkin\Node\TableNode $user_names_table
    *   Strings to identify generated random user data. Mainly used to identify
    *   the user data on other steps.
-   *
-   * @Given random users identified by:
    */
+  #[Given('random users identified by:')]
   public function generateRandomUsers(TableNode $user_names_table) {
     $hash = $user_names_table->getHash();
     $mail_names = array_map(function ($a) {
@@ -89,13 +92,13 @@ class UsersRandomContext extends RawDrupalContext {
 
   /**
    * Helper function to fill a form field with a given random user data.
-   * 
+   *
    * @param $field
-   *   Field that would be populated with the requested random user data. The 
+   *   Field that would be populated with the requested random user data. The
    *   user  must have been generated previously.
    * @param $random_user_identifier
    *   Random generated user identifier.
-   * @param $data_name 
+   * @param $data_name
    *   User data to put in the form. It can be 'username', 'email' or 'password'.
    * @param $region
    *   The region where the form field is present. Optional.
@@ -140,16 +143,15 @@ class UsersRandomContext extends RawDrupalContext {
    * The random user data must have been generated previously.
    *
    * @param $field
-   *   Field that would be populated with the random user data mail. The user 
+   *   Field that would be populated with the random user data mail. The user
    *   must have been generated previously.
    * @param $random_user_identifier
    *   Random generated user identifier.
    * @param $region
    *   The region where the form field is present. Optional.
-   *
-   * @Then I fill in :mail_field with random email from :random_user_identifier
-   * @Then I fill in :mail_field with random email from :random_user_identifier in the :region( region)
    */
+  #[Then('I fill in :mail_field with random email from :random_user_identifier')]
+  #[Then('I fill in :mail_field with random email from :random_user_identifier in the :region( region)')]
   public function iFillInWithRandomMail($field, $random_user_identifier, $region = NULL) {
     $this->fillFormFieldWithRandomUserData($field, $random_user_identifier, 'email', $region);
   }
@@ -165,10 +167,9 @@ class UsersRandomContext extends RawDrupalContext {
    *   Random generated user identifier.
    * @param $region
    *   The region where the form field is present. Optional.
-   *
-   * @Then I fill in :field with random username from :random_user_identifier
-   * @Then I fill in :field with random username from :random_user_identifier in the :region( region)
    */
+  #[Then('I fill in :field with random username from :random_user_identifier')]
+  #[Then('I fill in :field with random username from :random_user_identifier in the :region( region)')]
   public function iFillInWithRandomUserName($field, $random_user_identifier, $region = NULL) {
     $this->fillFormFieldWithRandomUserData($field, $random_user_identifier, 'username', $region);
   }
@@ -184,10 +185,9 @@ class UsersRandomContext extends RawDrupalContext {
    *   Random generated user identifier.
    * @param $region
    *   The region where the form field is present. Optional.
-   *
-   * @Then I fill in :field with random password from :random_user_identifier
-   * @Then I fill in :field with random password from :random_user_identifier in the :region( region)
    */
+  #[Then('I fill in :field with random password from :random_user_identifier')]
+  #[Then('I fill in :field with random password from :random_user_identifier in the :region( region)')]
   public function iFillInWithRandomUserPassword($field, $random_user_identifier, $region = NULL) {
     $this->fillFormFieldWithRandomUserData($field, $random_user_identifier, 'password', $region);
   }

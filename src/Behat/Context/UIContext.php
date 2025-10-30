@@ -9,6 +9,10 @@ use NuvoleWeb\Drupal\DrupalExtension\Context\RawMinkContext;
 use Behat\Mink\Exception\ExpectationException;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Hook\BeforeScenario;
+use Behat\Step\Given;
+use Behat\Step\When;
+use Behat\Step\Then;
 use NuvoleWeb\Drupal\DrupalExtension\Context\ScreenShotContext;
 
 /**
@@ -33,7 +37,7 @@ class UIContext extends RawMinkContext {
    */
   protected $waitingContext;
 
-    
+
   /**
    * The iframe to switch to.
    *
@@ -60,9 +64,8 @@ class UIContext extends RawMinkContext {
    * It doesn't work when multiple selection is enabled.
    *
    * See https://harvesthq.github.io/chosen/
-   *
-   * @Given I select :option from :select chosen.js select box
    */
+  #[Given('I select :option from :select chosen.js select box')]
   public function iSelectFromChosenJsSelectBox($option, $select) {
 
     // Get field.
@@ -89,9 +92,8 @@ class UIContext extends RawMinkContext {
 
   /**
    * Fill in a select 2 autocomplete field.
-   *
-   * @When I fill in the select2 autocomplete :autocomplete with :text
    */
+  #[When('I fill in the select2 autocomplete :autocomplete with :text')]
   public function fillInSelect2Autocomplete($locator, $text) {
 
     $session = $this->getSession();
@@ -138,9 +140,8 @@ class UIContext extends RawMinkContext {
    * PhantomJS is not compatible with file field multiple and crashes.
    * This workaround removes the property, this way the test can upload at least
    * one file to the widget.
-   *
-   * @Given the file field :field is not multiple
    */
+  #[Given('the file field :field is not multiple')]
   public function fileFieldIsNotMultiple($locator) {
     $el = $this->getSession()->getPage()->findField($locator);
 
@@ -180,20 +181,18 @@ class UIContext extends RawMinkContext {
 
   /**
    * Step scroll to selector.
-   *
-   * @When I scroll to :selector
-   * @When I scroll to :selector with :offset
    */
+  #[When('I scroll to :selector')]
+  #[When('I scroll to :selector with :offset')]
   public function scrollToElement($selector, $offset = NULL) {
     $this->scrollToSelector($selector, $offset);
   }
 
   /**
    * Step scroll to field.
-   *
-   * @When I scroll to :field field
-   * @When I scroll to :field field with :offset
    */
+  #[When('I scroll to :field field')]
+  #[When('I scroll to :field field with :offset')]
   public function scrollToField($field, $offset = NULL) {
 
     $page = $this->getSession()->getPage();
@@ -213,9 +212,8 @@ class UIContext extends RawMinkContext {
 
   /**
    * Click on the element with the provided CSS Selector.
-   *
-   * @When /^I click on the element with css selector "([^"]*)"$/
    */
+  #[When('/^I click on the element with css selector "([^"]*)"$/')]
   public function iClickOnTheElementWithCssSelector($cssSelector) {
     $session = $this->getSession();
     $element = $session->getPage()->find(
@@ -232,9 +230,8 @@ class UIContext extends RawMinkContext {
 
   /**
    * Click on the element with the provided xpath query.
-   *
-   * @When /^I click on the element with xpath "([^"]*)"$/
    */
+  #[When('/^I click on the element with xpath "([^"]*)"$/')]
   public function iClickOnTheElementWithXpath($xpath) {
     // Get the mink session.
     $session = $this->getSession();
@@ -254,9 +251,8 @@ class UIContext extends RawMinkContext {
 
   /**
    * Click on the label using xpath.
-   *
-   * @When I click on the :label label
    */
+  #[When('I click on the :label label')]
   public function iClickOnTheLabel($label) {
     $label = str_replace("\"", "\\\"", $label);
     $xpath = '//label[text()="' . $label . '"]';
@@ -274,9 +270,8 @@ class UIContext extends RawMinkContext {
 
   /**
    * Check if a type of element has an attribute with an specific value.
-   *
-   * @Then the :element element of :type type should have the :attribute attribute with :value value
    */
+  #[Then('the :element element of :type type should have the :attribute attribute with :value value')]
   public function theElementShouldHaveAttributeWithValue($element, $type, $attribute, $value, $not = FALSE) {
     $xpath_element = "//{$type}[contains(text(),'{$element}')]";
     $found_element = $this->getElementByXpath($xpath_element);
@@ -297,18 +292,16 @@ class UIContext extends RawMinkContext {
 
   /**
    * Check if a type of element has an attribute with an specific value.
-   *
-   * @Then the :element element of :type type should not have the :attribute attribute with :value value
    */
+  #[Then('the :element element of :type type should not have the :attribute attribute with :value value')]
   public function theElementShouldNotHaveAttributeWithValue($element, $type, $attribute, $value) {
     $this->theElementShouldHaveAttributeWithValue($element, $type, $attribute, $value, TRUE);
   }
 
   /**
    * Step switch to the frame.
-   *
-   * @When I switch to the frame :frame
    */
+  #[When('I switch to the frame :frame')]
   public function iSwitchToTheFrame($frame) {
     $this->getSession()->switchToIFrame($frame);
     $this->iframe = $frame;
@@ -316,9 +309,8 @@ class UIContext extends RawMinkContext {
 
   /**
    * Step switch out of all frames.
-   *
-   * @When I switch out of all frames
    */
+  #[When('I switch out of all frames')]
   public function iSwitchOutOfAllFrames() {
     $this->getSession()->switchToIFrame();
     $this->iframe = NULL;
@@ -327,11 +319,11 @@ class UIContext extends RawMinkContext {
   /**
    * Gather neccesary subcontexts.
    *
-   * @BeforeScenario
    *
    * @param BeforeScenarioScope $scope
    *   Scope del scenario.
    */
+  #[BeforeScenario]
   public function gatherWaitingContext(BeforeScenarioScope $scope) {
     /** @var InitializedContextEnvironment $environment */
     $environment = $scope->getEnvironment();
@@ -345,9 +337,8 @@ class UIContext extends RawMinkContext {
    *
    * @NOTE: This step has a strong dependency with the markup of the drupal base
    * multiple fields, if the html is modified it may stop working.
-   *
-   * @Then I fill in multiple field :arg1 with the following values:
    */
+  #[Then('I fill in multiple field :arg1 with the following values:')]
   public function iFillInMultipleFieldWithTheFollowingValues($field_label, TableNode $table)
   {
     $xpath_base = sprintf('//table[contains(@class, "field-multiple-table")]/thead[contains(*, "%s")]/../tbody', $field_label);
@@ -424,9 +415,8 @@ class UIContext extends RawMinkContext {
 
   /**
    * Check selector is disabled or not.
-   *
-   * @Then the input with :label label should be disabled
    */
+  #[Then('the input with :label label should be disabled')]
   public function inputIsDisabled($label) {
     $session = $this->getSession();
     $xpath = "//input[@id=//label[contains(text(),'" . $label . "')]/@for]";

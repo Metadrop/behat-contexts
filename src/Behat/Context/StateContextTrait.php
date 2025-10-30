@@ -2,6 +2,10 @@
 
 namespace Metadrop\Behat\Context;
 
+use Behat\Hook\AfterScenario;
+use Behat\Step\Given;
+
+
 /**
  * Trait to add to FeatureContext classes to create State changing steps.
  *
@@ -36,9 +40,8 @@ trait StateContextTrait {
 
   /**
    * Revert any changed config.
-   *
-   * @AfterScenario
    */
+  #[AfterScenario]
   public function cleanState() {
     // Revert config that was changed.
     foreach ($this->state as $name => $value) {
@@ -54,9 +57,8 @@ trait StateContextTrait {
    *   The state key.
    * @param mixed $value
    *   Value to associate with identifier.
-   *
-   * @Given I set the state key :key to :value
    */
+  #[Given('I set the state key :key to :value')]
   public function setState($key, $value) {
     $backup = $this->getCore()->getState($key);
     $this->getCore()->setState($key, $value);

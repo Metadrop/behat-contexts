@@ -14,6 +14,8 @@ use Behat\Behat\Hook\Scope\AfterStepScope;
 use Behat\Testwork\Tester\Result\TestResult;
 use Behat\Gherkin\Node\FeatureNode;
 use Behat\Gherkin\Node\StepNode;
+use Behat\Step\Then;
+use Behat\Step\When;
 use NuvoleWeb\Drupal\DrupalExtension\Context\ScreenShotContext as NuvoleScreenshotContext;
 
 /**
@@ -262,16 +264,12 @@ class DebugContext extends NuvoleScreenshotContext {
     }
   }
 
-  /**
-   * @Then capture full page with a width of :width
-   */
+  #[Then('capture full page with a width of :width')]
   public function captureFullPageWithAWidthOf($width) {
     $this->captureFullPageWithWidthOfToWithName($width, $this->getScreenshotsPath(), $this->generateFilenameDateBased());
   }
 
-  /**
-   * @Then capture full page with a width of :width with name :filename
-   */
+  #[Then('capture full page with a width of :width with name :filename')]
   public function captureFullPageWithAWidthOfWithFilename($width, $filename) {
     $this->captureFullPageWithWidthOfToWithName($width, $this->getScreenshotsPath(), $this->generateFilenameDateBased());
   }
@@ -281,16 +279,12 @@ class DebugContext extends NuvoleScreenshotContext {
     return 'Screenshot-' . date("Ymd--H-i-s") . '.' . $milliseconds['usec'] . '.png';
   }
 
-  /**
-   * @Then capture full page with a width of :width to :path
-   */
+  #[Then('capture full page with a width of :width to :path')]
   public function captureFullPageWithWidthOfTo($width, $path) {
     $this->captureFullPageWithWidthOfToWithName($width, $this->getScreenshotAbsolutePath($path), $this->generateFilenameDateBased());
   }
 
-  /**
-   * @Then capture full page with a width of :width to :path with name :filename
-   */
+  #[Then('capture full page with a width of :width to :path with name :filename')]
   public function captureFullPageWithWidthOfToWithName($width, $filepath, $filename) {
     // Use default height as screenshot is going to capture the complete page.
     $this->getSession()->resizeWindow((int) $width, $this::DEFAULT_HEIGHT, 'current');
@@ -300,10 +294,9 @@ class DebugContext extends NuvoleScreenshotContext {
   }
 
   /**
-   * @Given save last response
-   *
    * Step to save page content to a file.
    */
+  #[Given('save last response')]
   public function saveLastResponse() {
     $this->createScreenshot($this->getScreenshotsPath() . DIRECTORY_SEPARATOR . 'last_response', 'File saved in @file_name');
   }

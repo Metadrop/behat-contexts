@@ -7,6 +7,8 @@
 
 namespace Metadrop\Behat\Context;
 
+use Behat\Step\Given;
+
 /**
  * Utilities for testing organic groups.
  */
@@ -55,9 +57,8 @@ class DrupalOrganicGroupsExtendedContext extends RawDrupalContext {
    *   Group type.
    * @param string $group_name
    *   Group name.
-   *
-   * @Given user :user is subscribed to the group of type :group_type with name :name
    */
+  #[Given('user :user is subscribed to the group of type :group_type with name :name')]
   public function userIsSubscribedToGroup($username, $group_type, $group_name) {
     $gid = $this->getEntityIdBylabel($group_type, $group_name);
     if (empty($gid)) {
@@ -76,9 +77,8 @@ class DrupalOrganicGroupsExtendedContext extends RawDrupalContext {
    *   Group type.
    * @param string $group_name
    *   Group name.
-   *
-   * @Given user :user is subscribed to the group of type :group_type with name :name as a(n) :role role(s)
    */
+  #[Given('user :user is subscribed to the group of type :group_type with name :name as a(n) :role role(s)')]
   public function userIsSubscribedToGroupWithRoles($username, $group_type, $group_name, $roles) {
     $gid = $this->getEntityIdBylabel($group_type, $group_name);
     if (empty($gid)) {
@@ -101,9 +101,8 @@ class DrupalOrganicGroupsExtendedContext extends RawDrupalContext {
    *   User name.
    * @param string $group_name
    *   Group name.
-   *
-   * @Given user :user is subscribed to the group with name :name
    */
+  #[Given('user :user is subscribed to the group with name :name')]
   public function userIsSubscribedToNodeGroup($username, $group_name) {
     $this->userIsSubscribedToGroup($username, 'node', $group_name);
   }
@@ -117,9 +116,8 @@ class DrupalOrganicGroupsExtendedContext extends RawDrupalContext {
    *   Group name.
    * @param string $roles
    *   Roles. Use ',' to add multiple.
-   *
-   * @Given user :user is subscribed to the group with name :name as a(n) :role role(s)
    */
+  #[Given('user :user is subscribed to the group with name :name as a(n) :role role(s)')]
   public function userIsSubscribedToNodeGroupWithRoles($username, $group_name, $roles) {
     $this->userIsSubscribedToGroupWithRoles($username, 'node', $group_name, $roles);
   }

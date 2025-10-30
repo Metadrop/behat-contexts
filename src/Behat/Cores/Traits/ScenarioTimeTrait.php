@@ -17,9 +17,8 @@ trait ScenarioTimeTrait {
 
   /**
    * Set scenario time before a scenario starts.
-   *
-   * @BeforeScenario
    */
+  #[\Behat\Hook\BeforeScenario]
   public function setScenarioStartTimestamp() {
     $this->scenarioStartTime = time();
   }

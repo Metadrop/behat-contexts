@@ -27,12 +27,12 @@ trait DrupalContextDependencyTrait {
    *
    * It is assumed that the Drupal context is always present, as is the main
    * extension for behat tests in DRupal.
-   * 
-   * @BeforeScenario
+   *
    *
    * @param BeforeScenarioScope $scope
    *   Scope del scenario.
    */
+  #[\Behat\Hook\BeforeScenario]
   public function gatherDrupalContext(BeforeScenarioScope $scope) {
     $environment = $scope->getEnvironment();
     $classesArray = $environment->getContextClasses();

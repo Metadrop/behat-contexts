@@ -4,6 +4,10 @@ namespace Metadrop\Behat\Context;
 
 use Behat\MinkExtension\Context\RawMinkContext;
 use Behat\Mink\Driver\Selenium2Driver;
+use Behat\Step\Given;
+use Behat\Step\Then;
+use Behat\Step\When;
+use Behat\Hook\BeforeScenario;
 use Metadrop\Behat\Context\CookieManagerInterface;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -140,9 +144,8 @@ class CookieComplianceContext extends RawMinkContext {
 
   /**
    * Accept cookies by clicking the accept button in cookie popup or banner.
-   *
-   * @Then I accept cookies
    */
+  #[Then('I accept cookies')]
   public function iAcceptCookies() {
     $this->handleCookieBanner(
         $this->cookieManager->getAcceptButtonSelector(),
@@ -153,9 +156,8 @@ class CookieComplianceContext extends RawMinkContext {
 
   /**
    * Accept cookies automatically.
-   *
-   * @BeforeScenario @cookies-accepted
    */
+  #[BeforeScenario('@cookies-accepted')]
   public function acceptCookiesBeforeScenario() {
     $this->visitPath('/');
     $this->cookieManager->acceptCookies($this->getSession());
@@ -163,9 +165,8 @@ class CookieComplianceContext extends RawMinkContext {
 
   /**
    * Reject cookies by clicking the reject button in cookie popup or banner.
-   *
-   * @Then I reject cookies
    */
+  #[Then('I reject cookies')]
   public function iRejectCookies() {
     $this->handleCookieBanner(
       $this->cookieManager->getRejectButtonSelector(),
@@ -176,9 +177,8 @@ class CookieComplianceContext extends RawMinkContext {
 
   /**
    * Reject cookies automatically.
-   *
-   * @BeforeScenario @cookies-rejected
    */
+  #[BeforeScenario('@cookies-rejected')]
   public function rejectCookiesBeforeScenario() {
     $this->visitPath('/');
     $this->cookieManager->rejectCookies($this->getSession());
@@ -226,9 +226,8 @@ class CookieComplianceContext extends RawMinkContext {
 
   /**
    * Check the main cookies of a specific type are not present.
-   *
-   * @Then the cookies of :type type have not been loaded
    */
+  #[Then('the cookies of :type type have not been loaded')]
   public function cookiesShouldBeEmpty(string $type) {
     $cookies_list = $this->cookies[$type] ?? [];
     foreach ($cookies_list as $cookie_name) {
@@ -241,9 +240,8 @@ class CookieComplianceContext extends RawMinkContext {
 
   /**
    * Check the main cookies of a specific type are present.
-   *
-   * @Then the cookies of :type type have been loaded
    */
+  #[Then('the cookies of :type type have been loaded')]
   public function cookiesHaveBeenSaved(string $type) {
     $cookies_list = $this->cookies[$type] ?? [];
     foreach ($cookies_list as $cookie_name) {
@@ -256,10 +254,9 @@ class CookieComplianceContext extends RawMinkContext {
 
   /**
    * Wait until the cookie banner appears.
-   *
-   * @When I wait cookie banner appears
-   * @When I wait for the cookie banner to appear
    */
+  #[When('I wait cookie banner appears')]
+  #[When('I wait for the cookie banner to appear')]
   public function iWaitCookieBannerAppears() {
     if (!$this->getSession()->wait(10000, sprintf('document.querySelector("%s") != null', $this->cookieManager->getCookieBannerSelector()))) {
       throw new \Exception(sprintf('The cookie banner with selector "%s" does not appear.', $this->cookieManager->getCookieBannerSelector()));
@@ -270,9 +267,8 @@ class CookieComplianceContext extends RawMinkContext {
    * Check there aren't cookies.
    *
    * Only compatible with Selenium2 Driver.
-   *
-   * @Then there should not be any cookies loaded
    */
+  #[Then('there should not be any cookies loaded')]
   public function thereShouldNotBeAnyCookie() {
     if (!$this->getSession()->getDriver() instanceof Selenium2Driver) {
       throw new \Exception('This step is only supported by Selenium2 Driver');
@@ -424,9 +420,8 @@ class CookieComplianceContext extends RawMinkContext {
 
   /**
    * Check cookie exists.
-   *
-   * @Given the cookie with name :cookie_name exists
    */
+  #[Given('the cookie with name :cookie_name exists')]
   public function cookieExists($cookie_name) {
     $cookie_value = $this->getSession()->getDriver()->getCookie($cookie_name);
     if (empty($cookie_value)) {
@@ -436,9 +431,8 @@ class CookieComplianceContext extends RawMinkContext {
 
   /**
    * Check cookie exists with value.
-   *
-   * @Given the cookie with name :cookie_name exists with value :value
    */
+  #[Given('the cookie with name :cookie_name exists with value :value')]
   public function cookieExistsWithValue($cookie_name, $value) {
     $this->cookieExists($cookie_name);
     $cookie_value = $this->getSession()->getDriver()->getCookie($cookie_name);

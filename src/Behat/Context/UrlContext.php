@@ -3,14 +3,14 @@
 namespace Metadrop\Behat\Context;
 
 use NuvoleWeb\Drupal\DrupalExtension\Context\RawMinkContext;
+use Behat\Step\Then;
 
 class UrlContext extends RawMinkContext {
 
   /**
    * Check param with value in url.
-   *
-   * @Then current url should have the ":param" param with ":value" value
    */
+  #[Then('current url should have the ":param" param with ":value" value')]
   public function urlShouldHaveParamWithValue($param, $value, $have = TRUE) {
     $url = $this->getSession()->getCurrentUrl();
     $url_query = parse_url($url, PHP_URL_QUERY) ?? '';
@@ -26,9 +26,8 @@ class UrlContext extends RawMinkContext {
 
   /**
    * Check param with value in url not exists.
-   *
-   * @Then current url should not have the ":param" param with ":value" value
    */
+  #[Then('current url should not have the ":param" param with ":value" value')]
   public function urlShouldNotHaveParamWithValue($param, $value) {
     $this->urlShouldHaveParamWithValue($param, $value, FALSE);
   }

@@ -2,6 +2,8 @@
 
 namespace Metadrop\Behat\Context;
 
+use Behat\Hook\AfterScenario;
+use Behat\Hook\AfterScenario;
 use NuvoleWeb\Drupal\DrupalExtension\Context\RawMinkContext;
 
 class AntiSpamContext extends RawMinkContext {
@@ -15,10 +17,9 @@ class AntiSpamContext extends RawMinkContext {
    * Disable honeypot time limit value.
    *
    * To be used when the presence of a honeypot time limit is provoking
-   * false negatives on tests.
-   *
-   * @BeforeScenario @honeypot-disable
+   * false negatives on tests
    */
+  #[BeforeScenario('@honeypot-disable')]
   public function disableHoneypot() {
     print('Honeypot: disabling time limit');
     $this->honeypotTimeLimit = $this->getCore()->getHoneypotLimit();
@@ -27,9 +28,8 @@ class AntiSpamContext extends RawMinkContext {
 
   /**
    * Restore honeypot time limit value.
-   *
-   * @AfterScenario @honeypot-disable
    */
+  #[AfterScenario('@honeypot-disable')]
   public function restoreHoneypot() {
     print('Honeypot: restoring time limit');
     $this->getCore()->setHoneypotLimit($this->honeypotTimeLimit);

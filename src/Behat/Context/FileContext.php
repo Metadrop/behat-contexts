@@ -3,6 +3,10 @@
 namespace Metadrop\Behat\Context;
 
 use Drupal\file\FileInterface;
+use Behat\Hook\AfterScenario;
+use Behat\Step\Given;
+use Behat\Step\When;
+
 
 class FileContext extends RawDrupalContext {
 
@@ -15,9 +19,8 @@ class FileContext extends RawDrupalContext {
 
   /**
    * Deletes Files after each Scenario.
-   *
-   * @AfterScenario
    */
+  #[AfterScenario]
   public function cleanFiles() {
     foreach ($this->files as $k => $v) {
       $this->getCore()->fileDelete($v);
@@ -37,10 +40,9 @@ class FileContext extends RawDrupalContext {
    *
    * @throws Exception
    *   Exception file could not be copied.
-   *
-   * @Given file with name :filename
-   * @Given file with name :filename in the :directory directory
    */
+  #[Given('file with name :filename')]
+  #[Given('file with name :filename in the :directory directory')]
   public function createFileWithName($filename, $directory = NULL) {
     $absolutePath = $this->getMinkParameter('files_path');
     $path = $absolutePath . '/' . $filename;
@@ -61,10 +63,9 @@ class FileContext extends RawDrupalContext {
    *
    * @throws Exception
    *   Exception destination not found.
-   *
-   * @Given I visit file with name :filename
-   * @Given I visit file with name :filename in the :directory directory
    */
+  #[Given('I visit file with name :filename')]
+  #[Given('I visit file with name :filename in the :directory directory')]
   public function visitFileWithName($filename, $directory = NULL) {
     $destination = $this->getCore()->getFileDestination($filename, $directory);
 
@@ -75,9 +76,7 @@ class FileContext extends RawDrupalContext {
     $this->visitPath($destination);
   }
 
-  /**
-   * @When I go to the view the file with name :arg1
-   */
+  #[When('I go to the view the file with name :arg1')]
   public function iGoToTheViewTheFileWithName($filename)
   {
     $file = $this->getCore()->loadEntityByLabel('file', $filename);

@@ -4,6 +4,10 @@ namespace Metadrop\Behat\Context;
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Drupal\DrupalExtension\Context\DrupalContext;
+use Behat\Hook\BeforeScenario;
+use Behat\Step\Given;
+use Behat\Step\Then;
+
 
 class UsersContext extends RawDrupalContext {
 
@@ -15,11 +19,11 @@ class UsersContext extends RawDrupalContext {
   /**
    * Get the necessary contexts.
    *
-   * @BeforeScenario
    *
    * @param BeforeScenarioScope $scope
    *   Scope del scenario.
    */
+  #[BeforeScenario]
   public function gatherContexts(BeforeScenarioScope $scope) {
     $environment = $scope->getEnvironment();
     $classesArray = $environment->getContextClasses();
@@ -33,9 +37,8 @@ class UsersContext extends RawDrupalContext {
 
   /**
    * Check that user with mail exists.
-   *
-   * @Then user with mail :mail exists
    */
+  #[Then('user with mail :mail exists')]
   public function userWithMailExists($mail, $exists = TRUE) {
     $user = $this->getCore()->loadUserByProperty('mail', $mail);
     if (!$user && $exists) {
@@ -48,9 +51,8 @@ class UsersContext extends RawDrupalContext {
 
   /**
    * Check that user with mail not exists.
-   *
-   * @Then user with mail :mail not exists
    */
+  #[Then('user with mail :mail not exists')]
   public function userWithMailNotExists($mail) {
     $this->userWithMailExists($mail, FALSE);
   }
@@ -149,10 +151,9 @@ class UsersContext extends RawDrupalContext {
    * Check the user has a specific role.
    *
    * @see userRoleCheck()
-   *
-   * @Then I should have the :role role(s)
-   * @Then the user :user should have the :role role(s)
    */
+  #[Then('I should have the :role role(s)')]
+  #[Then('the user :user should have the :role role(s)')]
   public function userShouldHaveTheRole($role, $user = NULL) {
     return $this->userRoleCheck($role, $user);
   }
@@ -161,19 +162,17 @@ class UsersContext extends RawDrupalContext {
    * Check the user does not have a specific role.
    *
    * @see userRoleCheck()
-   *
-   * @Then I should not have the :role role(s)
-   * @Then the user :user should not have the :role role(s)
    */
+  #[Then('I should not have the :role role(s)')]
+  #[Then('the user :user should not have the :role role(s)')]
   public function userShouldNotHaveTheRole($role, $user = NULL) {
     return $this->userRoleCheck($role, $user, TRUE);
   }
 
   /**
    * Users with any type of role.
-   *
-   * @Given I am a(n) user with :role role
    */
+  #[Given('I am a(n) user with :role role')]
   public function assertUserByRole($role) {
     if (!$this->drupalContext instanceof DrupalContext) {
       throw new \Exception("The context 'Drupal\DrupalExtension\Context\DrupalContext' is not found in the suite environment. Please check behat.yml file");

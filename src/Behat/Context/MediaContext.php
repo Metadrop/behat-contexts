@@ -7,6 +7,8 @@ use Metadrop\Behat\Context\UIContext;
 use Metadrop\Behat\Context\WaitingContext;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\MinkExtension\Context\MinkContext;
+use Behat\Hook\BeforeScenario;
+use Behat\Step\Then;
 
 /**
  * Steps related with media.
@@ -37,11 +39,11 @@ class MediaContext extends RawDrupalContext {
   /**
    * Get the necessary contexts.
    *
-   * @BeforeScenario
    *
    * @param BeforeScenarioScope $scope
    *   Scope del scenario.
    */
+  #[BeforeScenario]
   public function gatherContexts(BeforeScenarioScope $scope) {
     $environment = $scope->getEnvironment();
     foreach ($environment->getContexts() as $context) {
@@ -70,10 +72,9 @@ class MediaContext extends RawDrupalContext {
 
   /**
    * Upload a media to media field.
-   *
-   * @Then I upload media with name :media_title to :field field using :widget widget
-   * @Then I assign the media with name :media_title to :field field
    */
+  #[Then('I upload media with name :media_title to :field field using :widget widget')]
+  #[Then('I assign the media with name :media_title to :field field')]
   public function iUploadMediaWithNameToField($media_title, $field, $widget = 'media_library') {
     if ($widget == 'media_library') {
       $this->uiContext->iClickOnTheElementWithXpath("//input[contains(@id, 'edit-" . $field . "-open-button')]");
@@ -85,9 +86,8 @@ class MediaContext extends RawDrupalContext {
 
   /**
    * Check media is visible.
-   *
-   * @Then I should see the :media_type media with name :media_title
    */
+  #[Then('I should see the :media_type media with name :media_title')]
   public function iShouldSeeTheMedia($media_type, $media_title) {
     switch ($media_type) {
       case "image":

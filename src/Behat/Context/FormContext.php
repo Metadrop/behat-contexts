@@ -4,6 +4,8 @@ namespace Metadrop\Behat\Context;
 
 use NuvoleWeb\Drupal\DrupalExtension\Context\RawMinkContext;
 use Behat\Mink\Element\NodeElement;
+use Behat\Step\Given;
+use Behat\Step\Then;
 
 class FormContext extends RawMinkContext {
 
@@ -43,9 +45,8 @@ class FormContext extends RawMinkContext {
   /**
    * Checks if a form element is required.
    *
-   *
-   * @Then form :type element :label should be required
    */
+  #[Then('form :type element :label should be required')]
   public function formElementShouldBeRequired($type, $label) {
     if (!$this->isFormElementRequired($type, $label)) {
       throw new \InvalidArgumentException("Form element \"$label\" of type \"$type\" is not required");
@@ -54,39 +55,30 @@ class FormContext extends RawMinkContext {
 
   /**
    * Checks if a form element is not required.
-   *
-   * @Then form :type element :label should not be required
    */
+  #[Then('form :type element :label should not be required')]
   public function formElementShouldNotBeRequired($type, $label) {
     if ($this->isFormElementRequired($type, $label)) {
       throw new \InvalidArgumentException("Form element \"$label\" of type \"$type\" is required");
     }
   }
 
-  /**
-   * @Given I fill :label start date with :date
-   */
+  #[Given('I fill :label start date with :date')]
   public function fillDateStartFieldDate($label, $date) {
     $this->fillDateField($label, 'start', 'date', $date);
   }
 
-  /**
-   * @Given I fill :label start date hour with :date
-   */
+  #[Given('I fill :label start date hour with :date')]
   public function fillDateStartFieldHour($label, $date) {
     $this->fillDateField($label, 'start', 'time', $date);
   }
 
-  /**
-   * @Given I fill :label end date with :date
-   */
+  #[Given('I fill :label end date with :date')]
   public function fillDateEndFieldDate($label, $date) {
     $this->fillDateField($label, 'end', 'date', $date);
   }
 
-  /**
-   * @Given I fill :label end date hour with :date
-   */
+  #[Given('I fill :label end date hour with :date')]
   public function fillDateEndFieldHour($label, $date) {
     $this->fillDateField($label, 'end', 'time', $date);
   }

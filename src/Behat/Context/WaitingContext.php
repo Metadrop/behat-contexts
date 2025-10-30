@@ -7,6 +7,11 @@ use Behat\Gherkin\Node\StepNode;
 use Behat\Behat\Hook\Scope\AfterStepScope;
 use Behat\Behat\Hook\Scope\BeforeStepScope;
 use Behat\Behat\Hook\Scope\AfterScenarioScope;
+use Behat\Step\Given;
+use Behat\Step\Then;
+use Behat\Hook\AfterStep;
+use Behat\Hook\BeforeStep;
+
 
 class WaitingContext extends RawMinkContext {
 
@@ -48,12 +53,12 @@ class WaitingContext extends RawMinkContext {
    * @param int $seconds
    *   Max time to wait for AJAX.
    *
-   * @Given I wait for AJAX to finish at least :seconds seconds
-   * @Given I wait for AJAX to finish :seconds seconds at most
    *
    * @throws \Exception
    *   Ajax call didn't finish on time.
    */
+  #[Given('I wait for AJAX to finish at least :seconds seconds')]
+  #[Given('I wait for AJAX to finish :seconds seconds at most')]
   public function iWaitForAjaxToFinish($seconds) {
     $finished = $this->getSession()->wait($seconds * 1000, '(typeof(jQuery)=="undefined" || (0 === jQuery.active && 0 === jQuery(\':animated\').length))');
     if (!$finished) {
@@ -72,18 +77,15 @@ class WaitingContext extends RawMinkContext {
    * not at least).
    *
    * @param init $seconds
-   *
-   * @Given I wait for the batch job to finish
-   * @Given I wait for the batch job to finish at least :seconds seconds
-   * @Given I wait for the batch job to finish :seconds seconds at most
    */
+  #[Given('I wait for the batch job to finish')]
+  #[Given('I wait for the batch job to finish at least :seconds seconds')]
+  #[Given('I wait for the batch job to finish :seconds seconds at most')]
   public function iWaitForTheBatchJobToFinish($seconds = 30) {
     $this->getSession()->wait($seconds * 1000, 'jQuery("#updateprogress").length === 0');
   }
 
   /**
-   * @Then I wait for :seconds second(s)
-   *
    * Wait seconds before the next step. Usually, this step should be avoided
    * because it's not a good idea to depend on time for a step. If the system
    * needs for whatever reason more time, the step will fail, and if previous
@@ -94,6 +96,7 @@ class WaitingContext extends RawMinkContext {
    * @param int|string $seconds
    *   Number of seconds to wait. Must be an integer value.
    */
+  #[Then('I wait for :seconds second(s)')]
   public function iWaitForSeconds($seconds) {
     if (!filter_var($seconds, FILTER_VALIDATE_INT) !== FALSE) {
       throw new \InvalidArgumentException("Expected a valid integer number of seconds but given value \"$seconds\" is invalid.");
@@ -106,9 +109,8 @@ class WaitingContext extends RawMinkContext {
    *
    * @param \Behat\Behat\Hook\Scope\AfterStepScope $scope
    *   After step scope.
-   *
-   * @AfterStep
    */
+  #[AfterStep]
   public function afterStep(AfterStepScope $scope) {
     $this->previousStep = $scope->getStep();
   }
@@ -118,9 +120,8 @@ class WaitingContext extends RawMinkContext {
    *
    * @param \Behat\Behat\Hook\Scope\BeforeStepScope $scope
    *   Before step scope.
-   *
-   * @BeforeStep
    */
+  #[BeforeStep]
   public function beforeStep(BeforeStepScope $scope) {
     if ($this->previousStep instanceof StepNode) {
       $text = $this->previousStep->getText();
@@ -137,9 +138,8 @@ class WaitingContext extends RawMinkContext {
    *
    * @param \Behat\Behat\Hook\Scope\AfterScenarioScope $scope
    *   After scenario scope.
-   *
-   * @AfterScenario
    */
+  // [\Behat\Hook\AfterScenario]
   public function afterScenario(AfterScenarioScope $scope) {
     $this->previousStep = NULL;
   }
