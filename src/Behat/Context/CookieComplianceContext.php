@@ -258,7 +258,7 @@ class CookieComplianceContext extends RawMinkContext {
    * Wait until the cookie banner appears.
    *
    * @When I wait cookie banner appears
-   * @When I wait for the cookie banner to appear.
+   * @When I wait for the cookie banner to appear
    */
   public function iWaitCookieBannerAppears() {
     if (!$this->getSession()->wait(10000, sprintf('document.querySelector("%s") != null', $this->cookieManager->getCookieBannerSelector()))) {
