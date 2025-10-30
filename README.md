@@ -130,8 +130,7 @@ Example configuration *without* Cookie Manager type:
 
 - **When I wait for the cookie banner to appear**:  Wait until the cookie banner is loaded.
 
-- **Then there should not be any cookies loaded**:  Check there are no cookies loaded at all. It also reports
-  potential cookie source coming from third party iframes (s.e.: youtube, doubleclick, etc).
+- **Then there should not be any cookies loaded**:  Check there are no cookies loaded at all. It also reports potential cookie source coming from third party iframes (s.e.: youtube, doubleclick, etc).
 
 - **Given the cookie with name :cookie_name exists**:  Check if the cookie exists.
 
