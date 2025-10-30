@@ -58,30 +58,41 @@ Helpers to execute cron.
 
 ### Cookie compliance context
 
-Allows checking that the sites are cookie GDPR compliant.
-This context works with any cookie banner integration : onetrust, cookies, eu cookie compliance...
+It allows to check that sites are GDPR-compliant with regard to cookies.
+This feature is compatible with any cookie banner integration, including OneTrust, Cookies and EU Cookie Compliance.
 
-It checks that before accepting cookies there are not cookies
-saved in the browser, and when the cookies are accepted, the
-expected cookies appears.
+It can check that there are no cookies before they are accepted.
+saved in the browser. It can also check the expected cookies appear when cookies are accepted.
 
-The context parameters are:
+The content has a default list of domains of typical third party services that may add cookies to the browser, but this list is not exhaustive. Check your site and add any additional domains you may need to the *cookies_third_party_domains_included* parameter.
 
-- **cookie_manager_type**: Types of cookie managers predefined. It also allows you to overwrite the other parameters if you consider it necessary. *Cookie managers implemented*:
-    - onetrust
-    - eu_cookie_compliance
-- **cookie_agree_selector**: The CSS selector of the button to accept the default cookies.
-- **cookie_reject_selector**: The CSS selector of the button to reject all cookie categories.
-- **cookie_banner_selector**: The CSS selector of the cookie compliance banner.
-- **cookies**: Map of cookies that should be handled by each cookie category. The key
-  is the cookie category and the value is the list of cookies that will be present after
-  accepting the cookie compliance category.
-- **cookies_ignored**: List of cookies that must be ignored if they appear at the step 'There are
-  no cookies loaded'. Add here cookies when they can't be managed at the server side.
-- **cookies_third_party_domains_ignored**: List of domains reported that contains potential cookies loaded
-  but they can be ignored because no cookies are being loaded.
-- **cookies_third_party_domains_included**: List of domains that are not present in the default list of domains
-  checked by the context, and is needed to be checked those sites are not loading cookies by iframes.
+
+There are two main ways to use this context: using one of the cookie managers supported (OneTrust and EU Cookie Compliance Drupal module), or configuring all the parameters manually.
+
+For supported provider, just set the **cookie_manager_type** parameter to the desired value:
+  - onetrust
+  - eu_cookie_compliance
+
+Example configuration *with* Cookie Manager type:
+```yaml
+  - CookieComplianceContext:
+      cookie_manager_type: onetrust
+      ...
+      ...
+```
+
+If you are using an unsupported cookie manager or if for whatever reason you want to configure the parameters manually, you can set parameters you need as shown in the example below.
+
+  - **cookie_agree_selector**: the CSS selector of the button to accept the default cookies.
+  - **cookie_reject_selector**: the CSS selector of the button to reject all cookie categories.
+  - **cookie_banner_selector**: the CSS selector of the cookie compliance banner.
+  - **cookies**: maps cookies to cookie categories. The key is the cookie category and the value is the list of cookies that will be present after
+    accepting that category in the cookie banner.
+  - **cookies_ignored**: list of cookies that won't be taken into account when checking
+  if cookies have been loaded.
+  - **cookies_third_party_domains_included**: additional domains to check for third party cookies apart from the default list (see CookieComplianceContext::THIRD_PARTY_COOKIE_HOSTS).
+  - **cookies_third_party_domains_ignored**: domains to ignore when checking for third party cookies. This allows to u ignore domains that are included in the default list (see CookieComplianceContext::THIRD_PARTY_COOKIE_HOSTS).
+
 
 Example configuration *without* Cookie Manager type:
 
@@ -106,14 +117,6 @@ Example configuration *without* Cookie Manager type:
         - extra-analytics-service.com
 ```
 
-Example configuration *with Cookie Manager type*:
-
-```yaml
-  - CookieComplianceContext:
-      cookie_manager_type: onetrust
-      ...
-      ...
-```
 
 #### Steps
 
@@ -125,7 +128,7 @@ Example configuration *with Cookie Manager type*:
 
 - **Then the cookies of :type type have been loaded**:  Assert the cookies of a specific category are present.
 
-- **When I wait cookie banner appears**:  Wait until the cookie banner is loaded.
+- **When I wait for the cookie banner to appear**:  Wait until the cookie banner is loaded.
 
 - **Then there should not be any cookies loaded**:  Check there are no cookies loaded at all. It also reports
   potential cookie source coming from third party iframes (s.e.: youtube, doubleclick, etc).
