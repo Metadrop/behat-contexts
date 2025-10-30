@@ -31,7 +31,7 @@ Steps to clear caches.
 
 ### Content authored context
 
-Allow created content owned by logged in user.
+Allows creating content owned by the logged-in user.
 
 #### Steps
 
@@ -61,15 +61,14 @@ Helpers to execute cron.
 It allows to check that sites are GDPR-compliant with regard to cookies.
 This feature is compatible with any cookie banner integration, including OneTrust, Cookies and EU Cookie Compliance.
 
-It can check that there are no cookies before they are accepted.
-saved in the browser. It can also check the expected cookies appear when cookies are accepted.
+It can check that there are no cookies saved in the browser before they are accepted. It can also check the expected cookies appear when cookies are accepted.
 
 The content has a default list of domains of typical third party services that may add cookies to the browser, but this list is not exhaustive. Check your site and add any additional domains you may need to the *cookies_third_party_domains_included* parameter.
 
 
 There are two main ways to use this context: using one of the cookie managers supported (OneTrust and EU Cookie Compliance Drupal module), or configuring all the parameters manually.
 
-For supported provider, just set the **cookie_manager_type** parameter to the desired value:
+For a supported provider, just set the **cookie_manager_type** parameter to the desired value:
   - onetrust
   - eu_cookie_compliance
 
@@ -91,7 +90,7 @@ If you are using an unsupported cookie manager or if for whatever reason you wan
   - **cookies_ignored**: list of cookies that won't be taken into account when checking
   if cookies have been loaded.
   - **cookies_third_party_domains_included**: additional domains to check for third party cookies apart from the default list (see CookieComplianceContext::THIRD_PARTY_COOKIE_HOSTS).
-  - **cookies_third_party_domains_ignored**: domains to ignore when checking for third party cookies. This allows to u ignore domains that are included in the default list (see CookieComplianceContext::THIRD_PARTY_COOKIE_HOSTS).
+  - **cookies_third_party_domains_ignored**: domains to ignore when checking for third party cookies. This allows to ignore domains that are included in the default list (see CookieComplianceContext::THIRD_PARTY_COOKIE_HOSTS).
 
 
 Example configuration *without* Cookie Manager type:
@@ -188,7 +187,7 @@ This report includes:
 #### Configuration
   Add DebugContext to your suite.
 
-  This is an example when bootstrap directorty is in DRUPALROOT/sites/all/tests/behat/bootstrap.
+  This is an example when bootstrap directory is in DRUPALROOT/sites/all/tests/behat/bootstrap.
 
 ```
 default:
@@ -215,7 +214,7 @@ default:
 **Parameters**
   - report_on_error: If _true_ error reports are generated on failed steps.
   - error_reporting_path: Path where reports are saved.
-  - error_reporting_url: Url where the error screenshots will be shown. As we can see in example, the url must point to the directory where we save the reports, and the directory must be accesible through website.
+  - error_reporting_url: Url where the error screenshots will be shown. As we can see in the example, the url must point to the directory where we save the reports, and the directory must be accessible through the website.
   - screenshots_path: Path where screenshots are saved. Report screenshots are saved in the report path, here only screenshots from _capture full page_ steps are saved.
   - page_contents_path: Path where page contents are saved. Report page contents are saved in the report path, here only page contents from _save page content_ steps are saved.
 
@@ -231,10 +230,10 @@ Agnostic steps related with entities.
    Go to the last entity created from a specific bundle.
 
  - Given I go to :subpath of the last entity :entity created
-   Go to last entity created subpath (s.e.:node/1/edit).
+   Go to last entity created subpath (e.g.: node/1/edit).
 
  - Given I go to :subpath of the last entity :entity with :bundle bundle created.
-   Go to last entity created subpath (s.e.:node/1/edit) from a specific bundle.
+   Go to last entity created subpath (e.g.: node/1/edit) from a specific bundle.
 
 ### File context
 
@@ -255,10 +254,10 @@ Steps for form elements.
 #### Steps
 
    - Then form :type element :label should be required
-     Check a form element of a specific type (s.e.: input, select) with label is required.
+     Check a form element of a specific type (e.g.: input, select) with label is required.
 
    - Then form :type element :label should not be required
-     Check a form element of a specific type (s.e.: input, select) with label isn't required.
+     Check a form element of a specific type (e.g.: input, select) with label isn't required.
 
 ### Node Access context
 
@@ -302,7 +301,7 @@ This context provides steps for certain UI elements.
 
 - Given I select :option from :select chosen.js select box
 
-  Selects and option from a Chosen select widget. Only for sinlge selection, it
+  Selects an option from a Chosen select widget. Only for single selection, it
   doesn't work with multiple selection enabled or tag style.
 
   See https://harvesthq.github.io/chosen/
@@ -322,17 +321,17 @@ This context provides steps for certain UI elements.
 
 This context provides waiting time after defined steps, and extra waiting steps.
 
-Waiting steps - Sometimes steps are running faster than our site, if this is the case you can delay them a few seconds. Don't abuse of this functionality, if Behat is running slow maybe there is a performance global site issue that needs to be solved first!
+Waiting steps - Sometimes steps are running faster than our site, if this is the case you can delay them a few seconds. Don't abuse this functionality, if Behat is running slow maybe there is a performance global site issue that needs to be solved first!
 
 #### Steps
 
     - Then I wait for :seconds second(s)
-      Step wait a defined seconds before execute next step.
+      Step waits for a defined number of seconds before executing the next step.
 
 
 #### Configure some waiting time before execute next step
 
-Set on `behat.yml` step action with wait time in seconds before execute next step.
+Set in `behat.yml` the step action with wait time in seconds before executing the next step.
 
 ##### Configuration
 ```
