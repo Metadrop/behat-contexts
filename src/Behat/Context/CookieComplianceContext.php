@@ -370,7 +370,7 @@ class CookieComplianceContext extends RawMinkContext {
       if (!empty($iframe_src)) {
         $iframe_host = parse_url($iframe_src, PHP_URL_HOST);
         foreach ($potential_cookie_source_domains as $third_party_cookie_host) {
-          if (!in_array($third_party_cookie_host, $this->cookiesThirdPartyDomainsIgnored) && str_ends_with($iframe_host, $third_party_cookie_host)) {
+          if (str_ends_with($iframe_host, $third_party_cookie_host)) {
             $third_party_cookie_urls_loaded[] = [
               'url' => $iframe_src,
               'domain' => $third_party_cookie_host,
