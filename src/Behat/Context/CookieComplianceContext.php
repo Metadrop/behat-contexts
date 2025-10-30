@@ -110,9 +110,9 @@ class CookieComplianceContext extends RawMinkContext {
    * @param array $cookies_ignored
    *   List of cookies to ignore.
    * @param array $cookies_third_party_domains_ignored
-   *   List of third party domains that loads cookies to ignore.
+   *   List of third party domains to ignore the cookies they load.
    * @param array $cookies_third_party_domains_included
-   *   List of third party domains that loads cookies to add.
+   *   List of third party domains to check for loaded cookies.
    */
   public function __construct(
     string $cookie_manager_type = '',
