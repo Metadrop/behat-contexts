@@ -9,16 +9,23 @@ This repository is based on [Nuvole Drupal extension](https://github.com/nuvolew
 - [Install](#install)
 - [Configure](#configure)
 - [Contexts](#contexts)
+  - [AntiSpam Context](#antispam-context)
   - [Cache context](#cache-context)
   - [Content authored context](#content-authored-context)
   - [Cron context](#cron-context)
   - [Cookie compliance context](#cookie-compliance-context)
   - [DebugContext](#debugcontext)
+  - [Drupal Groups Extended Context](#drupal-groups-extended-context)
+  - [Drupal Organic Groups Extended Context](#drupal-organic-groups-extended-context)
   - [Entity Context](#entity-context)
   - [File context](#file-context)
   - [Form Context](#form-context)
+  - [I18n Context](#i18n-context)
+  - [Logs Context](#logs-context)
+  - [Media Context](#media-context)
   - [Node Access context](#node-access-context)
   - [Paragraphs context](#paragraphs-context)
+  - [Search API Context](#search-api-context)
   - [Url Context](#url-context)
   - [UIContext](#uicontext)
   - [Users Context](#users-context)
@@ -37,6 +44,28 @@ Install with [Composer](http://getcomposer.org):
 Each context may have its own configuration. [Here is an example](https://github.com/Metadrop/behat-contexts/blob/dev/behat.yml.dist) with all the contexts added.
 
 ## Contexts
+
+### AntiSpam Context
+
+Provides functionality to temporarily disable Honeypot time limits during test execution to prevent false negatives.
+
+#### Steps
+
+No manual steps. This context uses tags.
+
+#### Tags
+
+- **@honeypot-disable**: Automatically disables honeypot time limit before scenarios with this tag and restores it afterwards.
+
+#### Configuration
+
+No configuration needed.
+
+#### Notes
+
+- Requires Honeypot module to be installed
+- Useful for preventing test failures caused by Honeypot's time-based form submission restrictions
+- Temporarily sets honeypot time limit to 0 and restores the original value after the scenario
 
 ### Cache context
 
@@ -258,6 +287,70 @@ default:
   - screenshots_path: Path where screenshots are saved. Report screenshots are saved in the report path, here only screenshots from _capture full page_ steps are saved.
   - page_contents_path: Path where page contents are saved. Report page contents are saved in the report path, here only page contents from _save page content_ steps are saved.
 
+### Drupal Groups Extended Context
+
+Utilities for testing with Drupal Group module.
+
+#### Steps
+
+- Given the user :user_name is the owner of the group type :group_type with name :group_name
+
+  Sets the owner of a group to a specific user.
+
+- Given user :user is subscribed to the group of type :group_type with name :name
+
+  Subscribes a user to a group as a member.
+
+- Given content :title with bundle :bundle is subscribed to the group of type :group_type with name :name
+
+  Adds content (node) to a group.
+
+- Given user :user is subscribed to the group of type :group_type with name :name as a(n) :role role(s)
+
+  Subscribes a user to a group with specific group roles. Multiple roles can be specified with comma separation.
+
+#### Configuration
+
+No configuration needed.
+
+#### Notes
+
+- Requires Drupal Group module (`drupal/group`)
+- For Drupal 7 Organic Groups, use `DrupalOrganicGroupsExtendedContext` instead
+- Groups, users, and content must already exist before using these steps
+
+### Drupal Organic Groups Extended Context
+
+Utilities for testing with Drupal 7 Organic Groups module.
+
+#### Steps
+
+- Given user :user is subscribed to the group of type :group_type with name :name
+
+  Subscribes a user to a group of any entity type.
+
+- Given user :user is subscribed to the group of type :group_type with name :name as a(n) :role role(s)
+
+  Subscribes a user to a group with specific organic group roles. Multiple roles can be specified with comma separation.
+
+- Given user :user is subscribed to the group with name :name
+
+  Subscribes a user to a node-type group (shortcut for entity_type='node').
+
+- Given user :user is subscribed to the group with name :name as a(n) :role role(s)
+
+  Subscribes a user to a node-type group with specific roles (shortcut for entity_type='node').
+
+#### Configuration
+
+No configuration needed.
+
+#### Notes
+
+- Drupal 7 only - requires Organic Groups module
+- For Drupal 8+ Group module, use `DrupalGroupsExtendedContext` instead
+- Groups must already exist and group roles must be configured before using these steps
+
 ### Entity Context
 
 Agnostic steps related to entities.
@@ -320,6 +413,128 @@ Steps for form elements.
 
 No configuration needed.
 
+### I18n Context
+
+Internationalization steps for testing multilingual sites, allowing interaction with translated interface elements.
+
+When steps reference "translated" fields, buttons, pages, or text, they use Drupal's translation system to find the translated label or text from the provided text.
+
+#### Steps
+
+- When I fill in :field translated field with :value
+
+  Fills in a form field using the translated label based on current page language.
+
+- When I fill in :value for :field translated field
+
+  Alternative syntax to fill in a form field using translated field label.
+
+- When I press the :button translated button
+
+  Presses a button using its translated label.
+
+- Given I press :button translated button in the :region( region)
+
+  Presses a button in a specific region using its translated label.
+
+- Then I (should )see the translated text :text
+
+  Asserts that the translated version of the text is visible on the page.
+
+- Then I should be on :path translated page
+
+  Checks the current page path matches the expected path after translation.
+
+#### Configuration
+
+No configuration needed.
+
+#### Notes
+
+- Automatically detects current page language from the HTML `lang` attribute
+- Uses Drupal's translation system to translate provided text in steps.
+- Useful for testing multilingual forms and UI elements without hardcoding translations
+- Requires multilingual site with language detection and interface translations configured
+
+### Logs Context
+
+Monitors and reports watchdog (dblog) errors during Behat test execution.
+
+#### Steps
+
+No manual steps. This context automatically displays logs after scenarios and provides a summary after the suite.
+
+#### Functionality
+
+- Displays watchdog logs generated during each scenario
+- Shows a summary table after the suite with all logs grouped by message
+- Optionally generates CSV reports with detailed log information
+
+#### Configuration
+
+```yaml
+- Metadrop\Behat\Context\LogsContext:
+    parameters:
+      base_url: 'http://example.docker.localhost:8000'
+      types:
+        - php
+        - cron
+      levels:
+        - ERROR
+        - WARNING
+        - NOTICE
+      limit: 100
+      path: '/var/www/html/reports/behat/dblog'
+      write_report: false
+```
+
+**Parameters:**
+- `base_url` (optional): Base URL for generating links to log event details
+- `types` (optional, default: `['php']`): Array of log types to monitor
+- `levels` (optional, default: `['ERROR', 'WARNING', 'NOTICE']`): Log severity levels to capture. Available levels: EMERGENCY, ALERT, CRITICAL, ERROR, WARNING, NOTICE, INFO, DEBUG
+- `limit` (optional, default: `100`): Maximum number of log entries in the after-suite table
+- `path` (optional, default: `DRUPAL_ROOT . '/../reports/behat/dblog'`): Path for CSV reports
+- `write_report` (optional, default: `false`): Enable/disable CSV report generation
+
+#### Notes
+
+- Requires dblog (Database Logging) module to be enabled
+- Logs are captured from suite start time
+- CSV report includes: Index, Type, Severity, Message, Location, Referer, Link, Details URL, Total Messages
+- For failed scenarios, all log types are shown; for passing scenarios, only configured types
+- Messages are truncated to 200 characters in display output
+
+### Media Context
+
+Steps for working with Drupal Media entities through the media library widget.
+
+#### Steps
+
+- Then I upload media with name :media_title to :field field using :widget widget
+
+  Selects an existing media item from the media library and assigns it to a field.
+
+- Then I assign the media with name :media_title to :field field
+
+  Alternative syntax to assign existing media to a field (uses media_library widget).
+
+- Then I should see the :media_type media with name :media_title
+
+  Verifies that media is visible on the page. Supports 'image' and 'document' media types.
+
+#### Configuration
+
+No configuration needed.
+
+#### Notes
+
+- Requires Drupal Media and Media Library modules
+- Currently only supports the 'media_library' widget
+- Media entities must already exist before assigning them (doesn't upload new files)
+- Requires JavaScript driver (Selenium) for AJAX interactions
+- Depends on UIContext and WaitingContext
+- For images: checks img src attribute; For documents: checks link href attribute
+
 ### Node Access context
 
 Steps related to the node access system. Only for D7.
@@ -351,6 +566,33 @@ Steps to attach paragraphs to content.
 #### Configuration
 
 No configuration needed.
+
+### Search API Context
+
+Automatically indexes content in Search API immediately after entity creation during tests.
+
+#### Steps
+
+No manual steps. This context automatically indexes entities using hooks.
+
+#### Functionality
+
+- Forces immediate indexing of nodes after creation via Behat steps
+- Indexes parent entities when child entities (like paragraphs) are created
+- Ensures search results are available without waiting for cron
+
+#### Configuration
+
+No configuration needed.
+
+#### Notes
+
+- Requires Search API module
+- Works with all entity types tracked by Search API
+- Handles all translations of entities
+- Includes a small delay (300ms) after indexing to allow cache tag invalidation
+- Automatically called after entity creation - no manual steps needed
+- Essential for tests that depend on search functionality
 
 ### Url Context
 
