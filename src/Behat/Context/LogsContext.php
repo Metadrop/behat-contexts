@@ -295,7 +295,7 @@ class LogsContext extends RawDrupalContext {
    * @param \Behat\Behat\Hook\Scope\AfterScenarioScope $scope
    *   After Scenario scope.
    */
-  #[AfterScenario]
+  #[AfterScenario('@api')]
   public function showDbLog(AfterScenarioScope $scope) {
     $module_is_enabled = in_array('dblog', $this->getCore()->getModuleList());
 
