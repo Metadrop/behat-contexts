@@ -1,9 +1,28 @@
 # Behat Contexts for Drupal
 
-
 Contexts that we use with Behat 3.x tests on Drupal sites.
 
-This repository is based on [Nuvole drupal extension](https://github.com/nuvoleweb/drupal-behat).
+This repository is based on [Nuvole Drupal extension](https://github.com/nuvoleweb/drupal-behat).
+
+## Table of Contents
+
+- [Install](#install)
+- [Configure](#configure)
+- [Contexts](#contexts)
+  - [Cache context](#cache-context)
+  - [Content authored context](#content-authored-context)
+  - [Cron context](#cron-context)
+  - [Cookie compliance context](#cookie-compliance-context)
+  - [DebugContext](#debugcontext)
+  - [Entity Context](#entity-context)
+  - [File context](#file-context)
+  - [Form Context](#form-context)
+  - [Node Access context](#node-access-context)
+  - [Paragraphs context](#paragraphs-context)
+  - [Url Context](#url-context)
+  - [UIContext](#uicontext)
+  - [WaitingContext](#waitingcontext)
+  - [Video Recording Context](#video-recording-context)
 
 ## Install
 
@@ -24,10 +43,16 @@ Steps to clear caches.
 #### Steps
 
 - Given :path page cache is flushed
+
   Clear specific page caches.
 
 - Given :view view data cache is flushed
-  Clear caches for a specific view. Only available for Drupal 7, pending to implement in D8.
+
+  Clear caches for a specific view. Only available for Drupal 7, not yet implemented in D8.
+
+#### Configuration
+
+No configuration needed.
 
 ### Content authored context
 
@@ -35,8 +60,13 @@ Allows creating content owned by the logged-in user.
 
 #### Steps
 
- - Given own :type content:
-   Create content with the author as the current user.
+- Given own :type content:
+
+  Create content with the author as the current user.
+
+#### Configuration
+
+No configuration needed.
 
 ### Cron context
 
@@ -44,27 +74,36 @@ Helpers to execute cron.
 
 #### Steps
 
- - Given I run elysia cron
-   Run elysia cron. Only for D7.
+- Given I run elysia cron
 
- - Given I run the elysia cron :job job
-   Run elysia-cron-job. Only for D7.
+  Runs Elysia cron. Only for D7.
 
- - Given I run the cron of Search API
-   Run search api cron. Only for D7.
+- Given I run the elysia cron :job job
 
- - Given I run the cron of Search API Solr
-   Run search api solr cron. Only for D7.
+  Runs the specified Elysia cron job. Only for D7.
+
+- Given I run the cron of Search API
+
+  Runs Search API cron. Only for D7.
+
+- Given I run the cron of Search API Solr
+
+  Runs Search API Solr cron. Only for D7.
+
+#### Configuration
+
+No configuration needed.
 
 ### Cookie compliance context
 
 It allows to check that sites are GDPR-compliant with regard to cookies.
-This feature is compatible with any cookie banner integration, including OneTrust, Cookies and EU Cookie Compliance.
+This feature is compatible with any cookie banner integration with the proper configuration. The context includes preconfigurations for OneTrust and EU Cookie Compliance Drupal module.
 
 It can check that there are no cookies saved in the browser before they are accepted. It can also check the expected cookies appear when cookies are accepted.
 
-The content has a default list of domains of typical third party services that may add cookies to the browser, but this list is not exhaustive. Check your site and add any additional domains you may need to the *cookies_third_party_domains_included* parameter.
+The context has a default list of domains of typical third party services that may add cookies to the browser, but this list is not exhaustive. Check your site and add any additional domains you may need to the *cookies_third_party_domains_included* parameter.
 
+By default, only those iframes whose domains belong to the **THIRD_PARTY_COOKIE_HOSTS** CookieComplianceContext constant will be detected as iframes that will add unwanted cookies.
 
 There are two main ways to use this context: using one of the cookie managers supported (OneTrust and EU Cookie Compliance Drupal module), or configuring all the parameters manually.
 
@@ -129,13 +168,12 @@ Example configuration *without* Cookie Manager type:
 
 - **When I wait for the cookie banner to appear**:  Wait until the cookie banner is loaded.
 
-- **Then there should not be any cookies loaded**:  Check there are no cookies loaded at all. It also reports potential cookie source coming from third party iframes (s.e.: youtube, doubleclick, etc).
+- **Then there should not be any cookies loaded**:  Check there are no cookies loaded at all. It also reports potential cookie source coming from third party iframes (e.g.: YouTube, DoubleClick, etc.).
 
 - **Given the cookie with name :cookie_name exists**:  Check if the cookie exists.
 
 - **Given the cookie with name :cookie_name exists with value :value**: Check that the cookie exists with the specific value.
 
-  By default, only those iframes which domains belongs to the **THIRD_PARTY_COOKIE_HOSTS** CookieComplianceContext constant will be detected as iframes that will add unwanted cookies.
 
 #### Tags
 
@@ -179,7 +217,7 @@ This report includes:
 
   Saves page content to a file in the given path.
 
-- Then save last response to :path
+- Then I wait for :seconds second(s)
 
   Halts test for a given amount of seconds. Useful when debugging tests with timing issues. Don't use this step in real tests.
 
@@ -220,32 +258,47 @@ default:
 
 ### Entity Context
 
-Agnostic steps related with entities.
+Agnostic steps related to entities.
 
 #### Steps
- - Given I go to the last entity :entity created
-   Go to last entity created.
 
- - Given I go to the last entity :entity with :bundle bundle created
-   Go to the last entity created from a specific bundle.
+- Given I go to the last entity :entity created
 
- - Given I go to :subpath of the last entity :entity created
-   Go to last entity created subpath (e.g.: node/1/edit).
+  Go to last entity created.
 
- - Given I go to :subpath of the last entity :entity with :bundle bundle created.
-   Go to last entity created subpath (e.g.: node/1/edit) from a specific bundle.
+- Given I go to the last entity :entity with :bundle bundle created
+
+  Go to the last entity created from a specific bundle.
+
+- Given I go to :subpath of the last entity :entity created
+
+  Go to last entity created subpath (e.g.: node/1/edit).
+
+- Given I go to :subpath of the last entity :entity with :bundle bundle created
+
+  Go to last entity created subpath (e.g.: node/1/edit) from a specific bundle.
+
+#### Configuration
+
+No configuration needed.
 
 ### File context
 
-Create files in drupal.
+Create files in Drupal.
 
 #### Steps
 
-   - Given file with name :filename
-     Create file in drupal file system. Files are extracted from files_path set in behat.
+- Given file with name :filename
 
-   - Given file with name :filename in the :directory directory
-     Create file in drupal file system in a specific directory. Directory must start with file system (public:// , private://). Default is public:// .
+  Create file in Drupal file system. Files are extracted from `files_path` set in Behat configuration.
+
+- Given file with name :filename in the :directory directory
+
+  Create file in Drupal file system in a specific directory. Directory must start with file system (public:// , private://). Default is public:// .
+
+#### Configuration
+
+Configure the `files_path` parameter in your `behat.yml` to specify where test files are located.
 
 ### Form Context
 
@@ -253,23 +306,35 @@ Steps for form elements.
 
 #### Steps
 
-   - Then form :type element :label should be required
-     Check a form element of a specific type (e.g.: input, select) with label is required.
+- Then form :type element :label should be required
 
-   - Then form :type element :label should not be required
-     Check a form element of a specific type (e.g.: input, select) with label isn't required.
+  Check a form element of a specific type (e.g.: input, select) with label is required.
+
+- Then form :type element :label should not be required
+
+  Check a form element of a specific type (e.g.: input, select) with label isn't required.
+
+#### Configuration
+
+No configuration needed.
 
 ### Node Access context
 
-Steps related with node access system. Only for D7.
+Steps related to the node access system. Only for D7.
 
 #### Steps
 
-   - Given the access of last node created is refreshed
-     Refresh node grants from the last node.
+- Given the access of last node created is refreshed
 
-   - @Given the access of last node created with :bundle bundle is refreshed
-     Refresh node grants from the last node of a specific content type.
+  Refresh node grants from the last node.
+
+- Given the access of last node created with :bundle bundle is refreshed
+
+  Refresh node grants from the last node of a specific content type.
+
+#### Configuration
+
+No configuration needed.
 
 ### Paragraphs context
 
@@ -277,8 +342,13 @@ Steps to attach paragraphs to content.
 
 #### Steps
 
-   - Given paragraph of :paragraph_type type referenced on the :field_paragraph field of the last content:
-     Create a paragraph with fields and attach it to the last node created.
+- Given paragraph of :paragraph_type type referenced on the :field_paragraph field of the last content:
+
+  Create a paragraph with fields and attach it to the last node created.
+
+#### Configuration
+
+No configuration needed.
 
 ### Url Context
 
@@ -286,11 +356,17 @@ Steps to check url values
 
 #### Steps
 
-   - Then current url should have the ":param" param with ":value" value
-     Check an url has a specific value in a query parameter.
+- Then current url should have the ":param" param with ":value" value
 
-   - Then current url should not have the ":param" param with ":value" value
-     Check an url hasn't a specific value in a query parameter.
+  Check an url has a specific value in a query parameter.
+
+- Then current url should not have the ":param" param with ":value" value
+
+  Check an url hasn't a specific value in a query parameter.
+
+#### Configuration
+
+No configuration needed.
 
 
 ### UIContext
@@ -306,16 +382,28 @@ This context provides steps for certain UI elements.
 
   See https://harvesthq.github.io/chosen/
 
-#### Example of how to use internal method elementShouldBeInPosition
+#### Configuration
 
-    /**
-    * Example of implementation elementShouldBeInPosition on a custom step.
-    *
-    * @Then the card on the infinite scroll view with title :title should be in position :position.
-    */
-    public function theCardWithTitleShouldBeInPositionExample(string $title, string $position) {
-      $this->elementShouldBeInPosition('item-list-css-selector', $title, 'views-infinite-scroll-content-wrapper', $position);
-    }
+No configuration needed.
+
+#### Advanced usage
+
+**Using elementShouldBeInPosition method**
+
+The UIContext provides an `elementShouldBeInPosition` method that can be used to verify element positions in lists or grids. This is useful for testing sorting, ordering, or layout functionality.
+
+Example implementation in a custom step:
+
+```php
+/**
+ * Example of implementation elementShouldBeInPosition on a custom step.
+ *
+ * @Then the card on the infinite scroll view with title :title should be in position :position.
+ */
+public function theCardWithTitleShouldBeInPositionExample(string $title, string $position) {
+  $this->elementShouldBeInPosition('item-list-css-selector', $title, 'views-infinite-scroll-content-wrapper', $position);
+}
+```
 
 ### WaitingContext
 
@@ -329,7 +417,7 @@ Waiting steps - Sometimes steps are running faster than our site, if this is the
       Step waits for a defined number of seconds before executing the next step.
 
 
-#### Configure some waiting time before execute next step
+#### Configure waiting time before executing the next step
 
 Set in `behat.yml` the step action with wait time in seconds before executing the next step.
 
@@ -381,14 +469,12 @@ Add `VideoRecordingContext` to your suite in `behat.yml`:
 ```yaml
 - Metadrop\Behat\Context\VideoRecordingContext:
     parameters:
-        - Metadrop\Behat\Context\VideoRecordingContext:
-            parameters:
-              enabled: true
-              show_test_info_screen: true
-              show_test_info_screen_time: 2000
-              show_green_screen: false
-              show_green_screen_time: 1000
-              show_step_info_bubble: true
-              show_step_info_bubble_time: 2000
-              show_error_info_bubble: true
-              show_error_info_bubble_time: 2000
+      enabled: true
+      show_test_info_screen: true
+      show_test_info_screen_time: 2000
+      show_green_screen: false
+      show_green_screen_time: 1000
+      show_step_info_bubble: true
+      show_step_info_bubble_time: 2000
+      show_error_info_bubble: true
+      show_error_info_bubble_time: 2000
