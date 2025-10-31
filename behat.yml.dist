@@ -8,6 +8,7 @@ default:
         - Drupal\DrupalExtension\Context\MessageContext:
         - Drupal\DrupalExtension\Context\MarkupContext
         - Drupal\DrupalExtension\Context\DrushContext
+        - Metadrop\Behat\Context\AntiSpamContext
         - Metadrop\Behat\Context\CacheContext
         - Metadrop\Behat\Context\ContentAuthoredContext
         - Metadrop\Behat\Context\CronContext
@@ -36,11 +37,28 @@ default:
               'error_reporting_url': "http://metadropnet.docker.localhost:8000/sites/default/files/behat/errors"
               'screenshots_path':  "/var/www/html/docroot/sites/default/files/behat/screenshots"
               'page_contents_path': "/var/www/html/docroot/sites/default/files/behat/pages"
+        - Metadrop\Behat\Context\DrupalGroupsExtendedContext
+        - Metadrop\Behat\Context\DrupalOrganicGroupsExtendedContext
+        - Metadrop\Behat\Context\EntityContext
         - Metadrop\Behat\Context\FileContext
         - Metadrop\Behat\Context\FormContext
-        - Metadrop\Behat\Context\EntityContext
+        - Metadrop\Behat\Context\I18nContext
+        - Metadrop\Behat\Context\LogsContext:
+            parameters:
+              base_url: "${drupal.base_url}"
+              types:
+                - php
+              levels:
+                - ERROR
+                - WARNING
+                - NOTICE
+              limit: 100
+              path: '/var/www/html/reports/behat/dblog'
+              write_report: false
+        - Metadrop\Behat\Context\MediaContext
         - Metadrop\Behat\Context\NodeAccessContext
         - Metadrop\Behat\Context\ParagraphsContext
+        - Metadrop\Behat\Context\SearchApiContext
         - Metadrop\Behat\Context\UIContext:
             parameters:
               scroll_offset: -100
