@@ -11,6 +11,24 @@ default:
         - Metadrop\Behat\Context\CacheContext
         - Metadrop\Behat\Context\ContentAuthoredContext
         - Metadrop\Behat\Context\CronContext
+        - Metadrop\Behat\Context\CookieComplianceContext:
+            parameters:
+              cookie_manager_type: onetrust
+              # Alternative manual configuration:
+              # cookie_agree_selector: 'button.agree-button'
+              # cookie_reject_selector: 'button.reject-button'
+              # cookie_banner_selector: '.cookie-banner'
+              # cookies:
+              #   mandatory:
+              #     - 'cookie-mandatory'
+              #   analytics:
+              #     - '_ga'
+              # cookies_ignored:
+              #   - 'example-cookie'
+              # cookies_third_party_domains_ignored:
+              #   - example.com
+              # cookies_third_party_domains_included:
+              #   - extra-service.com
         - Metadrop\Behat\Context\DebugContext:
             parameters:
               'report_on_error': true
