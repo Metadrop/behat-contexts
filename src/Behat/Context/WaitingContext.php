@@ -7,10 +7,12 @@ use Behat\Gherkin\Node\StepNode;
 use Behat\Behat\Hook\Scope\AfterStepScope;
 use Behat\Behat\Hook\Scope\BeforeStepScope;
 use Behat\Behat\Hook\Scope\AfterScenarioScope;
+use \Behat\Hook\AfterScenario;
 use Behat\Step\Given;
 use Behat\Step\Then;
 use Behat\Hook\AfterStep;
 use Behat\Hook\BeforeStep;
+
 
 
 class WaitingContext extends RawMinkContext {
@@ -139,7 +141,7 @@ class WaitingContext extends RawMinkContext {
    * @param \Behat\Behat\Hook\Scope\AfterScenarioScope $scope
    *   After scenario scope.
    */
-  // [\Behat\Hook\AfterScenario]
+  #[AfterScenario]
   public function afterScenario(AfterScenarioScope $scope) {
     $this->previousStep = NULL;
   }
