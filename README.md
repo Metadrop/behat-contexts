@@ -189,28 +189,28 @@ Example configuration *without* Cookie Manager type:
 
 #### Steps
 
-- **Then I accept cookies**: Accept cookies by clicking the accept button in cookie popup or banner.
+- **Then I accept cookies**: accept cookies by clicking the accept button in cookie popup or banner.
 
-- **Then I reject cookies**: Reject cookies by clicking the reject button in cookie popup or banner.
+- **Then I reject cookies**: reject cookies by clicking the reject button in cookie popup or banner.
 
-- **Then the cookies of :type type have not been loaded**: Assert the cookies of a specific category are not present.
+- **Then the cookies of :type type have not been loaded**: assert the cookies of a specific category are not present.
 
-- **Then the cookies of :type type have been loaded**:  Assert the cookies of a specific category are present.
+- **Then the cookies of :type type have been loaded**:  assert the cookies of a specific category are present.
 
-- **When I wait for the cookie banner to appear**:  Wait until the cookie banner is loaded.
+- **When I wait for the cookie banner to appear**:  wait until the cookie banner is loaded.
 
-- **Then there should not be any cookies loaded**:  Check there are no cookies loaded at all. It also reports potential cookie source coming from third party iframes (e.g.: YouTube, DoubleClick, etc.).
+- **Then there should not be any cookies loaded**:  check there are no cookies loaded at all. It also reports potential cookie source coming from third party iframes (e.g.: YouTube, DoubleClick, etc.).
 
-- **Given the cookie with name :cookie_name exists**:  Check if the cookie exists.
+- **Given the cookie with name :cookie_name exists**:  check if the cookie exists.
 
-- **Given the cookie with name :cookie_name exists with value :value**: Check that the cookie exists with the specific value.
+- **Given the cookie with name :cookie_name exists with value :value**: check that the cookie exists with the specific value.
 
 
 #### Tags
 
-- **@cookies-accepted**: Accept cookies automatically adding the tag to the test.
+- **@cookies-accepted**: accept cookies automatically adding the tag to the test.
 
-- **@cookies-rejected**: Reject cookies automatically adding the tag to the test.
+- **@cookies-rejected**: reject cookies automatically adding the tag to the test.
 
 
 ### DebugContext
