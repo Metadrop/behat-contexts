@@ -21,6 +21,8 @@ This repository is based on [Nuvole Drupal extension](https://github.com/nuvolew
   - [Paragraphs context](#paragraphs-context)
   - [Url Context](#url-context)
   - [UIContext](#uicontext)
+  - [Users Context](#users-context)
+  - [Users Random Context](#users-random-context)
   - [WaitingContext](#waitingcontext)
   - [Video Recording Context](#video-recording-context)
 
@@ -404,6 +406,115 @@ public function theCardWithTitleShouldBeInPositionExample(string $title, string 
   $this->elementShouldBeInPosition('item-list-css-selector', $title, 'views-infinite-scroll-content-wrapper', $position);
 }
 ```
+
+### Users Context
+
+Context for user-related operations and assertions. Provides steps to verify user existence, check user roles, and authenticate as users with specific roles.
+
+#### Steps
+
+- Then the user with mail :mail exists
+
+  Check that a user with the specified email address exists in the system.
+
+- Then user with the email address :mail does not exist
+
+  Check that a user with the specified email address does not exist in the system.
+
+- Then I should have the :role role(s)
+
+  Check the current user has specific role(s). The role parameter can be a single role or comma-separated list of roles.
+
+- Then the user :user should have the :role role(s)
+
+  Check a specified user has specific role(s). The role parameter can be a single role or comma-separated list of roles. User parameter can be a username, email, or uid.
+
+- Then I should not have the :role role(s)
+
+  Check the current user does not have specific role(s). The role parameter can be a single role or comma-separated list of roles.
+
+- Then the user :user should not have the :role role(s)
+
+  Check a specified user does not have specific role(s). The role parameter can be a single role or comma-separated list of roles. User parameter can be a username, email, or uid.
+
+- Given I am a user with :role role
+
+  Authenticate as a user with a specific role. If role is 'anonymous', logs out the current user. Otherwise, creates and logs in as a user with the specified role.
+
+#### Configuration
+
+No configuration needed.
+
+### Users Random Context
+
+Context used to generate random user data (username, email, password) for testing purposes. This context does NOT create actual Drupal users - it only generates random user data that can be used to fill forms during tests. This is particularly useful for testing interactions with remote APIs that require unique values on each test run and cannot clean previous data.
+
+#### Steps
+
+- Given random users identified by:
+
+  Generate random user data (email, username, and password) that can be referenced in later steps. Requires a table with an 'identifier' column. Do not use spaces or special characters in identifiers.
+
+  Example:
+  ```gherkin
+  Given random users identified by:
+    | identifier  |
+    | debug       |
+    | email_test2 |
+  ```
+
+- Then I fill in :field with random email from :random_user_identifier
+
+  Fill a form field with the random email from a previously generated random user.
+
+- Then I fill in :field with random email from :random_user_identifier in the :region( region)
+
+  Fill a form field in a specific region with the random email from a previously generated random user.
+
+- Then I fill in :field with random username from :random_user_identifier
+
+  Fill a form field with the random username from a previously generated random user.
+
+- Then I fill in :field with random username from :random_user_identifier in the :region( region)
+
+  Fill a form field in a specific region with the random username from a previously generated random user.
+
+- Then I fill in :field with random password from :random_user_identifier
+
+  Fill a form field with the random password from a previously generated random user.
+
+- Then I fill in :field with random password from :random_user_identifier in the :region( region)
+
+  Fill a form field in a specific region with the random password from a previously generated random user.
+
+#### Configuration
+
+No configuration needed.
+
+#### Usage Example
+
+```gherkin
+Scenario: Register user via external API
+  Given random users identified by:
+    | identifier |
+    | new_user   |
+  When I visit "/register"
+  And I fill in "Username" with random username from "new_user"
+  And I fill in "Email" with random email from "new_user"
+  And I fill in "Password" with random password from "new_user"
+  And I press "Submit"
+  Then I should see "Registration successful"
+```
+
+#### Important Notes
+
+- Random user identifiers should not contain spaces or special characters.
+- Random email format: `{identifier}+{uuid}@metadrop.net`
+- Random username format: `{identifier}_{uuid}`
+- Random password format: `{identifier}_{uuid}`
+- You must generate random users with the "Given random users identified by:" step before using them in other steps.
+- This context does NOT create actual Drupal user entities - it only generates data for form filling.
+- Useful for testing scenarios where the same user data cannot be used multiple times (e.g., external API integrations).
 
 ### WaitingContext
 

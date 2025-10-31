@@ -53,6 +53,7 @@ class UsersContext extends RawDrupalContext {
    * Check that user with mail not exists.
    */
   #[Then('user with mail :mail not exists')]
+  #[Then('user with the email address :mail does not exist')]
   public function userWithMailNotExists($mail) {
     $this->userWithMailExists($mail, FALSE);
   }
