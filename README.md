@@ -128,7 +128,7 @@ No configuration needed.
 ### Cookie compliance context
 
 It allows to check that sites are GDPR-compliant with regard to cookies.
-This feature is compatible with any cookie banner integration with the proper configuration. The context includes preconfigurations for OneTrust and EU Cookie Compliance Drupal module.
+This feature is compatible with any cookie banner integration with the proper configuration. The context includes preconfigurations for OneTrust, Klaro and EU Cookie Compliance Drupal modules.
 
 It can check that there are no cookies saved in the browser before they are accepted. It can also check the expected cookies appear when cookies are accepted.
 
@@ -136,10 +136,11 @@ The context has a default list of domains of typical third party services that m
 
 By default, only those iframes whose domains belong to the **THIRD_PARTY_COOKIE_HOSTS** CookieComplianceContext constant will be detected as iframes that will add unwanted cookies.
 
-There are two main ways to use this context: using one of the cookie managers supported (OneTrust and EU Cookie Compliance Drupal module), or configuring all the parameters manually.
+There are two main ways to use this context: using one of the cookie managers supported (OneTrust, Klaro and EU Cookie Compliance Drupal module), or configuring all the parameters manually.
 
 For a supported provider, just set the **cookie_manager_type** parameter to the desired value:
   - onetrust
+  - klaro
   - eu_cookie_compliance
 
 Example configuration *with* Cookie Manager type:
