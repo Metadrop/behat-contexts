@@ -133,6 +133,10 @@ class CookieComplianceContext extends RawMinkContext {
         $this->cookieManager = new EUCookieComplianceCookieManager($cookie_agree_selector, $cookie_banner_selector);
         break;
 
+      case 'klaro':
+        $this->cookieManager = new KlaroCookieManager($cookie_agree_selector, $cookie_reject_selector, $cookie_banner_selector);
+        break;
+
       default:
         $this->cookieManager = new DefaultCookieManager($cookie_agree_selector, $cookie_reject_selector, $cookie_banner_selector);
     }
