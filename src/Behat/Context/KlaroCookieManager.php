@@ -1,0 +1,111 @@
+<?php
+
+namespace Metadrop\Behat\Context;
+
+use Behat\Mink\Session;
+
+/**
+ * Klaro cookie manager implementation.
+ *
+ * Manages Klaro cookie consent interactions.
+ */
+class KlaroCookieManager implements CookieManagerInterface {
+
+  /**
+   * Selector to locate the button to accept the default cookie categories.
+   *
+   * @var string
+   */
+  protected string $cookieAcceptSelector;
+
+  /**
+   * Selector to locate the button to reject all cookie categories.
+   *
+   * @var string
+   */
+  protected string $cookieRejectSelector;
+
+  /**
+   * Cookie banner selector.
+   *
+   * @var string
+   */
+  protected string $cookieBannerSelector;
+
+  /**
+   * Klaro cookie manager constructor.
+   *
+   * @param string $cookie_agree_selector
+   *   Selector to locate the button to accept the default cookie categories.
+   * @param string $cookie_reject_selector
+   *   Selector to locate the button to reject all cookie categories.
+   * @param string $cookie_banner_selector
+   *   Cookie banner selector.
+   */
+  public function __construct(
+    string $cookie_agree_selector,
+    string $cookie_reject_selector,
+    string $cookie_banner_selector,
+  ) {
+    $this->cookieAcceptSelector = empty($cookie_agree_selector) ? '#klaro .cm-btn.cm-btn-success' : $cookie_agree_selector;
+    $this->cookieRejectSelector = empty($cookie_reject_selector) ? '#klaro .cm-btn.cn-decline' : $cookie_reject_selector;
+    $this->cookieBannerSelector = empty($cookie_banner_selector) ? '#klaro-cookie-notice' : $cookie_banner_selector;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAcceptButtonSelector(): string {
+    return $this->cookieAcceptSelector;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRejectButtonSelector(): string {
+    return $this->cookieRejectSelector;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCookieBannerSelector(): string {
+    return $this->cookieBannerSelector;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function acceptCookies($session): void {
+    $this->executeKlaroMethod($session, TRUE);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function rejectCookies($session): void {
+    $this->executeKlaroMethod($session, FALSE);
+  }
+
+  /**
+   * Execute a Klaro API method.
+   *
+   * @param Behat\Mink\Session $session
+   *   The current session.
+   * @param boolean $value
+   *   The Klaro method name to execute.
+   */
+  protected function executeKlaroMethod(Session $session, bool $value): void {
+    // Wait for the Klaro global object to be defined.
+    $session->wait(10000, "typeof window.klaro === 'object' && window.klaro !== null");
+    $jsValue = $value ? 'true' : 'false';
+
+    // Declare JS script and execute.
+    $script = "
+      const manager = window.klaro.getManager();
+      manager.changeAll({$jsValue});
+      manager.saveAndApplyConsents();
+    ";
+    $session->executeScript($script);
+  }
+}
