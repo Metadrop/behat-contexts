@@ -27,6 +27,12 @@ setup_test_environment() {
   # Create unique temp directory for this test
   TEST_TEMP_DIR=$(mktemp -d "${TMPDIR:-/tmp}/bats-behat-XXXXXX")
 
+  # Configure DDEV and install Aljibe
+  echo "# Setting up DDEV and Aljibe..." >&3
+  ddev config --auto
+  ddev add-on get metadrop/ddev-aljibe
+  ddev aljibe-assistant -a
+
   # Ensure DDEV is running
   if ! ddev describe >/dev/null 2>&1; then
     echo "# WARNING: DDEV project not running. Tests may fail." >&3
@@ -39,6 +45,11 @@ setup_test_environment() {
 # Cleans up temporary test artifacts
 #
 teardown_test_environment() {
+  # Destroy DDEV containers before cleanup
+  if [[ -n "${TEST_TEMP_DIR}" && -d "${TEST_TEMP_DIR}" ]]; then
+    ddev delete -Oy ${TEST_TEMP_DIR} >/dev/null 2>&1
+  fi
+
   # Clean up temp directory if it exists
   if [[ -n "${TEST_TEMP_DIR}" && -d "${TEST_TEMP_DIR}" ]]; then
     rm -rf "${TEST_TEMP_DIR}"
