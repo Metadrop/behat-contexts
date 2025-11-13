@@ -165,6 +165,8 @@ class CookieComplianceContext extends RawMinkContext {
   public function acceptCookiesBeforeScenario() {
     $this->visitPath('/');
     $this->cookieManager->acceptCookies($this->getSession());
+    // Give some time to digest the cookies
+    sleep(1);
   }
 
   /**
