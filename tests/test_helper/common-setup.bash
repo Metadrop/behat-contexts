@@ -98,50 +98,6 @@ get_test_features_dir() {
 }
 
 #
-# Copy a feature file to DDEV container's features directory
-#
-# Usage: copy_feature_to_ddev <local-feature-file>
-#
-copy_feature_to_ddev() {
-  local feature_file="$1"
-  local feature_basename=$(basename "${feature_file}")
-
-  # Copy to DDEV's tests/features directory
-  ddev exec mkdir -p tests/features
-  cat "${feature_file}" | ddev exec "cat > tests/features/${feature_basename}"
-}
-
-#
-# Assert that a file exists in the DDEV container
-#
-# Usage: assert_file_exists_in_ddev <path-in-container>
-#
-assert_file_exists_in_ddev() {
-  local file_path="$1"
-
-  ddev exec test -f "${file_path}"
-  local result=$?
-
-  if [ $result -ne 0 ]; then
-    echo "# File does not exist in DDEV: ${file_path}" >&3
-    return 1
-  fi
-
-  return 0
-}
-
-#
-# Get contents of a file from DDEV container
-#
-# Usage: get_file_from_ddev <path-in-container>
-#
-get_file_from_ddev() {
-  local file_path="$1"
-
-  ddev exec cat "${file_path}"
-}
-
-#
 # Assert that output contains a specific string
 #
 # Usage: assert_output_contains <expected-string>
