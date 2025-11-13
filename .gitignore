@@ -1,1 +1,19 @@
 /vendor/
+
+# Test artifacts and temporary files
+tests/tmp/
+tests/**/*.tmp
+tests/**/.bats-run-*
+
+# Behat error reports and debugging artifacts
+**/behat/errors/
+**/behat/screenshots/
+**/behat/pages/
+**/behat/dblog/
+
+# Test output and reports
+test-results/
+reports/behat/
+
+# Temporary test directories
+/tmp/bats-behat-*/
