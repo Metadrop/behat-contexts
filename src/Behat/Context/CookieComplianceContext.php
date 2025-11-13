@@ -95,6 +95,14 @@ class CookieComplianceContext extends RawMinkContext {
   protected array $cookiesThirdPartyDomainsIncluded;
 
   /**
+   * Enable debug mode.
+   *
+   * This makes the context to print the cookies after accepting or rejecting
+   * them.
+   */
+  protected bool $debug = false;
+
+  /**
    * Cookie compliance constructor.
    *
    * @param string $cookie_manager_type
@@ -113,6 +121,8 @@ class CookieComplianceContext extends RawMinkContext {
    *   List of third party domains to ignore the cookies they load.
    * @param array $cookies_third_party_domains_included
    *   List of third party domains to check for loaded cookies.
+   * @param bool $debug
+   *   Enable debug mode.
    */
   public function __construct(
     string $cookie_manager_type = '',
@@ -123,6 +133,7 @@ class CookieComplianceContext extends RawMinkContext {
     array $cookies_ignored = [],
     array $cookies_third_party_domains_ignored = [],
     array $cookies_third_party_domains_included = [],
+    bool $debug = false,
   ) {
     switch ($cookie_manager_type) {
       case 'onetrust':
@@ -147,6 +158,16 @@ class CookieComplianceContext extends RawMinkContext {
   }
 
   /**
+   * Get all cookies from the browser.
+   *
+   * @return mixed The list of cookies.
+   */
+  private function getAllCookies() {
+    $webdriver_session = $this->getSession()->getDriver()->getWebDriverSession();
+    return $webdriver_session->getAllCookies();
+  }
+
+  /**
    * Accept cookies by clicking the accept button in cookie popup or banner.
    */
   #[Then('I accept cookies')]
@@ -165,6 +186,10 @@ class CookieComplianceContext extends RawMinkContext {
   public function acceptCookiesBeforeScenario() {
     $this->visitPath('/');
     $this->cookieManager->acceptCookies($this->getSession());
+
+    if ($this->debug) {
+      $this->showCookies($this->getAllCookies());
+    }
   }
 
   /**
@@ -177,6 +202,10 @@ class CookieComplianceContext extends RawMinkContext {
       $this->cookieManager->getCookieBannerSelector(),
       'reject'
     );
+
+    if ($this->debug) {
+      $this->showCookies($this->getAllCookies());
+    }
   }
 
   /**
@@ -306,8 +335,7 @@ class CookieComplianceContext extends RawMinkContext {
    * and show a table with all the loaded cookies.
    */
   protected function analyzeHostCookies() {
-    $webdriver_session = $this->getSession()->getDriver()->getWebDriverSession();
-    $cookies = array_filter($webdriver_session->getAllCookies(), function ($cookie) {
+    $cookies = array_filter($this->getAllCookies(), function ($cookie) {
       return !in_array($cookie['name'], $this->cookiesIgnored);
     });
 
@@ -332,22 +360,25 @@ class CookieComplianceContext extends RawMinkContext {
    */
   protected function showCookies(array $cookies) {
     $output = new BufferedOutput();
-    $cookiesTable = new Table($output);
 
-    $cookiesTable->setHeaders(['Domain', 'Name', 'Value']);
+    if (empty($cookies)) {
+      $output->writeln("\nNo cookies set\n");
+    }
+    else {
+      $output->writeln("\nCookies found:\n");
 
-    $cookiesTable->setRows(array_map(function ($cookie) {
-      return [
-        $cookie['domain'],
-        $cookie['name'],
-        $cookie['value'],
-      ];
-    }, $cookies));
+      $cookiesTable = new Table($output);
+      $cookiesTable->setHeaders(['Domain', 'Name', 'Value']);
+      $cookiesTable->setRows(array_map(function ($cookie) {
+        return [
+          $cookie['domain'],
+          $cookie['name'],
+          $cookie['value'],
+        ];
+      }, $cookies));
 
-    $output->writeln("\nCookies found:\n");
-
-    $cookiesTable->render();
-
+      $cookiesTable->render();
+    }
     echo $output->fetch();
   }
 

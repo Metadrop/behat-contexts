@@ -187,6 +187,14 @@ Example configuration *without* Cookie Manager type:
         - extra-analytics-service.com
 ```
 
+Additionally, you can enable debug mode by setting the *debug* parameter to true. This will print the cookies present in the browser after accepting or rejecting cookies.
+
+```yaml
+  - CookieComplianceContext:
+      ...
+      ...
+      debug: true
+```
 
 #### Steps
 
