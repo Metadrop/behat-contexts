@@ -2,6 +2,8 @@
 
 namespace Metadrop\Behat\Context;
 
+use Behat\Mink\Session;
+
 /**
  * Default cookie manager implementation.
  *
@@ -104,4 +106,12 @@ class DefaultCookieManager implements CookieManagerInterface {
     throw new \Exception('Please, add or use a valid Cookie Manager type (cookie_manager_type) if you need to reject cookies');
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function cookiesCategoriesAcceptedStatus(Session $session): array {
+    throw new \InvalidArgumentException(
+      'Category cookies acceptance status not unknowns cookie managers.'
+    );
+  }
 }

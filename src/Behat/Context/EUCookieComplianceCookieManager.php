@@ -2,6 +2,8 @@
 
 namespace Metadrop\Behat\Context;
 
+use Behat\Mink\Session;
+
 /**
  * EU Cookie Compliance cookie manager implementation.
  *
@@ -78,4 +80,12 @@ class EUCookieComplianceCookieManager implements CookieManagerInterface {
     $session->setCookie("cookie-agreed", "0");
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function cookiesCategoriesAcceptedStatus(Session $session): array {
+    throw new \InvalidArgumentException(
+      'To be implemented for EU Cookie Compliance.'
+    );
+  }
 }
