@@ -13,7 +13,7 @@ export TEST_TEMP_DIR=""
 # DDEV project name (can be overridden)
 export DDEV_PROJECT_NAME="${DDEV_PROJECT_NAME:-behat-contexts-test}"
 
-# Path to behat-contexts source inside DDEV container
+# Path to behat-contexts source to be tested.
 # This MUST be set by the caller (locally or in CI)
 export BEHAT_CONTEXTS_SOURCE_PATH="${BEHAT_CONTEXTS_SOURCE_PATH:-}"
 
@@ -61,7 +61,7 @@ setup_test_environment() {
   # Check that BEHAT_CONTEXTS_SOURCE_PATH is set
   if [ -z "${BEHAT_CONTEXTS_SOURCE_PATH}" ]; then
     echo "# ERROR: BEHAT_CONTEXTS_SOURCE_PATH environment variable must be set" >&3
-    echo "#        It should point to the behat-contexts source path inside DDEV container" >&3
+    echo "#        It should point to the behat-contexts source path under testing" >&3
     return 1
   fi
 
