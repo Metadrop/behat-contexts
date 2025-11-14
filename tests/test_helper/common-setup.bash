@@ -13,6 +13,10 @@ export TEST_TEMP_DIR=""
 # DDEV project name (can be overridden)
 export DDEV_PROJECT_NAME="${DDEV_PROJECT_NAME:-behat-contexts-test}"
 
+# Path to behat-contexts source inside DDEV container
+# This MUST be set by the caller (locally or in CI)
+export BEHAT_CONTEXTS_SOURCE_PATH="${BEHAT_CONTEXTS_SOURCE_PATH:-}"
+
 # Base paths inside DDEV container
 export DDEV_DOCROOT="/var/www/html/web"
 export DDEV_BEHAT_DIR="/var/www/html"
@@ -54,8 +58,15 @@ setup_test_environment() {
   # Install behat-contexts library from local source
   echo "# Installing behat-contexts from local source..." >&3
 
+  # Check that BEHAT_CONTEXTS_SOURCE_PATH is set
+  if [ -z "${BEHAT_CONTEXTS_SOURCE_PATH}" ]; then
+    echo "# ERROR: BEHAT_CONTEXTS_SOURCE_PATH environment variable must be set" >&3
+    echo "#        It should point to the behat-contexts source path inside DDEV container" >&3
+    return 1
+  fi
+
   # Add path repository to composer.json
-  ddev composer config repositories.behat-contexts path /var/www/html
+  ddev composer config repositories.behat-contexts path "${BEHAT_CONTEXTS_SOURCE_PATH}"
 
   # Require the library
   ddev composer require metadrop/behat-contexts:@dev
