@@ -4,16 +4,6 @@
 #   - TMP_DIR: Base temp directory for tests (default: /tmp)
 #   - GITHUB_TOKEN: GitHub token for composer auth (optional)
 
-# Imports BATS libraries needed for tests
-import_bats_libraries() {
-
-  echo "# Importing BATS libraries..." >&3
-
-  bats_load_library bats-assert
-  bats_load_library bats-file
-  bats_load_library bats-support
-}
-
 
 # Configure GitHub token for composer to avoid rate limiting
 #
@@ -83,7 +73,6 @@ setup_suite() {
 
   echo "# Setting up test suite environment..." >&3
 
-  import_bats_libraries
   create_temp_dir "$TMP_DIR"
   configure_composer_github_token
   setup_ddev_and_aljibe
