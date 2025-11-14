@@ -30,6 +30,15 @@ setup_test_environment() {
   cd "$TEST_TEMP_DIR"
 
 
+  # Configure GitHub token for composer to avoid rate limiting
+  # The token is passed as an environment variable from GitHub Actions
+  if [ -n "${GITHUB_TOKEN:-}" ]; then
+    echo "# Configuring composer with GitHub token to avoid rate limiting" >&3
+    echo "{\"github-oauth\": {\"github.com\": \"${GITHUB_TOKEN}\"}}" > auth.json
+  fi
+
+
+
   # Configure DDEV and install Aljibe
   echo "# Setting up DDEV and Aljibe..." >&3
   ddev config --auto
