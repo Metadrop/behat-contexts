@@ -68,16 +68,31 @@ class EUCookieComplianceCookieManager implements CookieManagerInterface {
    * {@inheritdoc}
    */
   public function acceptCookies($session): void {
-    $session->setCookie("cookie-agreed", "2");
-    $session->setCookie("cookie-agreed-categories", '["essential","analytics"]');
-    $session->setCookie("cookie-agreed-version", "1.0.0");
+    $this->executeEUCookieComplianceMethod($session, 'acceptAllAction');
   }
 
   /**
    * {@inheritdoc}
    */
   public function rejectCookies($session): void {
-    $session->setCookie("cookie-agreed", "0");
+    $this->executeEUCookieComplianceMethod($session, 'rejectAllAction');
+  }
+
+  /**
+   * Execute a EUCookieCompliance API method.
+   *
+   * @param Behat\Mink\Session $session
+   *   The current session.
+   * @param string $method
+   *   The EUCookieCompliance method name to execute.
+   */
+  protected function executeEUCookieComplianceMethod(Session $session, string $method): void {
+    // Wait for the Drupal global object and eu_cookie_compliance function to be defined.
+    $session->wait(10000, "typeof window.Drupal === 'object' && window.Drupal !== null && typeof window.Drupal.eu_cookie_compliance === 'function'");
+
+    // Wait for the API method to be ready and execute.
+    $session->wait(5000, "typeof window.Drupal.eu_cookie_compliance.{$method} === 'function'");
+    $session->executeScript("window.Drupal.eu_cookie_compliance.{$method}();");
   }
 
   /**
