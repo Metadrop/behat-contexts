@@ -147,23 +147,6 @@ get_test_features_dir() {
 }
 
 #
-# Assert that output contains a specific string
-#
-# Usage: assert_output_contains <expected-string>
-#
-assert_output_contains() {
-  local expected="$1"
-
-  if [[ ! "${output}" =~ ${expected} ]]; then
-    echo "# Expected output to contain: ${expected}" >&3
-    echo "# Actual output: ${output}" >&3
-    return 1
-  fi
-
-  return 0
-}
-
-#
 # Clean up Behat artifacts from previous runs
 #
 # Removes error reports, screenshots, logs, etc.
