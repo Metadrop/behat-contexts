@@ -1,0 +1,74 @@
+name: Test Behat Contexts
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Enable debug mode'
+        required: false
+        default: false
+
+jobs:
+  test-contexts:
+    name: Test Behat Contexts (DDEV ${{ matrix.ddev_version }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        ddev_version: [stable]
+        # Future: Add more versions for comprehensive testing
+        # ddev_version: [stable, HEAD]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up environment variables
+        run: |
+          echo "BEHAT_CONTEXTS_SOURCE_PATH=/var/www/html" >> $GITHUB_ENV
+          echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+
+      - name: Run BATS tests with DDEV
+        uses: ddev/github-action-add-on-test@v2
+        with:
+          ddev_version: ${{ matrix.ddev_version }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          debug_enabled: ${{ inputs.debug_enabled || false }}
+          addon_repository: ${{ github.repository }}
+          addon_ref: ${{ github.ref }}
+          # PoC: Running single test file
+          # TODO: Make this more generic to run all test files
+          test_command: bats tests/contexts/cookie-compliance-context.bats
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BEHAT_CONTEXTS_SOURCE_PATH: /var/www/html
+
+      - name: Upload test artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts-${{ matrix.ddev_version }}
+          path: |
+            **/behat/errors/
+            **/behat/screenshots/
+            **/behat/pages/
+            reports/behat/
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Upload BATS logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bats-logs-${{ matrix.ddev_version }}
+          path: |
+            tests/**/*.log
+            /tmp/bats-*.log
+          retention-days: 7
+          if-no-files-found: ignore
