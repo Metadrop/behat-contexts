@@ -291,8 +291,20 @@ class CookieComplianceContext extends RawMinkContext {
   #[When('I wait cookie banner appears')]
   #[When('I wait for the cookie banner to appear')]
   public function iWaitCookieBannerAppears() {
-    if (!$this->getSession()->wait(10000, sprintf('document.querySelector("%s") != null', $this->cookieManager->getCookieBannerSelector()))) {
-      throw new \Exception(sprintf('The cookie banner with selector "%s" does not appear.', $this->cookieManager->getCookieBannerSelector()));
+    $selector = $this->cookieManager->getCookieBannerSelector();
+    if (!$this->getSession()->wait(10000, sprintf('document.querySelector("%s") != null', $selector))) {
+      throw new \Exception(sprintf('The cookie banner with selector "%s" does not appear.', $selector));
+    }
+  }
+
+  /**
+   * Cookie banner should not be visible
+   */
+  #[Then('(the )cookie banner should not be visible')]
+  public function cookieBannerShouldNotBeVisible() {
+    $selector = $this->cookieManager->getCookieBannerSelector();
+    if ($this->getSession()->wait(5000, sprintf('document.querySelector("%s") != null', $selector))) {
+      throw new \Exception(sprintf('The cookie banner with selector "%s" is visible.', $selector));
     }
   }
 
