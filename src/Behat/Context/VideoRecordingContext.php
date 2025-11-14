@@ -14,7 +14,7 @@ use Behat\Behat\Hook\Scope\BeforeStepScope;
 use NuvoleWeb\Drupal\DrupalExtension\Context\RawMinkContext;
 use Behat\Hook\AfterStep;
 use Behat\Hook\BeforeStep;
-use Behat\Hook\BeforeScenario
+use Behat\Hook\BeforeScenario;
 
 /**
  * Context to show test info before tests to record it.
