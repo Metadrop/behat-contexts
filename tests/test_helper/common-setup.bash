@@ -24,6 +24,12 @@ export DDEV_BEHAT_DIR="/var/www/html"
 # and ensures DDEV is running.
 #
 setup_test_environment() {
+
+  set -eu -o pipefail
+
+  export DDEV_NONINTERACTIVE=true
+  export DDEV_NO_INSTRUMENTATION=true
+
   # Create unique temp directory for this test
   TEST_TEMP_DIR=$(mktemp -d ${TMPDIR:-~/tmp}/bats-behat-XXXXXX)
 
