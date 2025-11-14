@@ -4,14 +4,32 @@ Feature: Cookie Compliance Context - Cookie Detection
   So that I can validate cookie compliance functionality
 
   @api @javascript
-  Scenario: Check for cookies on homepage
+  Scenario: Accept cookies
     Given I am on the homepage
-    # This step will list all cookies (or show "No cookies set" message)
-    Then there should not be any cookies loaded
+      And I wait for the cookie banner to appear
+     Then I accept cookies
+      And cookie banner should not be visible
+      And the following cookie categories have been accepted: "cms, klaro, vimeo and youtube"
+
+  @api @javascript @cookies-accepted
+  Scenario: Use @cookies-accepted tag to accept cookies automatically
+    Given I am on the homepage
+     Then cookie banner should not be visible
+     And the following cookie categories have been accepted: "cms, klaro, vimeo and youtube"
+
 
   @api @javascript
-  Scenario: Verify mandatory cookies
+  Scenario: Reject cookies
     Given I am on the homepage
-    When I reload the page
-    # Check if mandatory cookies are loaded (depends on site configuration)
-    Then the cookies of "mandatory" type have been loaded
+      And I wait for the cookie banner to appear
+     Then I reject cookies
+      And cookie banner should not be visible
+     And the following cookie categories have been accepted: "cms and klaro"
+     And the following cookie categories have been rejected: "vimeo and youtube"
+
+  @api @javascript @cookies-rejected
+  Scenario: Use @cookies-rejected tag to reject cookies automatically
+    Given I am on the homepage
+     Then cookie banner should not be visible
+     And the following cookie categories have been accepted: "cms and klaro"
+     And the following cookie categories have been rejected: "vimeo and youtube"
