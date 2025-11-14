@@ -55,10 +55,10 @@ setup_test_environment() {
   echo "# Installing behat-contexts from local source..." >&3
 
   # Add path repository to composer.json
-  ddev exec composer config repositories.behat-contexts path /var/www/html
+  ddev composer config repositories.behat-contexts path /var/www/html
 
   # Require the library
-  ddev exec composer require metadrop/behat-contexts:@dev
+  ddev composer require metadrop/behat-contexts:@dev
 
   # Ensure DDEV is running
   if ! ddev describe >/dev/null 2>&1; then
