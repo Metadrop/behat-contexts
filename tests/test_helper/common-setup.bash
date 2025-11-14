@@ -33,6 +33,15 @@ setup_test_environment() {
   ddev add-on get metadrop/ddev-aljibe
   ddev aljibe-assistant -a
 
+  # Install behat-contexts library from local source
+  echo "# Installing behat-contexts from local source..." >&3
+
+  # Add path repository to composer.json
+  ddev exec composer config repositories.behat-contexts path /var/www/html
+
+  # Require the library
+  ddev exec composer require metadrop/behat-contexts:@dev
+
   # Ensure DDEV is running
   if ! ddev describe >/dev/null 2>&1; then
     echo "# WARNING: DDEV project not running. Tests may fail." >&3
