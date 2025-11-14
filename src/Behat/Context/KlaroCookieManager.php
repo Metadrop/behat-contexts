@@ -77,14 +77,14 @@ class KlaroCookieManager implements CookieManagerInterface {
    * {@inheritdoc}
    */
   public function acceptCookies($session): void {
-    $this->executeKlaroMethod($session, TRUE);
+    $this->setAcceptanceStatusForAllCookies($session, TRUE);
   }
 
   /**
    * {@inheritdoc}
    */
   public function rejectCookies($session): void {
-    $this->executeKlaroMethod($session, FALSE);
+    $this->setAcceptanceStatusForAllCookies($session, FALSE);
   }
 
   /**
@@ -108,7 +108,7 @@ class KlaroCookieManager implements CookieManagerInterface {
    * @param boolean $value
    *   The Klaro method name to execute.
    */
-  protected function executeKlaroMethod(Session $session, bool $value): void {
+  protected function setAcceptanceStatusForAllCookies(Session $session, bool $value): void {
 
     $this->waitForKlaroObjectAvailability($session);
 
