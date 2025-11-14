@@ -24,74 +24,66 @@ export DDEV_BEHAT_DIR="/var/www/html"
 #
 # Setup function - called before each test
 #
-# Creates a unique temporary directory for test artifacts
-# and ensures DDEV is running.
+# Currently a no-op, can be extended for setup if needed.
 #
 setup_test_environment() {
-
   set -eu -o pipefail
 
-  export DDEV_NONINTERACTIVE=true
-  export DDEV_NO_INSTRUMENTATION=true
-
-  # Create unique temp directory for this test
-  TEST_TEMP_DIR=$(mktemp -d ${TMPDIR:-~/tmp}/bats-behat-XXXXXX)
-
-  cd "$TEST_TEMP_DIR"
-
-
-  # Configure GitHub token for composer to avoid rate limiting
-  # The token is passed as an environment variable from GitHub Actions
-  if [ -n "${GITHUB_TOKEN:-}" ]; then
-    echo "# Configuring composer with GitHub token to avoid rate limiting" >&3
-    echo "{\"github-oauth\": {\"github.com\": \"${GITHUB_TOKEN}\"}}" > auth.json
-  fi
-
-
-
-  # Configure DDEV and install Aljibe
-  echo "# Setting up DDEV and Aljibe..." >&3
-  ddev config --auto
-  ddev add-on get metadrop/ddev-aljibe
-  ddev aljibe-assistant -a
-
-  # Install behat-contexts library from local source
-  echo "# Installing behat-contexts from local source..." >&3
-
-  # Check that BEHAT_CONTEXTS_SOURCE_PATH is set
-  if [ -z "${BEHAT_CONTEXTS_SOURCE_PATH}" ]; then
-    echo "# ERROR: BEHAT_CONTEXTS_SOURCE_PATH environment variable must be set" >&3
-    echo "#        It should point to the behat-contexts source path under testing" >&3
-    return 1
-  fi
-
-  # Add path repository to composer.json
-  ddev composer config repositories.behat-contexts path "${BEHAT_CONTEXTS_SOURCE_PATH}"
-
-  # Require the library
-  ddev composer require metadrop/behat-contexts:@dev
-
-  # Ensure DDEV is running
-  if ! ddev describe >/dev/null 2>&1; then
-    echo "# WARNING: DDEV project not running. Tests may fail." >&3
-  fi
+  bats_load_library bats-assert
+  bats_load_library bats-file
+  bats_load_library bats-support
 }
 
 #
 # Teardown function - called after each test
 #
-# Cleans up temporary test artifacts
-#
+# Currently a no-op, can be extended for cleanup if needed.
 teardown_test_environment() {
-  # Destroy DDEV containers before cleanup
-  if [[ -n "${TEST_TEMP_DIR}" && -d "${TEST_TEMP_DIR}" ]]; then
-    ddev delete -Oy ${TEST_TEMP_DIR} >/dev/null 2>&1
+  set -eu -o pipefail
+}
+
+# Prepares a test by copying feature file and modifying behat.yml accordingly.
+#
+# Parameters:
+#   $1 - Feature file name (relative to tests/features/)
+#   $2 - Begin marker in behat.yml to locate insertion point
+#   $3 - End marker in behat.yml to locate insertion point
+#   $4 - Replacement text to insert between markers
+prepare_test() {
+
+  local BEHAT_YML_TEMPLATE_PATH="tests/behat/local/behat.yml"
+  export BEHAT_YML_CURRENT_TEST_PATH="tests/behat/local/behat-test.yml"
+  export FEATURE_UNDER_TEST_PATH="tests/behat/local/features/feature_under_test.feature"
+
+  # Skip if DDEV is not running
+  if ! is_ddev_running; then
+    skip "DDEV is not running"
   fi
 
-  # Clean up temp directory if it exists
-  if [[ -n "${TEST_TEMP_DIR}" && -d "${TEST_TEMP_DIR}" ]]; then
-    rm -rf "${TEST_TEMP_DIR}"
-  fi
+  # Get the feature file path
+  local FEATURE_FILE="tests/features/$1"
+  local BEGIN_MARK="$2"
+  local END_MARK="$3"
+  local REPLACEMENT="$4"
+
+  cp "$BEHAT_CONTEXTS_SOURCE_PATH/$FEATURE_FILE" "$FEATURE_UNDER_TEST_PATH"
+
+  cp "$BEHAT_YML_TEMPLATE_PATH" "$BEHAT_YML_CURRENT_TEST_PATH"
+
+  # Escape backslashes for sed safely
+  sed_start=$(printf '%s\n' "$BEGIN_MARK" | sed 's/\\/\\\\/g')
+  sed_end=$(printf '%s\n' "$END_MARK" | sed 's/\\/\\\\/g')
+
+  sed \
+  "
+    /$sed_start/,/$sed_end/{
+      /$sed_start/!{
+        /$sed_end/!d
+      }
+    }
+    /$sed_start/a\\
+  $REPLACEMENT
+  " "$BEHAT_YML_TEMPLATE_PATH" > "$BEHAT_YML_CURRENT_TEST_PATH"
 }
 
 #
