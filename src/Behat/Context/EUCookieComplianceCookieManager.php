@@ -2,6 +2,8 @@
 
 namespace Metadrop\Behat\Context;
 
+use Behat\Mink\Session;
+
 /**
  * EU Cookie Compliance cookie manager implementation.
  *
