@@ -20,47 +20,74 @@ on:
 
 jobs:
   test-contexts:
-    name: Test Behat Contexts (DDEV ${{ matrix.ddev_version }})
+    name: Test Behat Contexts
     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        ddev_version: [stable]
-        # Future: Add more versions for comprehensive testing
-        # ddev_version: [stable, HEAD]
+    env:
+      BEHAT_CONTEXTS_SOURCE_PATH: /var/www/html
+      DDEV_NONINTERACTIVE: true
+      DDEV_NO_INSTRUMENTATION: true
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up environment variables
+      - name: Install BATS and libraries
         run: |
-          echo "BEHAT_CONTEXTS_SOURCE_PATH=/var/www/html" >> $GITHUB_ENV
-          echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+          sudo apt-get update
+          sudo apt-get install -y bats
 
-      - name: Run BATS tests with DDEV
-        uses: ddev/github-action-add-on-test@v2
-        with:
-          ddev_version: ${{ matrix.ddev_version }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          debug_enabled: ${{ inputs.debug_enabled || false }}
-          addon_repository: ${{ github.repository }}
-          addon_ref: ${{ github.ref }}
-          # PoC: Running single test file
-          # TODO: Make this more generic to run all test files
-          test_command: bats tests/contexts/cookie-compliance-context.bats
+          # Install bats-support
+          sudo git clone https://github.com/bats-core/bats-support /usr/lib/bats-support
+
+          # Install bats-assert
+          sudo git clone https://github.com/bats-core/bats-assert /usr/lib/bats-assert
+
+          # Install bats-file
+          sudo git clone https://github.com/bats-core/bats-file /usr/lib/bats-file
+
+          # Verify installation
+          bats --version
+          ls -la /usr/lib/bats-*
+
+      - name: Install DDEV
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/ddev/ddev/master/scripts/install_ddev.sh | bash
+          ddev version
+
+      - name: Set up DDEV project with Aljibe
+        run: |
+          # Configure DDEV
+          ddev config --auto
+
+          # Install Aljibe addon
+          ddev add-on get metadrop/ddev-aljibe
+
+          # Run Aljibe assistant to set up Drupal + Behat
+          ddev aljibe-assistant -a
+
+          # Install behat-contexts from local source
+          ddev composer config repositories.behat-contexts path "${BEHAT_CONTEXTS_SOURCE_PATH}"
+          ddev composer require metadrop/behat-contexts:@dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run BATS tests
+        run: |
+          # PoC: Running single test file
+          # TODO: Make this more generic to run all test files
+          bats tests/contexts/cookie-compliance-context.bats
+        env:
           BEHAT_CONTEXTS_SOURCE_PATH: /var/www/html
           BEHAT_CONTEXTS_BRANCH: ${GITHUB_REF_NAME}
           DEBUG_GITHUB_REF: ${GITHUB_REF}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload test artifacts on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: test-artifacts-${{ matrix.ddev_version }}
+          name: test-artifacts
           path: |
             **/behat/errors/
             **/behat/screenshots/
@@ -73,7 +100,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: bats-logs-${{ matrix.ddev_version }}
+          name: bats-logs
           path: |
             tests/**/*.log
             /tmp/bats-*.log
