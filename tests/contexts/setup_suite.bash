@@ -39,9 +39,7 @@ setup_ddev_and_aljibe() {
   ddev aljibe-assistant -a -p standard
 }
 
-# Overrides behat-contexts installation to use local source that is being tested
-install_behat_contexts_from_source() {
-
+determine_source_path() {
   if [ -z "${BEHAT_CONTEXTS_SOURCE_PATH}" ]; then
     echo "# BEHAT_CONTEXTS_SOURCE_PATH is not set; trying GITHUB_WORKSPACE..." >&3
     if [ -n "${GITHUB_WORKSPACE:-}" ]; then
@@ -54,6 +52,12 @@ install_behat_contexts_from_source() {
   fi
 
   echo "# BEHAT_CONTEXTS_SOURCE_PATH is set to: ${BEHAT_CONTEXTS_SOURCE_PATH}" >&3
+  export BEHAT_CONTEXTS_SOURCE_PATH
+}
+
+# Overrides behat-contexts installation to use local source that is being tested
+install_behat_contexts_from_source() {
+
 
     # Install behat-contexts library from local source
   echo "# Installing behat-contexts from local source..." >&3
@@ -71,6 +75,7 @@ setup_suite() {
 
   echo "# Setting up test suite environment..." >&3
 
+  determine_source_path
   create_temp_dir "$TMP_DIR"
   configure_composer_github_token
   setup_ddev_and_aljibe
