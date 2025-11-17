@@ -54,6 +54,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BEHAT_CONTEXTS_SOURCE_PATH: /var/www/html
           BEHAT_CONTEXTS_BRANCH: ${GITHUB_REF_NAME}
+          DEBUG_GITHUB_REF: ${GITHUB_REF}
 
       - name: Upload test artifacts on failure
         if: failure()

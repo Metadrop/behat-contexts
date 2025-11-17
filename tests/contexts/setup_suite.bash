@@ -63,8 +63,14 @@ install_behat_contexts_from_source() {
   # Add path repository to composer.json
   ddev composer config repositories.behat-contexts path "./$(basename "${BEHAT_CONTEXTS_SOURCE_PATH}")"
 
+
+  echo "# GitHub REF: ${GITHUB_REF}"
+  echo "# GitHub REF NAME: ${GITHUB_REF_NAME}"
+  echo "# DEBUG_GITHUB_REF: ${DEBUG_GITHUB_REF}..."
+  env
+
   # Require the library. Use alias to force specific branch.
-  ddev composer require "metadrop/behat-contexts:dev-${BEHAT_CONTEXTS_BRANCH} as 1.0.0"
+  ddev composer require "metadrop/behat-contexts:dev-${BEHAT_CONTEXTS_BRANCH} as 1.99"
 }
 
 #
