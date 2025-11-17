@@ -1,4 +1,4 @@
-[![tests](https://github.com/Metadrop/behat-contexts/actions/workflows/tests.yml/badge.svg)](https://github.com/Metadrop/behat-contexts/actions/workflows/tests.yml) ![project is maintained](https://img.shields.io/maintenance/yes/2025.svg)
+[![tests](https://github.com/Metadrop/behat-contexts/actions/workflows/test-contexts.yml/badge.svg)](https://github.com/Metadrop/behat-contexts/actions/workflows/tests.yml) ![project is maintained](https://img.shields.io/maintenance/yes/2025.svg)
 ![GitHub Release](https://img.shields.io/github/v/release/Metadrop/behat-contexts)
 
 # Behat Contexts for Drupal
