@@ -326,7 +326,7 @@ class DebugContext extends NuvoleScreenshotContext {
    */
   #[Given('save last response')]
   public function saveLastResponse() {
-    $this->createScreenshot($this->getScreenshotsPath() . DIRECTORY_SEPARATOR . 'last_response', 'File saved in @file_name');
+    $this->createScreenshot($this->getScreenshotsPath() . DIRECTORY_SEPARATOR . '_last_response', 'File saved in @file_name');
   }
 
   /**
