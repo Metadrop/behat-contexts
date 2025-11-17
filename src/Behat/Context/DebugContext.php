@@ -9,13 +9,9 @@
 
 namespace Metadrop\Behat\Context;
 
-use Behat\Behat\Hook\Scope\AfterScenarioScope;
-use Behat\Behat\Hook\Scope\AfterStepScope;
 use Behat\Testwork\Tester\Result\TestResult;
-use Behat\Gherkin\Node\FeatureNode;
-use Behat\Gherkin\Node\StepNode;
 use Behat\Step\Then;
-use Behat\Step\When;
+use Behat\Step\Given;
 use NuvoleWeb\Drupal\DrupalExtension\Context\ScreenShotContext as NuvoleScreenshotContext;
 
 /**
