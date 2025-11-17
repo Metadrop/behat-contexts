@@ -7,9 +7,6 @@
 # with DDEV and Aljibe.
 #
 
-# Test temporary directory for artifacts
-export TEST_TEMP_DIR=""
-
 # DDEV project name (can be overridden)
 export DDEV_PROJECT_NAME="${DDEV_PROJECT_NAME:-behat-contexts-test}"
 
@@ -163,6 +160,7 @@ get_test_features_dir() {
 # Removes error reports, screenshots, logs, etc.
 #
 cleanup_behat_artifacts() {
+  return
   ddev exec rm -rf \
     "${DDEV_DOCROOT}/sites/default/files/behat" \
     /var/www/html/reports/behat \
@@ -196,16 +194,6 @@ wait_for_ddev() {
 #
 get_timestamp() {
   date +"%Y%m%d_%H%M%S"
-}
-
-#
-# Debug: Print test environment info
-#
-print_test_info() {
-  echo "# Test Environment Info:" >&3
-  echo "#   TEST_TEMP_DIR: ${TEST_TEMP_DIR}" >&3
-  echo "#   DDEV Project: ${DDEV_PROJECT_NAME}" >&3
-  echo "#   DDEV Running: $(is_ddev_running && echo 'Yes' || echo 'No')" >&3
 }
 
 #
