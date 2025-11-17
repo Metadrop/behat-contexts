@@ -62,15 +62,14 @@ prepare_test() {
   local END_MARK="$3"
   local REPLACEMENT="$4"
 
-  # echo "Contents of $BEHAT_CONTEXTS_SOURCE_PATH":
-  # echo "Contents of $BEHAT_CONTEXTS_SOURCE_PATH": >&3
-  # ls -la "$BEHAT_CONTEXTS_SOURCE_PATH/"
 
+  echo "Copying feature file: cp $BEHAT_CONTEXTS_SOURCE_PATH/$FEATURE_FILE" "$FEATURE_UNDER_TEST_PATH"
+  cp "$BEHAT_CONTEXTS_SOURCE_PATH/$FEATURE_FILE" "$FEATURE_UNDER_TEST_PATH"
 
-
-  cp "$GITHUB_WORKSPACE/$FEATURE_FILE" "$FEATURE_UNDER_TEST_PATH"
+  echo "Copying YML template file: cp $BEHAT_YML_TEMPLATE_PATH" "$BEHAT_YML_CURRENT_TEST_PATH"
 
   cp "$BEHAT_YML_TEMPLATE_PATH" "$BEHAT_YML_CURRENT_TEST_PATH"
+
 
   # Escape backslashes for sed safely
   sed_start=$(printf '%s\n' "$BEGIN_MARK" | sed 's/\\/\\\\/g')

@@ -41,13 +41,28 @@ setup_ddev_and_aljibe() {
 
 # Overrides behat-contexts installation to use local source that is being tested
 install_behat_contexts_from_source() {
+
+  if [ -z "${BEHAT_CONTEXTS_SOURCE_PATH}" ]; then
+    echo "# BEHAT_CONTEXTS_SOURCE_PATH is not set; trying GITHUB_WORKSPACE..." >&3
+    if [ -n "${GITHUB_WORKSPACE:-}" ]; then
+      echo "# Using GITHUB_WORKSPACE as behat-contexts source: ${GITHUB_WORKSPACE}" >&3
+      BEHAT_CONTEXTS_SOURCE_PATH="${GITHUB_WORKSPACE}"
+    else
+      echo "# ERROR: BEHAT_CONTEXTS_SOURCE_PATH is not set and GITHUB_WORKSPACE is not available." >&3
+      exit 1
+    fi
+  fi
+
+  echo "# BEHAT_CONTEXTS_SOURCE_PATH is set to: ${BEHAT_CONTEXTS_SOURCE_PATH}" >&3
+
     # Install behat-contexts library from local source
   echo "# Installing behat-contexts from local source..." >&3
 
   rm vendor/metadrop/behat-contexts -rf || true
-  cp -r "${GITHUB_WORKSPACE}" vendor/metadrop/behat-contexts
+  cp -r "${BEHAT_CONTEXTS_SOURCE_PATH}" vendor/metadrop/behat-contexts
 
   ls -la vendor/metadrop/behat-contexts >&3
+
 }
 
 #
