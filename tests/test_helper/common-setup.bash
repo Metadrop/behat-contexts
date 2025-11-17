@@ -45,6 +45,9 @@ teardown_test_environment() {
 #   $2 - Begin marker in behat.yml to locate insertion point
 #   $3 - End marker in behat.yml to locate insertion point
 #   $4 - Replacement text to insert between markers
+#
+# Parameters $2, $3, and $4 are optional; if not provided, the behat.yml
+# will be copied without modifications.
 prepare_test() {
 
   local BEHAT_YML_TEMPLATE_PATH="tests/behat/local/behat.yml"
@@ -56,20 +59,35 @@ prepare_test() {
     skip "DDEV is not running"
   fi
 
-  # Get the feature file path
+  if [ -f "$BEHAT_YML_CURRENT_TEST_PATH" ]; then
+    rm "$BEHAT_YML_CURRENT_TEST_PATH"
+  fi
+
+  if [ -f "$FEATURE_UNDER_TEST_PATH" ]; then
+    rm "$FEATURE_UNDER_TEST_PATH"
+  fi
+
+  # At this point all checks and clean up actions are done.
+
+  # Now copy the feature file and the behat.yml template
   local FEATURE_FILE="tests/features/$1"
+  cp "$BEHAT_CONTEXTS_SOURCE_PATH/$FEATURE_FILE" "$FEATURE_UNDER_TEST_PATH"
+
+  # Now decide whether to modify behat.yml or just copy it depending on
+  # given parameters.
+  if [ $# -eq 1 ]; then
+    cp "$BEHAT_YML_TEMPLATE_PATH" "$BEHAT_YML_CURRENT_TEST_PATH"
+    return
+  fi
+
+  if [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ]; then
+      echo "Error: Missing parameters for prepare_test function: begin marker, end marker and replacement are all required if any of them is provided (please provide all or none)." >&2
+      exit 1
+  fi
+
   local BEGIN_MARK="$2"
   local END_MARK="$3"
   local REPLACEMENT="$4"
-
-
-  echo "Copying feature file: cp $BEHAT_CONTEXTS_SOURCE_PATH/$FEATURE_FILE" "$FEATURE_UNDER_TEST_PATH"
-  cp "$BEHAT_CONTEXTS_SOURCE_PATH/$FEATURE_FILE" "$FEATURE_UNDER_TEST_PATH"
-
-  echo "Copying YML template file: cp $BEHAT_YML_TEMPLATE_PATH" "$BEHAT_YML_CURRENT_TEST_PATH"
-
-  cp "$BEHAT_YML_TEMPLATE_PATH" "$BEHAT_YML_CURRENT_TEST_PATH"
-
 
   # Escape backslashes for sed safely
   sed_start=$(printf '%s\n' "$BEGIN_MARK" | sed 's/\\/\\\\/g')
