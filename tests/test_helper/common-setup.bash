@@ -7,9 +7,6 @@
 # with DDEV and Aljibe.
 #
 
-# Test temporary directory for artifacts
-export TEST_TEMP_DIR=""
-
 # DDEV project name (can be overridden)
 export DDEV_PROJECT_NAME="${DDEV_PROJECT_NAME:-behat-contexts-test}"
 
@@ -45,6 +42,9 @@ teardown_test_environment() {
 #   $2 - Begin marker in behat.yml to locate insertion point
 #   $3 - End marker in behat.yml to locate insertion point
 #   $4 - Replacement text to insert between markers
+#
+# Parameters $2, $3, and $4 are optional; if not provided, the behat.yml
+# will be copied without modifications.
 prepare_test() {
 
   local BEHAT_YML_TEMPLATE_PATH="tests/behat/local/behat.yml"
@@ -56,20 +56,35 @@ prepare_test() {
     skip "DDEV is not running"
   fi
 
-  # Get the feature file path
+  if [ -f "$BEHAT_YML_CURRENT_TEST_PATH" ]; then
+    rm "$BEHAT_YML_CURRENT_TEST_PATH"
+  fi
+
+  if [ -f "$FEATURE_UNDER_TEST_PATH" ]; then
+    rm "$FEATURE_UNDER_TEST_PATH"
+  fi
+
+  # At this point all checks and clean up actions are done.
+
+  # Now copy the feature file and the behat.yml template
   local FEATURE_FILE="tests/features/$1"
+  cp "$BEHAT_CONTEXTS_SOURCE_PATH/$FEATURE_FILE" "$FEATURE_UNDER_TEST_PATH"
+
+  # Now decide whether to modify behat.yml or just copy it depending on
+  # given parameters.
+  if [ $# -eq 1 ]; then
+    cp "$BEHAT_YML_TEMPLATE_PATH" "$BEHAT_YML_CURRENT_TEST_PATH"
+    return
+  fi
+
+  if [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ]; then
+      echo "Error: Missing parameters for prepare_test function: begin marker, end marker and replacement are all required if any of them is provided (please provide all or none)." >&2
+      exit 1
+  fi
+
   local BEGIN_MARK="$2"
   local END_MARK="$3"
   local REPLACEMENT="$4"
-
-
-  echo "Copying feature file: cp $BEHAT_CONTEXTS_SOURCE_PATH/$FEATURE_FILE" "$FEATURE_UNDER_TEST_PATH"
-  cp "$BEHAT_CONTEXTS_SOURCE_PATH/$FEATURE_FILE" "$FEATURE_UNDER_TEST_PATH"
-
-  echo "Copying YML template file: cp $BEHAT_YML_TEMPLATE_PATH" "$BEHAT_YML_CURRENT_TEST_PATH"
-
-  cp "$BEHAT_YML_TEMPLATE_PATH" "$BEHAT_YML_CURRENT_TEST_PATH"
-
 
   # Escape backslashes for sed safely
   sed_start=$(printf '%s\n' "$BEGIN_MARK" | sed 's/\\/\\\\/g')
@@ -145,6 +160,7 @@ get_test_features_dir() {
 # Removes error reports, screenshots, logs, etc.
 #
 cleanup_behat_artifacts() {
+  return
   ddev exec rm -rf \
     "${DDEV_DOCROOT}/sites/default/files/behat" \
     /var/www/html/reports/behat \
@@ -178,16 +194,6 @@ wait_for_ddev() {
 #
 get_timestamp() {
   date +"%Y%m%d_%H%M%S"
-}
-
-#
-# Debug: Print test environment info
-#
-print_test_info() {
-  echo "# Test Environment Info:" >&3
-  echo "#   TEST_TEMP_DIR: ${TEST_TEMP_DIR}" >&3
-  echo "#   DDEV Project: ${DDEV_PROJECT_NAME}" >&3
-  echo "#   DDEV Running: $(is_ddev_running && echo 'Yes' || echo 'No')" >&3
 }
 
 #

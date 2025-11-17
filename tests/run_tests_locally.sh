@@ -21,4 +21,4 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-bats tests/contexts/cookie-compliance-context.bats
+bats tests/contexts

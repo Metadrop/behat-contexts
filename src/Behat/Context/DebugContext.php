@@ -9,13 +9,9 @@
 
 namespace Metadrop\Behat\Context;
 
-use Behat\Behat\Hook\Scope\AfterScenarioScope;
-use Behat\Behat\Hook\Scope\AfterStepScope;
 use Behat\Testwork\Tester\Result\TestResult;
-use Behat\Gherkin\Node\FeatureNode;
-use Behat\Gherkin\Node\StepNode;
 use Behat\Step\Then;
-use Behat\Step\When;
+use Behat\Step\Given;
 use NuvoleWeb\Drupal\DrupalExtension\Context\ScreenShotContext as NuvoleScreenshotContext;
 
 /**
@@ -264,13 +260,26 @@ class DebugContext extends NuvoleScreenshotContext {
     }
   }
 
+
+  /**
+   * @deprecated Because it is not easy to get a full page capture and it may
+   * only work in Chrome. Resize viewport and do a normal capture.
+   */
   #[Then('capture full page with a width of :width')]
   public function captureFullPageWithAWidthOf($width) {
+    echo "\033[33m[DEPRECATED]\033[0m This step will be removed in the next major version. Use any other capture step.\n";
+
     $this->captureFullPageWithWidthOfToWithName($width, $this->getScreenshotsPath(), $this->generateFilenameDateBased());
   }
 
+  /**
+   * @deprecated Because it is not easy to get a full page capture and it may
+   * only work in Chrome. Resize viewport and do a normal capture.
+   */
   #[Then('capture full page with a width of :width with name :filename')]
   public function captureFullPageWithAWidthOfWithFilename($width, $filename) {
+    echo "\033[33m[DEPRECATED]\033[0m This step will be removed in the next major version. Use any other capture step.\n";
+
     $this->captureFullPageWithWidthOfToWithName($width, $this->getScreenshotsPath(), $this->generateFilenameDateBased());
   }
 
@@ -279,13 +288,32 @@ class DebugContext extends NuvoleScreenshotContext {
     return 'Screenshot-' . date("Ymd--H-i-s") . '.' . $milliseconds['usec'] . '.png';
   }
 
+
+  /**
+   * @deprecated Because it is not easy to get a full page capture and it may
+   * only work in Chrome. Resize viewport and do a normal capture.
+   */
   #[Then('capture full page with a width of :width to :path')]
   public function captureFullPageWithWidthOfTo($width, $path) {
+
+    echo "\033[33m[DEPRECATED]\033[0m This step will be removed in the next major version. Use any other capture step.\n";
+
+   print_r($this->getScreenshotAbsolutePath($path) . "\n");
+   print_r("Width: " . $width);
+
+
     $this->captureFullPageWithWidthOfToWithName($width, $this->getScreenshotAbsolutePath($path), $this->generateFilenameDateBased());
   }
 
+  /**
+   * @deprecated Because it is not easy to get a full page capture and it may
+   * only work in Chrome. Resize viewport and do a normal capture.
+   */
   #[Then('capture full page with a width of :width to :path with name :filename')]
   public function captureFullPageWithWidthOfToWithName($width, $filepath, $filename) {
+
+    echo "\033[33m[DEPRECATED]\033[0m This step will be removed in the next major version. Use any other capture step.\n";
+
     // Use default height as screenshot is going to capture the complete page.
     $this->getSession()->resizeWindow((int) $width, $this::DEFAULT_HEIGHT, 'current');
     $message = "Screenshot created in @file_name";
@@ -298,7 +326,7 @@ class DebugContext extends NuvoleScreenshotContext {
    */
   #[Given('save last response')]
   public function saveLastResponse() {
-    $this->createScreenshot($this->getScreenshotsPath() . DIRECTORY_SEPARATOR . 'last_response', 'File saved in @file_name');
+    $this->createScreenshot($this->getScreenshotsPath() . DIRECTORY_SEPARATOR . '_last_response', 'File saved in @file_name');
   }
 
   /**
