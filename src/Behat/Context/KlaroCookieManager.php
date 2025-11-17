@@ -97,7 +97,14 @@ class KlaroCookieManager implements CookieManagerInterface {
    */
   protected function waitForKlaroObjectAvailability(Session $session): void {
     // Wait for the Klaro global object to be defined.
-    $session->wait(10000, "typeof window.klaro === 'object' && window.klaro !== null");
+    if (!$session->wait(10000, "typeof window.klaro === 'object' && window.klaro !== null
+      && typeof window.klaro.getManager === 'function'
+      && typeof window.klaro.getManager().changeAll === 'function'
+      && typeof window.klaro.getManager().saveAndApplyConsents === 'function'")) {
+      throw new \InvalidArgumentException(
+        "Klaro API does not exist or has not loaded correctly."
+      );
+    }
   }
 
   /**
@@ -110,14 +117,8 @@ class KlaroCookieManager implements CookieManagerInterface {
    */
   protected function setAcceptanceStatusForAllCookies(Session $session, bool $value): void {
 
-    if (!$session->wait(10000, "typeof window.klaro === 'object' && window.klaro !== null
-    && typeof window.klaro.getManager === 'function'
-    && typeof window.klaro.getManager().changeAll === 'function'
-    && typeof window.klaro.getManager().saveAndApplyConsents === 'function'")) {
-      throw new \InvalidArgumentException(
-        "Klaro API does not exist or has not loaded correctly."
-      );
-    }
+    $this->waitForKlaroObjectAvailability($session);
+
     // Declare JS script and Klaro API methods.
     $jsValue = $value ? 'true' : 'false';
     $script = "
