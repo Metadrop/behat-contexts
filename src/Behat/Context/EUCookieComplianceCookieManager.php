@@ -95,4 +95,12 @@ class EUCookieComplianceCookieManager implements CookieManagerInterface {
     $session->executeScript("window.Drupal.eu_cookie_compliance.{$method}();");
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function cookiesCategoriesAcceptedStatus(Session $session): array {
+    throw new \InvalidArgumentException(
+      'To be implemented for EU Cookie Compliance.'
+    );
+  }
 }

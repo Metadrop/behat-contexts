@@ -8,6 +8,7 @@ This repository is based on [Nuvole Drupal extension](https://github.com/nuvolew
 
 - [Install](#install)
 - [Configure](#configure)
+- [Testing](#testing)
 - [Contexts](#contexts)
   - [AntiSpam Context](#antispam-context)
   - [Cache context](#cache-context)
@@ -42,6 +43,10 @@ Install with [Composer](http://getcomposer.org):
 ## Configure
 
 Each context may have its own configuration. [Here is an example](https://github.com/Metadrop/behat-contexts/blob/dev/behat.yml.dist) with all the contexts added.
+
+## Testing
+
+This library includes a BATS-based testing infrastructure to validate Behat context behaviors and outputs. See the **[Testing documentation](tests/README.md)** for detailed information.
 
 ## Contexts
 

@@ -77,27 +77,41 @@ class KlaroCookieManager implements CookieManagerInterface {
    * {@inheritdoc}
    */
   public function acceptCookies($session): void {
-    $this->executeKlaroMethod($session, TRUE);
+    $this->setAcceptanceStatusForAllCookies($session, TRUE);
   }
 
   /**
    * {@inheritdoc}
    */
   public function rejectCookies($session): void {
-    $this->executeKlaroMethod($session, FALSE);
+    $this->setAcceptanceStatusForAllCookies($session, FALSE);
+  }
+
+  /**
+   * Waits a few second until the Klaro JS object appears in the window object.
+   *
+   * @param Session $session
+   *   The current Mink session.
+   *
+   * @return void
+   */
+  protected function waitForKlaroObjectAvailability(Session $session): void {
+    // Wait for the Klaro global object to be defined.
+    $session->wait(10000, "typeof window.klaro === 'object' && window.klaro !== null");
   }
 
   /**
    * Execute a Klaro API method.
    *
-   * @param Behat\Mink\Session $session
-   *   The current session.
+   * @param Session $session
+   *   The current Mink session.
    * @param boolean $value
    *   The Klaro method name to execute.
    */
-  protected function executeKlaroMethod(Session $session, bool $value): void {
-    // Wait for the Klaro global object to be defined.
-    $session->wait(10000, "typeof window.klaro === 'object' && window.klaro !== null");
+  protected function setAcceptanceStatusForAllCookies(Session $session, bool $value): void {
+
+    $this->waitForKlaroObjectAvailability($session);
+
     $jsValue = $value ? 'true' : 'false';
 
     // Declare JS script and execute.
@@ -107,5 +121,21 @@ class KlaroCookieManager implements CookieManagerInterface {
       manager.saveAndApplyConsents();
     ";
     $session->executeScript($script);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function cookiesCategoriesAcceptedStatus(Session $session): array {
+
+    $this->waitForKlaroObjectAvailability($session);
+
+    // Declare JS script and execute.
+    $script = "
+      return window.klaro.getManager().consents;
+    ";
+    $result = $session->evaluateScript($script);
+
+    return is_array($result) ? $result : [];
   }
 }

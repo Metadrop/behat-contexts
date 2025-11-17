@@ -291,8 +291,20 @@ class CookieComplianceContext extends RawMinkContext {
   #[When('I wait cookie banner appears')]
   #[When('I wait for the cookie banner to appear')]
   public function iWaitCookieBannerAppears() {
-    if (!$this->getSession()->wait(10000, sprintf('document.querySelector("%s") != null', $this->cookieManager->getCookieBannerSelector()))) {
-      throw new \Exception(sprintf('The cookie banner with selector "%s" does not appear.', $this->cookieManager->getCookieBannerSelector()));
+    $selector = $this->cookieManager->getCookieBannerSelector();
+    if (!$this->getSession()->wait(10000, sprintf('document.querySelector("%s") != null', $selector))) {
+      throw new \Exception(sprintf('The cookie banner with selector "%s" does not appear.', $selector));
+    }
+  }
+
+  /**
+   * Cookie banner should not be visible
+   */
+  #[Then('(the )cookie banner should not be visible')]
+  public function cookieBannerShouldNotBeVisible() {
+    $selector = $this->cookieManager->getCookieBannerSelector();
+    if ($this->getSession()->wait(5000, sprintf('document.querySelector("%s") != null', $selector))) {
+      throw new \Exception(sprintf('The cookie banner with selector "%s" is visible.', $selector));
     }
   }
 
@@ -476,4 +488,59 @@ class CookieComplianceContext extends RawMinkContext {
     }
   }
 
+  /**
+   * Check that specific cookie categories are accepted.
+   *
+   * @param string $categories
+   *   Comma-separated list of cookie categories.
+   */
+  #[Then('the following cookie categories have been accepted: :categories')]
+  public function categoriesHaveBeenAccepted(string $categories) {
+    $this->assertCategoriesStatus($categories, true, 'acceptance');
+  }
+
+  /**
+   * Check that specific cookie categories are rejected.
+   *
+   * @param string $categories
+   *   Comma-separated list of cookie categories.
+   */
+  #[Then('the following cookie categories have been rejected: :categories')]
+  public function categoriesHaveBeenRejected(string $categories) {
+    $this->assertCategoriesStatus($categories, false, 'rejection');
+  }
+
+  /**
+   * Helper method to assert cookie categories status.
+   *
+   * @param string $categories
+   *   Comma-separated list of cookie categories.
+   * @param bool $expected_status
+   *   Expected status (true for accepted, false for rejected).
+   * @param string $action_name
+   *   Name of the action for error messages ('acceptance' or 'rejection').
+   *
+   * @throws \Exception
+   *   If any category doesn't match the expected status.
+   */
+  private function assertCategoriesStatus(string $categories, bool $expected_status, string $action_name): void {
+    $categories_normalized = str_replace(' and ', ',', $categories);
+    $expected_categories = array_map('trim', explode(',', $categories_normalized));
+    $accepted_categories = $this->cookieManager->cookiesCategoriesAcceptedStatus($this->getSession());
+
+    $errors = [];
+    foreach ($expected_categories as $category) {
+      if (!isset($accepted_categories[$category])) {
+        $errors[] = sprintf('Category "%s" is not found in the cookie manager.', $category);
+      }
+      elseif ($accepted_categories[$category] !== $expected_status) {
+        $status_label = $expected_status ? 'accepted' : 'rejected';
+        $errors[] = sprintf('Category "%s" is not %s (status: %s).', $category, $status_label, $accepted_categories[$category] ? 'true' : 'false');
+      }
+    }
+
+    if (!empty($errors)) {
+      throw new \Exception(sprintf("Cookie category %s errors:\n  - %s", $action_name, implode("\n  - ", $errors)));
+    }
+  }
 }

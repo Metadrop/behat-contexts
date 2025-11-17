@@ -1,0 +1,113 @@
+name: Test Behat Contexts
+
+on:
+  pull_request:
+    paths-ignore:
+      - "**.md"
+  push:
+    branches:
+      - main
+      - 'tests**'
+    paths-ignore:
+      - "**.md"
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Enable debug mode'
+        required: false
+        default: false
+
+jobs:
+  test-contexts:
+    name: Test Behat Contexts
+    runs-on: ubuntu-latest
+
+    env:
+      DDEV_NONINTERACTIVE: true
+      DDEV_NO_INSTRUMENTATION: true
+      BATS_LIB_PATH: /usr/lib
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install BATS and libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bats
+
+          # Install bats-support
+          sudo git clone https://github.com/bats-core/bats-support /usr/lib/bats-support
+
+          # Install bats-assert
+          sudo git clone https://github.com/bats-core/bats-assert /usr/lib/bats-assert
+
+          # Install bats-file
+          sudo git clone https://github.com/bats-core/bats-file /usr/lib/bats-file
+
+          # Verify installation
+          bats --version
+          ls -la /usr/lib/bats-*
+
+      - name: Install DDEV
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/ddev/ddev/master/scripts/install_ddev.sh | bash
+          ddev version
+
+      - name: Set up DDEV project with Aljibe
+        run: |
+          # Configure DDEV
+          ddev config --auto
+
+          # Install Aljibe addon
+          ddev add-on get metadrop/ddev-aljibe
+
+          # Run Aljibe assistant to set up Drupal + Behat
+          ddev aljibe-assistant -a -p standard
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run BATS tests
+        run: |
+          # Debug: Verify BATS libraries are accessible
+          echo "BATS_LIB_PATH: $BATS_LIB_PATH"
+          echo "Libraries in BATS_LIB_PATH:"
+          ls -la $BATS_LIB_PATH/bats-* || echo "No BATS libraries found"
+
+          # Verify load.bash files exist
+          echo "Checking for load.bash files:"
+          ls -la $BATS_LIB_PATH/bats-support/load.bash || echo "bats-support/load.bash not found"
+          ls -la $BATS_LIB_PATH/bats-assert/load.bash || echo "bats-assert/load.bash not found"
+          ls -la $BATS_LIB_PATH/bats-file/load.bash || echo "bats-file/load.bash not found"
+
+          # PoC: Running single test file
+          # TODO: Make this more generic to run all test files
+          bats tests/contexts/cookie-compliance-context.bats
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+      - name: Upload test artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts
+          path: |
+            **/behat/errors/
+            **/behat/screenshots/
+            **/behat/pages/
+            reports/behat/
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Upload BATS logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bats-logs
+          path: |
+            tests/**/*.log
+            /tmp/bats-*.log
+          retention-days: 7
+          if-no-files-found: ignore
