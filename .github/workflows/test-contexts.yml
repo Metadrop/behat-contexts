@@ -27,6 +27,7 @@ jobs:
       BEHAT_CONTEXTS_SOURCE_PATH: /var/www/html
       DDEV_NONINTERACTIVE: true
       DDEV_NO_INSTRUMENTATION: true
+      BATS_LIB_PATH: /usr/lib
 
     steps:
       - name: Checkout repository
@@ -74,6 +75,17 @@ jobs:
 
       - name: Run BATS tests
         run: |
+          # Debug: Verify BATS libraries are accessible
+          echo "BATS_LIB_PATH: $BATS_LIB_PATH"
+          echo "Libraries in BATS_LIB_PATH:"
+          ls -la $BATS_LIB_PATH/bats-* || echo "No BATS libraries found"
+
+          # Verify load.bash files exist
+          echo "Checking for load.bash files:"
+          ls -la $BATS_LIB_PATH/bats-support/load.bash || echo "bats-support/load.bash not found"
+          ls -la $BATS_LIB_PATH/bats-assert/load.bash || echo "bats-assert/load.bash not found"
+          ls -la $BATS_LIB_PATH/bats-file/load.bash || echo "bats-file/load.bash not found"
+
           # PoC: Running single test file
           # TODO: Make this more generic to run all test files
           bats tests/contexts/cookie-compliance-context.bats
