@@ -47,7 +47,7 @@ teardown() {
   # Drupal CMS default accept button does the same as reject: only mandatory
   # cookies are accepted. We enable this so clicking accept accepts all cookies
   # we can tell the difference in tests.
-  ddev drush cset klaro.settings accept_all true -y
+  ddev drush cset klaro.settings library.accept_all true -y
 
 
 
