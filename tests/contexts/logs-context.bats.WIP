@@ -29,13 +29,10 @@ teardown() {
 # when write_report is enabled
 #
 @test "LogsContext: outputs 'Created dblog report' message" {
-  # Skip if DDEV is not running
-  if ! is_ddev_running; then
-    skip "DDEV is not running"
-  fi
 
-  # Get the feature file path
-  local feature_file="tests/features/logs-test.feature"
+
+  prepare_test "tests/features/logs-test.feature"
+
 
   # Run Behat with the logs feature
   run ddev exec behat "${feature_file}"
