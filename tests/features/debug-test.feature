@@ -3,9 +3,9 @@ Feature: Debug Context - Error Report Generation
   I want to verify that DebugContext can generate error reports
   So that I can validate error reporting functionality
 
-  @api
+  @api @javascript
   Scenario: Trigger error report generation
     Given I am on the homepage
+     Then save last response
     # This step is intentionally designed to fail to trigger error report
-    When I am on "/non-existent-path-that-should-404"
-    Then I should see "This page should exist"
+      And I should be on "non-existent-page"
