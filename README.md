@@ -8,6 +8,7 @@ This repository is based on [Nuvole Drupal extension](https://github.com/nuvolew
 
 - [Install](#install)
 - [Configure](#configure)
+- [Testing](#testing)
 - [Contexts](#contexts)
   - [AntiSpam Context](#antispam-context)
   - [Cache context](#cache-context)
@@ -42,6 +43,42 @@ Install with [Composer](http://getcomposer.org):
 ## Configure
 
 Each context may have its own configuration. [Here is an example](https://github.com/Metadrop/behat-contexts/blob/dev/behat.yml.dist) with all the contexts added.
+
+## Testing
+
+This library includes a BATS-based testing infrastructure to validate Behat context behaviors and outputs.
+
+### Running Tests Locally
+
+```bash
+# Set required environment variables
+export BEHAT_CONTEXTS_SOURCE_PATH=$(pwd)
+export GITHUB_TOKEN=your_github_token
+
+# Run tests
+./tests/run_tests_locally.sh
+```
+
+### Running Specific Tests
+
+```bash
+bats tests/contexts/cookie-compliance-context.bats
+```
+
+### CI/CD Testing
+
+Tests run automatically in GitHub Actions on:
+- Push to `main` or `dev` branches
+- Pull requests
+- Manual workflow dispatch
+
+For detailed information about the testing infrastructure, including:
+- Prerequisites and setup
+- Test structure and organization
+- How to add new tests
+- Troubleshooting guide
+
+See the **[Testing Documentation](tests/README.md)**.
 
 ## Contexts
 
