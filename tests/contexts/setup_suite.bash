@@ -93,8 +93,6 @@ setup_suite() {
 #
 teardown_suite() {
 
-  return
-
   echo "# Tearing down test environment..." >&3
 
   # Destroy DDEV containers before cleanup
