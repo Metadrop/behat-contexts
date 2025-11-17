@@ -52,25 +52,15 @@ install_behat_contexts_from_source() {
   fi
 
   # Check that BEHAT_CONTEXTS_BRANCH is set
-  if [ -z "${BEHAT_CONTEXTS_BRANCH}" ]; then
-    echo "# ERROR: BEHAT_CONTEXTS_BRANCH environment variable must be set" >&3
-    echo "#        It should contain the branch tat needs to be tested" >&3
-    return 1
-  fi
+  # if [ -z "${BEHAT_CONTEXTS_BRANCH}" ]; then
+  #   echo "# ERROR: BEHAT_CONTEXTS_BRANCH environment variable must be set" >&3
+  #   echo "#        It should contain the branch tat needs to be tested" >&3
+  #   return 1
+  # fi
 
-  cp -r "${BEHAT_CONTEXTS_SOURCE_PATH}" .
+  rm vendor/metadrop/behat-contexts -rf || true
+  cp -r "${BEHAT_CONTEXTS_SOURCE_PATH}" vendor/metadrop/behat-contexts
 
-  # Add path repository to composer.json
-  ddev composer config repositories.behat-contexts path "./$(basename "${BEHAT_CONTEXTS_SOURCE_PATH}")"
-
-
-  echo "# GitHub REF: ${GITHUB_REF}"
-  echo "# GitHub REF NAME: ${GITHUB_REF_NAME}"
-  echo "# DEBUG_GITHUB_REF: ${DEBUG_GITHUB_REF}..."
-  env
-
-  # Require the library. Use alias to force specific branch.
-  ddev composer require "metadrop/behat-contexts:dev-${BEHAT_CONTEXTS_BRANCH} as 1.99"
 }
 
 #
