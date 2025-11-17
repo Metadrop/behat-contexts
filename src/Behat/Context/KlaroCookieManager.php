@@ -110,11 +110,16 @@ class KlaroCookieManager implements CookieManagerInterface {
    */
   protected function setAcceptanceStatusForAllCookies(Session $session, bool $value): void {
 
-    $this->waitForKlaroObjectAvailability($session);
-
+    if (!$session->wait(10000, "typeof window.klaro === 'object' && window.klaro !== null
+    && typeof window.klaro.getManager === 'function'
+    && typeof window.klaro.getManager().changeAll === 'function'
+    && typeof window.klaro.getManager().saveAndApplyConsents === 'function'")) {
+      throw new \InvalidArgumentException(
+        "Klaro API does not exist or has not loaded correctly."
+      );
+    }
+    // Declare JS script and Klaro API methods.
     $jsValue = $value ? 'true' : 'false';
-
-    // Declare JS script and execute.
     $script = "
       const manager = window.klaro.getManager();
       manager.changeAll({$jsValue});
@@ -138,4 +143,5 @@ class KlaroCookieManager implements CookieManagerInterface {
 
     return is_array($result) ? $result : [];
   }
+
 }
