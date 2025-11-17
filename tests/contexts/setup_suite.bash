@@ -21,9 +21,12 @@ configure_composer_github_token() {
 create_temp_dir() {
   # Create unique temp directory for this test
   local tmp_dir="${1:-/tmp}"
-  TEST_TEMP_DIR=$(mktemp -d ${tmp_dir:-~/tmp}/bats-behat-XXXXXX)
-  echo "# Created temporary test directory: ${TEST_TEMP_DIR}" >&3
-  cd "$TEST_TEMP_DIR" || exit 1
+  export TEST_ROOT_DIR
+  TEST_ROOT_DIR=$(mktemp -d ${tmp_dir:-~/tmp}/bats-behat-XXXXXX)
+  echo "# Created temporary test directory: ${TEST_ROOT_DIR}" >&3
+  cd "$TEST_ROOT_DIR" || exit 1
+
+
 }
 
 # Configure DDEV and install Aljibe
@@ -58,15 +61,11 @@ determine_source_path() {
 # Overrides behat-contexts installation to use local source that is being tested
 install_behat_contexts_from_source() {
 
-
-    # Install behat-contexts library from local source
+  # Install behat-contexts library from local source
   echo "# Installing behat-contexts from local source..." >&3
 
   rm vendor/metadrop/behat-contexts -rf || true
   cp -r "${BEHAT_CONTEXTS_SOURCE_PATH}" vendor/metadrop/behat-contexts
-
-  ls -la vendor/metadrop/behat-contexts >&3
-
 }
 
 #
@@ -96,11 +95,11 @@ teardown_suite() {
   echo "# Tearing down test environment..." >&3
 
   # Destroy DDEV containers before cleanup
-  cd "${TEST_TEMP_DIR}" || exit 1
-  ddev delete -Oy ${TEST_TEMP_DIR} >/dev/null 2>&1
+  cd "${TEST_ROOT_DIR}" || exit 1
+  ddev delete -Oy ${TEST_ROOT_DIR} >/dev/null 2>&1
   echo "# DDEV project deleted." >&3
 
   cd ..
-  rm -rf "${TEST_TEMP_DIR}"
-  echo "# Removed temporary test directory: ${TEST_TEMP_DIR}" >&3
+  rm -rf "${TEST_ROOT_DIR}"
+  echo "# Removed temporary test directory: ${TEST_ROOT_DIR}" >&3
 }
