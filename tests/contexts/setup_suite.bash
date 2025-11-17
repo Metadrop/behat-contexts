@@ -44,23 +44,10 @@ install_behat_contexts_from_source() {
     # Install behat-contexts library from local source
   echo "# Installing behat-contexts from local source..." >&3
 
-  # Check that BEHAT_CONTEXTS_SOURCE_PATH is set
-  if [ -z "${BEHAT_CONTEXTS_SOURCE_PATH}" ]; then
-    echo "# ERROR: BEHAT_CONTEXTS_SOURCE_PATH environment variable must be set" >&3
-    echo "#        It should point to the behat-contexts source path under testing" >&3
-    return 1
-  fi
-
-  # Check that BEHAT_CONTEXTS_BRANCH is set
-  # if [ -z "${BEHAT_CONTEXTS_BRANCH}" ]; then
-  #   echo "# ERROR: BEHAT_CONTEXTS_BRANCH environment variable must be set" >&3
-  #   echo "#        It should contain the branch tat needs to be tested" >&3
-  #   return 1
-  # fi
-
   rm vendor/metadrop/behat-contexts -rf || true
-  cp -r "${BEHAT_CONTEXTS_SOURCE_PATH}" vendor/metadrop/behat-contexts
+  cp -r "${GITHUB_WORKSPACE}" vendor/metadrop/behat-contexts
 
+  ls -la vendor/metadrop/behat-contexts >&3
 }
 
 #

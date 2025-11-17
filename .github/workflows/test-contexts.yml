@@ -24,7 +24,6 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      BEHAT_CONTEXTS_SOURCE_PATH: /var/www/html
       DDEV_NONINTERACTIVE: true
       DDEV_NO_INSTRUMENTATION: true
       BATS_LIB_PATH: /usr/lib
@@ -65,11 +64,7 @@ jobs:
           ddev add-on get metadrop/ddev-aljibe
 
           # Run Aljibe assistant to set up Drupal + Behat
-          ddev aljibe-assistant -a
-
-          # Install behat-contexts from local source
-          ddev composer config repositories.behat-contexts path "${BEHAT_CONTEXTS_SOURCE_PATH}"
-          ddev composer require metadrop/behat-contexts:@dev
+          ddev aljibe-assistant -a -p standard
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -90,10 +85,8 @@ jobs:
           # TODO: Make this more generic to run all test files
           bats tests/contexts/cookie-compliance-context.bats
         env:
-          BEHAT_CONTEXTS_SOURCE_PATH: /var/www/html
-          BEHAT_CONTEXTS_BRANCH: ${GITHUB_REF_NAME}
-          DEBUG_GITHUB_REF: ${GITHUB_REF}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
       - name: Upload test artifacts on failure
         if: failure()

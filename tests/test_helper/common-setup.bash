@@ -13,10 +13,6 @@ export TEST_TEMP_DIR=""
 # DDEV project name (can be overridden)
 export DDEV_PROJECT_NAME="${DDEV_PROJECT_NAME:-behat-contexts-test}"
 
-# Path to behat-contexts source to be tested.
-# This MUST be set by the caller (locally or in CI)
-export BEHAT_CONTEXTS_SOURCE_PATH="${BEHAT_CONTEXTS_SOURCE_PATH:-}"
-
 # Base paths inside DDEV container
 export DDEV_DOCROOT="/var/www/html/web"
 export DDEV_BEHAT_DIR="/var/www/html"
@@ -66,7 +62,13 @@ prepare_test() {
   local END_MARK="$3"
   local REPLACEMENT="$4"
 
-  cp "$BEHAT_CONTEXTS_SOURCE_PATH/$FEATURE_FILE" "$FEATURE_UNDER_TEST_PATH"
+  # echo "Contents of $BEHAT_CONTEXTS_SOURCE_PATH":
+  # echo "Contents of $BEHAT_CONTEXTS_SOURCE_PATH": >&3
+  # ls -la "$BEHAT_CONTEXTS_SOURCE_PATH/"
+
+
+
+  cp "$GITHUB_WORKSPACE/$FEATURE_FILE" "$FEATURE_UNDER_TEST_PATH"
 
   cp "$BEHAT_YML_TEMPLATE_PATH" "$BEHAT_YML_CURRENT_TEST_PATH"
 
