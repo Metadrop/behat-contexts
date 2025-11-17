@@ -96,11 +96,14 @@ class OneTrustCookieManager implements CookieManagerInterface {
    *   The OneTrust method name to execute.
    */
   protected function executeOneTrustMethod(Session $session, string $method): void {
-    // Wait for the OneTrust global object to be defined.
-    $session->wait(10000, "typeof window.OneTrust === 'object' && window.OneTrust !== null");
-
-    // Wait for the API method to be ready and execute.
-    $session->wait(5000, "typeof window.OneTrust.{$method} === 'function'");
+    // Wait for the OneTrust API method to be ready.
+    if (!$session->wait(10000, "typeof window.OneTrust === 'object' && window.OneTrust !== null
+    && typeof window.OneTrust.{$method} === 'function'")) {
+      throw new \InvalidArgumentException(
+        "OneTrust '.{$method}()' function does not exist or has not loaded correctly."
+      );
+    }
+    // Execute OneTrust API method.
     $session->executeScript("window.OneTrust.{$method}();");
   }
 

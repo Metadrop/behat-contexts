@@ -87,11 +87,14 @@ class EUCookieComplianceCookieManager implements CookieManagerInterface {
    *   The EUCookieCompliance method name to execute.
    */
   protected function executeEUCookieComplianceMethod(Session $session, string $method): void {
-    // Wait for the Drupal global object and eu_cookie_compliance function to be defined.
-    $session->wait(10000, "typeof window.Drupal === 'object' && window.Drupal !== null && typeof window.Drupal.eu_cookie_compliance === 'function'");
-
-    // Wait for the API method to be ready and execute.
-    $session->wait(5000, "typeof window.Drupal.eu_cookie_compliance.{$method} === 'function'");
+    // Wait for the EU Cookie Compliance API method to be ready.
+    if (!$session->wait(10000, "typeof window.Drupal === 'object' && window.Drupal !== null
+    && typeof window.Drupal.eu_cookie_compliance === 'function' && typeof window.Drupal.eu_cookie_compliance.{$method} === 'function'")) {
+      throw new \InvalidArgumentException(
+        "EUCookieCompliance '.{$method}()' function does not exist or has not loaded correctly."
+      );
+    }
+    // Execute EU Cookie Compliance API method.
     $session->executeScript("window.Drupal.eu_cookie_compliance.{$method}();");
   }
 
