@@ -46,39 +46,7 @@ Each context may have its own configuration. [Here is an example](https://github
 
 ## Testing
 
-This library includes a BATS-based testing infrastructure to validate Behat context behaviors and outputs.
-
-### Running Tests Locally
-
-```bash
-# Set required environment variables
-export BEHAT_CONTEXTS_SOURCE_PATH=$(pwd)
-export GITHUB_TOKEN=your_github_token
-
-# Run tests
-./tests/run_tests_locally.sh
-```
-
-### Running Specific Tests
-
-```bash
-bats tests/contexts/cookie-compliance-context.bats
-```
-
-### CI/CD Testing
-
-Tests run automatically in GitHub Actions on:
-- Push to `main` or `dev` branches
-- Pull requests
-- Manual workflow dispatch
-
-For detailed information about the testing infrastructure, including:
-- Prerequisites and setup
-- Test structure and organization
-- How to add new tests
-- Troubleshooting guide
-
-See the **[Testing Documentation](tests/README.md)**.
+This library includes a BATS-based testing infrastructure to validate Behat context behaviors and outputs. See the **[Testing documentation](tests/README.md)** for detailed information.
 
 ## Contexts
 

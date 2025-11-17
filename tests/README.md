@@ -23,7 +23,9 @@ The tests validate that Behat contexts produce expected outputs and behaviors th
 
 ## Prerequisites
 
-### Local Development
+### Local development
+
+To run tests locally, ensure you have the following installed:
 
 - **DDEV**: [Install DDEV](https://ddev.readthedocs.io/en/stable/)
 - **BATS**: Install via your package manager
@@ -34,56 +36,55 @@ The tests validate that Behat contexts produce expected outputs and behaviors th
   # Ubuntu/Debian
   sudo apt-get install bats
   ```
-- **BATS Libraries**: Required for assertions
+- **BATS Libraries**: Required for assertions.
+
+Install via package manager. Example for Ubuntu/Debian:
   ```bash
-  # Clone to standard library path
-  sudo git clone https://github.com/bats-core/bats-support /usr/lib/bats-support
-  sudo git clone https://github.com/bats-core/bats-assert /usr/lib/bats-assert
-  sudo git clone https://github.com/bats-core/bats-file /usr/lib/bats-file
+ apt install bats-assert
+ apt install bats-file
+ apt install bats-support
   ```
+
+
 - **GitHub Token**: For composer authentication (avoids rate limiting)
 
 ### CI/CD
 
 GitHub Actions workflow automatically installs all prerequisites.
 
-## Running Tests Locally
-
-### Quick Start
-
-1. **Set required environment variables**:
-   ```bash
-   export BEHAT_CONTEXTS_SOURCE_PATH=/path/to/behat-contexts
-   export GITHUB_TOKEN=your_github_token
-   export TMP_DIR=/tmp  # Optional, defaults to /tmp
-   ```
-
-2. **Run the test script**:
-   ```bash
-   cd /path/to/behat-contexts
-   ./tests/run_tests_locally.sh
-   ```
-
-### Running Specific Tests
-
-Run individual test files directly:
+## Running tests locally
 
 ```bash
-# Set environment variables first
-export BEHAT_CONTEXTS_SOURCE_PATH=$(pwd)
-export GITHUB_TOKEN=your_token
+# Set required environment variables
+export BEHAT_CONTEXTS_SOURCE_PATH=$(pwd) # When done from the behat-contexts repo root
+export GITHUB_TOKEN=your_github_token
+export TEMP_DIR=/path/to/temp/dir #If not provided, /tmp is used.
 
-# Run specific test file
+# Run tests
+./tests/run_tests_locally.sh
+```
+
+## Running specific tests
+
+```bash
 bats tests/contexts/cookie-compliance-context.bats
 ```
 
-Run specific test by name:
+## CI/CD Testing
 
-```bash
-bats tests/contexts/cookie-compliance-context.bats --filter "CookieComplianceContext"
-```
+Tests run automatically in GitHub Actions on:
+- Push to `main` or branches starting with `tests`
+- Pull requests
+- Manual workflow dispatch
 
-### Environment Variables
+For detailed information about the testing infrastructure, including:
+- Prerequisites and setup
+- Test structure and organization
+- How to add new tests
+- Troubleshooting guide
+
+
+## Environment Variables
 
 | Variable | Required | Description | Default |
 |----------|----------|-------------|---------|
@@ -92,21 +93,6 @@ bats tests/contexts/cookie-compliance-context.bats --filter "CookieComplianceCon
 | `TMP_DIR` | No | Base directory for temporary test files | `/tmp` |
 | `BATS_LIB_PATH` | No | Path to BATS libraries | `/usr/lib` |
 
-## Running Tests in CI/CD
-
-Tests run automatically in GitHub Actions on:
-- Push to `main` or `dev` branches
-- Pull requests to `main` or `dev` branches
-- Manual workflow dispatch
-
-The workflow:
-1. Installs DDEV and BATS with all libraries
-2. Sets up DDEV with Aljibe
-3. Installs behat-contexts from source
-4. Runs BATS tests
-5. Uploads artifacts on failure
-
-See `.github/workflows/test-contexts.yml` for details.
 
 ## Test Structure
 
