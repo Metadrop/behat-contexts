@@ -560,7 +560,7 @@ class EntityContext extends RawDrupalContext {
   public function afterNodeCreate(AfterNodeCreateScope $scope) {
 
     $node = $scope->getEntity();
-    $this->nodes[] = $node->nid;
+    $this->nodes[] = $node;
   }
 
   /**
@@ -568,7 +568,7 @@ class EntityContext extends RawDrupalContext {
    */
   public function afterUserCreate(AfterUserCreateScope $scope) {
     $user = $scope->getEntity();
-    $this->users[] = $user->uid;
+    $this->users[] = $user;
   }
 
   #[\Behat\Hook\AfterScenario]
