@@ -474,8 +474,12 @@ class EntityContext extends RawDrupalContext {
       $map[$item['entity_type']][] = $item['entity_id'];
     };
 
-    $map['user'] = $this->users;
-    $map['node'] = $this->nodes;
+    $map['user'] = array_map(function ($user) {
+      return $user->uid;
+    }, $this->users);
+    $map['node'] = array_map(function ($node) {
+      return $node->nid;
+    }, $this->nodes);
 
     return $map;
   }
