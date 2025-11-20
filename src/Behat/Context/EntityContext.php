@@ -474,8 +474,12 @@ class EntityContext extends RawDrupalContext {
       $map[$item['entity_type']][] = $item['entity_id'];
     };
 
-    $map['user'] = $this->users;
-    $map['node'] = $this->nodes;
+    $map['user'] = array_map(function ($user) {
+      return $user->uid;
+    }, $this->users);
+    $map['node'] = array_map(function ($node) {
+      return $node->nid;
+    }, $this->nodes);
 
     return $map;
   }
@@ -560,7 +564,7 @@ class EntityContext extends RawDrupalContext {
   public function afterNodeCreate(AfterNodeCreateScope $scope) {
 
     $node = $scope->getEntity();
-    $this->nodes[] = $node->nid;
+    $this->nodes[] = $node;
   }
 
   /**
@@ -568,7 +572,7 @@ class EntityContext extends RawDrupalContext {
    */
   public function afterUserCreate(AfterUserCreateScope $scope) {
     $user = $scope->getEntity();
-    $this->users[] = $user->uid;
+    $this->users[] = $user;
   }
 
   #[\Behat\Hook\AfterScenario]
