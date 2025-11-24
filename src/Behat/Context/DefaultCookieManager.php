@@ -111,7 +111,7 @@ class DefaultCookieManager implements CookieManagerInterface {
    */
   public function cookiesCategoriesAcceptedStatus(Session $session): array {
     throw new \InvalidArgumentException(
-      'Category cookies acceptance status not unknowns cookie managers.'
+      'Category cookies acceptance status not available for unknown cookie managers'
     );
   }
 }
