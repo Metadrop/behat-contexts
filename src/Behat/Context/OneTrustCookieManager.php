@@ -107,4 +107,12 @@ class OneTrustCookieManager implements CookieManagerInterface {
     $session->executeScript("window.OneTrust.{$method}();");
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function cookiesCategoriesAcceptedStatus(Session $session): array {
+    throw new \InvalidArgumentException(
+      'Category cookies acceptance status not available for OneTrust cookie manager'
+    );
+  }
 }
