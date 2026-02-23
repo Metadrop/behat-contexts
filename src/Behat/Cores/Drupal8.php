@@ -70,7 +70,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function staticEntityCacheClear($entity_type_id, array $ids = NULL) {
+  public function staticEntityCacheClear($entity_type_id, ?array $ids = NULL) {
     \Drupal::entityTypeManager()->getStorage($entity_type_id)->resetCache($ids);
   }
 
@@ -583,7 +583,7 @@ class Drupal8 extends OriginalDrupal8 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function buildPath(string $path, string $langcode = NULL) {
+  public function buildPath(string $path, ?string $langcode = NULL) {
     $url_parameters = [];
     if (!empty($langcode)) {
       $language_manager = \Drupal::languageManager();

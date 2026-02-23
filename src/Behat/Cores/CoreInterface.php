@@ -51,7 +51,7 @@ interface CoreInterface {
    * @param array $ids
    *   List of ids to clear its static cache. If null, all entities are cleared.
    */
-  public function staticEntityCacheClear($entity_type_id, array $ids = NULL);
+  public function staticEntityCacheClear($entity_type_id, ?array $ids = NULL);
 
   /**
    * Run elysia cron.
@@ -398,7 +398,7 @@ interface CoreInterface {
    * @return string
    *   Relative path accesible by browser.
    */
-  public function buildPath(string $path, string $langcode = NULL);
+  public function buildPath(string $path, ?string $langcode = NULL);
 
   /**
    * Gets the request time.

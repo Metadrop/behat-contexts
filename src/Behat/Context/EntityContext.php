@@ -113,7 +113,7 @@ class EntityContext extends RawDrupalContext {
    * @param $language
    *   Language.
    */
-  protected function visitEntityPath(string $entity_type, $entity, string $subpath = NULL, $language = NULL) {
+  protected function visitEntityPath(string $entity_type, $entity, ?string $subpath = NULL, $language = NULL) {
     $path_found = $this->getCore()->buildEntityUri($entity_type, $entity, $subpath);
     if (!empty($path_found)) {
       $path = $this->getCore()->buildPath(
