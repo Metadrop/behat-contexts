@@ -38,7 +38,7 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function staticEntityCacheClear($entity_type_id, array $ids = NULL) {
+  public function staticEntityCacheClear($entity_type_id, ?array $ids = NULL) {
     entity_get_controller($entity_type_id)->resetCache($ids);
   }
 
@@ -388,7 +388,7 @@ class Drupal7 extends OriginalDrupal7 implements CoreInterface {
   /**
    * {@inheritdoc}
    */
-  public function buildPath(string $path, string $langcode = NULL) {
+  public function buildPath(string $path, ?string $langcode = NULL) {
     if (!empty($langcode)) {
       $prefix = $this->getLanguagePrefix($langcode);
       return $prefix . '/' . $path;
