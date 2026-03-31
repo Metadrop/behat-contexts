@@ -26,7 +26,7 @@ trait StateContextTrait {
    *
    * @return \Drupal\Driver\DrupalDriver
    */
-  abstract public function getDriver($name = NULL);
+  abstract public function getDriver(?string $name = null);
 
   /**
    * Get current Drupal core.
